@@ -4,13 +4,12 @@ import java.time.LocalDate;
 
 /**
  * The Goal class represents an individual goal with various attributes to track its details and progress.
- * This class provides the structure for creating, reading, and updating goals.
+ * This class provides methods for creating, reading, and updating goals.
  */
 public class Goal {
     private String title;
-
-    private String section = "general"; //default section
-    private String difficulty = "medium"; //default difficulty
+    private String section = "General"; //default section
+    private String difficulty = "Medium"; //default difficulty
     private LocalDate startDate = LocalDate.now();
     private LocalDate endDate = LocalDate.now();
 
@@ -96,5 +95,56 @@ public class Goal {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 '}';
+    }
+
+    /**
+     * Unit Testing (basically for understanding how this works but it's pretty simple tbt to 270 :) )
+     */
+    public static void main(String[] args) {
+        // Test Goal creation and attributes
+        Goal goal1 = new Goal(
+                "Read 3 books: X, Y, and Z.",
+                "Personal",
+                "Medium",
+                LocalDate.of(2025, 2, 1),
+                LocalDate.of(2025, 3, 1)
+        );
+
+        // Display goal information
+        System.out.println("Goal 1 Details:");
+        System.out.println("Title: " + goal1.getTitle());
+        System.out.println("Section: " + goal1.getSection());
+        System.out.println("Difficulty: " + goal1.getDifficulty());
+        System.out.println("Start Date: " + goal1.getStartDate());
+        System.out.println("End Date: " + goal1.getEndDate());
+
+        // Test updating section
+        goal1.setSection("Learning");
+        System.out.println("\nAfter Section Update:");
+        System.out.println("Section: " + goal1.getSection());
+
+        // Test goal's toString method
+        System.out.println("\nGoal 1 toString():");
+        System.out.println(goal1.toString());
+
+        // Test Goal with different attributes (different constructor)
+        Goal goal2 = new Goal(
+                "Run a Marathon",
+                LocalDate.of(2025, 3, 1),
+                LocalDate.of(2025, 11, 1)
+        );
+
+        // Display goal information (with default values)
+        System.out.println("\nGoal 2 Details:");
+        System.out.println("Title: " + goal2.getTitle());
+        System.out.println("Section: " + goal2.getSection());
+        System.out.println("Difficulty: " + goal2.getDifficulty());
+        System.out.println("Start Date: " + goal2.getStartDate());
+        System.out.println("End Date: " + goal2.getEndDate());
+
+
+        // Test toString() method
+        System.out.println("\nGoal 2 toString():");
+        System.out.println(goal2.toString());
     }
 }
