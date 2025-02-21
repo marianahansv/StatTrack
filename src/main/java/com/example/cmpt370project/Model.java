@@ -5,6 +5,7 @@ import java.util.List;
 /**
  * Model in the MVC Structure, holds all the DATA OF THE APPLICATION and PROVIDES METHODS TO OPERATE ON THIS DATA.
  * We may consider having multiple models to separate areas of data in our application (i.e. Goal Model, Plan Model, etc.)
+ *
  */
 
 // TODO: At some point in our application, we need to look at how we will store this data to JSON before app close or
