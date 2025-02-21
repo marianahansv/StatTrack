@@ -13,12 +13,11 @@ import java.util.List;
  * serialization (storage) of Goals.
  */
 public class GoalModel {
-    private HashMap<String, Goal> goals; // I went with a dictionary for faster and easier lookup
     private static final String FILE_NAME = "goals_data.json";
-
+    private HashMap<String, Goal> goals; // I went with a dictionary for faster and easier lookup
     public GoalModel(){
         goals = new HashMap<>();
-        //load_goals_from_file();
+        load_goals_from_file();
     }
     /**
      * Create a new goal and add it to the dictionary.
@@ -54,18 +53,16 @@ public class GoalModel {
         }
         return false;
     }
-
     /**
      * @return list of all goals. (I'm thinking of future sorting/filtering operations for which we'll need a list)
      */
     public List<Goal> listGoals(){
         return new ArrayList<>(goals.values());
     }
-
     /**
      * Save goals to file (in JSON format).
      */
-    private void save_goals_to_file() {
+    public void save_goals_to_file() {
         try (Writer writer = new FileWriter(FILE_NAME)) {
             Gson gson = new Gson();
             gson.toJson(goals.values(), writer);
@@ -73,5 +70,24 @@ public class GoalModel {
             System.err.println("Error saving goals to file: " + e.getMessage());
         }
     }
+    /**
+     * Load goals from file (in JSON format).
+     */
+    public void load_goals_from_file() {
+        try (Reader reader = new FileReader(FILE_NAME)){
+            Gson gson = new Gson();
+            Goal[] goalListFromJson = gson.fromJson(reader,Goal[].class);
+            if (goalListFromJson != null){
+                for (Goal goal: goalListFromJson){
+                    //add goals to the dictionary :)
+                    goals.put(goal.getTitle(),goal);
+                }
+            }
+        }
+        catch (IOException e){
+            System.err.println("Error loading goals from file: " + e.getMessage());
+        }
+    }
+    
 
 }
