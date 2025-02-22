@@ -11,8 +11,7 @@ import javafx.scene.layout.VBox;
  */
 public class View extends StackPane implements Subscriber {
 
-    private Model m;
-
+    private GoalModel gm;
     /**
      * The "Add Goal" Button.
      */
@@ -52,8 +51,8 @@ public class View extends StackPane implements Subscriber {
         this.getChildren().add(root);
     }
 
-    public void setModel(Model m) {
-        this.m = m;
+    public void setModel(GoalModel goalModel) {
+        this.gm = goalModel;
     }
 
     /**
@@ -81,6 +80,6 @@ public class View extends StackPane implements Subscriber {
      */
     public void update() {
         // Update the label to show the new goal list
-        l.setText("My Goals: " + m.getGoals());
+        l.setText("My Goals: " + gm.getGoals());
     }
 }

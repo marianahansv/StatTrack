@@ -10,7 +10,7 @@ public class MainUI extends StackPane {
     public MainUI() {
 
         // Create MVC components
-        Model m = new Model();
+        GoalModel m = new GoalModel();
         Controller c = new Controller();
         View v = new View();
 

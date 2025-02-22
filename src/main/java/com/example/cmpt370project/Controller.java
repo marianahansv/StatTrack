@@ -2,21 +2,24 @@ package com.example.cmpt370project;
 
 import javafx.event.ActionEvent;
 
+import java.time.LocalDate;
+import java.util.Random;
+
 /**
  * Handles changing model according to the users actions. Only calls model using its public API!
  * (i.e. call Model methods INSTEAD OF ITS ATTRIBUTES DIRECTLY as will likely miss notifying subscribers when needed.)
  */
 public class Controller {
 
-    private Model m;
+    private GoalModel gm;
 
     // Could consider adding states for a state machine if that comes up later, depending on what our application requires...
     // (i.e. if there are different interaction states for a single view...)
 
     public Controller() {}
 
-    public void setModel(Model m) {
-        this.m = m;
+    public void setModel(GoalModel goalModel) {
+        this.gm = goalModel;
     }
 
     /**
@@ -24,7 +27,8 @@ public class Controller {
      * @param actionEvent the event that happens when the button is pressed.
      */
     public void handleButtonPress(ActionEvent actionEvent) {
-        m.addGoal("Goal #" + m.getGoalCount());
+        Goal newGoal = new Goal("Goal #" + gm.getGoalCount(), LocalDate.now(), LocalDate.now().plusDays(3));
+        gm.addGoal(newGoal);
     }
 
     /**
@@ -32,6 +36,6 @@ public class Controller {
      * @param actionEvent the event that happens when the button is pressed.
      */
     public void removeButtonPress(ActionEvent actionEvent) {
-        m.clearGoals();
+        gm.clearGoals();
     }
 }

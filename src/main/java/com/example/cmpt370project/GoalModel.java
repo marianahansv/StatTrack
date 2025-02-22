@@ -199,4 +199,5 @@ public class GoalModel {
             System.out.println(goal.toString());
         }
     }
+
 }
