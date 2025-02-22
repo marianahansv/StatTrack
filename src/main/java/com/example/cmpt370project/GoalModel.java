@@ -28,17 +28,37 @@ public class GoalModel {
             LocalDate.parse(json.getAsJsonPrimitive().getAsString(), format)).create(); //basically this is saying...
             //when saving a LocalDate, convert it to a string ("2025-02-21") and when loading a LocalDate, read the string and convert it back
 
+    /**
+     * The subscriber list (i.e. the view), which will update when the view changes.
+     */
+    private List<Subscriber> subscribers;
+
     public GoalModel(){
         goals = new HashMap<>();
+        subscribers = new ArrayList<Subscriber>();
         load_goals_from_file();
     }
+
+    public void addSubscriber(Subscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
     /**
      * Create a new goal and add it to the dictionary.
      */
     public void addGoal(Goal newGoal){
         goals.put(newGoal.getTitle(),newGoal);
         save_goals_to_file();
+        notifySubscribers();
     }
+    /**
+     * Empties the goal dictionary.
+     */
+    public void clearGoals() {
+        goals.clear();
+        notifySubscribers();
+    }
+
     /**
      * Update an existing goal by replacing the goal with the same title.
      * @param title The title of the goal to update.
@@ -69,8 +89,16 @@ public class GoalModel {
     /**
      * @return list of all goals. (I'm thinking of future sorting/filtering operations for which we'll need a list)
      */
-    public List<Goal> listGoals(){
+    public List<Goal> getGoals(){
         return new ArrayList<>(goals.values());
+    }
+
+    /**
+     * Return the number of goals.
+     * @return number of goals
+     */
+    public int getGoalCount() {
+        return goals.size();
     }
 
     /**
@@ -127,6 +155,13 @@ public class GoalModel {
         }
     }
 
+    /**
+     * Notify th subscribers of this model that the data has changed.
+     */
+    public void notifySubscribers() {
+        subscribers.forEach(Subscriber::modelUpdated);
+    }
+
     // Unit Testing :)
     public static void main(String[] args) {
         GoalModel model = new GoalModel();
@@ -141,7 +176,7 @@ public class GoalModel {
 
         //list all goals
         System.out.println("Goals:");
-        for (Goal goal : model.listGoals()) {
+        for (Goal goal : model.getGoals()) {
             System.out.println(goal);
         }
 
@@ -149,7 +184,7 @@ public class GoalModel {
         model.deleteGoal("Run a marathon");
         // list goals again to see if the goal is deleted
         System.out.println("\nGoals after deletion:");
-        for (Goal goal : model.listGoals()) {
+        for (Goal goal : model.getGoals()) {
             System.out.println(goal);
         }
 
@@ -160,7 +195,7 @@ public class GoalModel {
         //test save_to_file and load_from_file (saving should have happened when adding/updating goals)
         System.out.println("Goals loaded from file:");
         GoalModel emptyModel = new GoalModel();
-        for (Goal goal: emptyModel.listGoals()) {
+        for (Goal goal: emptyModel.getGoals()) {
             System.out.println(goal.toString());
         }
     }
