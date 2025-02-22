@@ -19,10 +19,10 @@ public class GoalApplication extends Application {
         // Pass to the scene of the application
         // (JavaFX application is composed of a Stage with a Scene, which holds all your UI elements)
         // 400 x 400 is the default size of the window.
-        Scene scene = new Scene(root, 400, 400);
+        Scene scene = new Scene(root, 1000, 600);
 
         // Set the title of the window when it comes up
-        stage.setTitle("CMPT 370 Testing Ground");
+        stage.setTitle("Goal Tracker");
 
         // Set the scene to the stage and show it!
         stage.setScene(scene);

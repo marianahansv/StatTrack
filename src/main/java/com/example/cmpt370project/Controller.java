@@ -3,14 +3,12 @@ package com.example.cmpt370project;
 import javafx.event.ActionEvent;
 
 import java.time.LocalDate;
-import java.util.Random;
 
 /**
  * Handles changing model according to the users actions. Only calls model using its public API!
  * (i.e. call Model methods INSTEAD OF ITS ATTRIBUTES DIRECTLY as will likely miss notifying subscribers when needed.)
  */
 public class Controller {
-
     private GoalModel gm;
 
     // Could consider adding states for a state machine if that comes up later, depending on what our application requires...

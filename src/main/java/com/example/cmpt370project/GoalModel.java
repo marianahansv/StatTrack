@@ -56,6 +56,7 @@ public class GoalModel {
      */
     public void clearGoals() {
         goals.clear();
+        save_goals_to_file();
         notifySubscribers();
     }
 

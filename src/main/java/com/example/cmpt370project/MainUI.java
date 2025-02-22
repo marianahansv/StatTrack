@@ -29,7 +29,6 @@ public class MainUI extends StackPane {
         // (i.e. for event handling, the view essentially hands over the events when they happen to the controller)
         v.setModel(m);
         v.setupEvents(c);
-
         // Add view to this MainUI StackPane so it can be shown in the window (it is the UI after all...)
         this.getChildren().addAll(v);
     }

@@ -10,22 +10,12 @@ import javafx.scene.layout.VBox;
  * Different views for different pages allows management of which views to show based on the current state of the application.
  */
 public class View extends StackPane implements Subscriber {
-
     private GoalModel gm;
-    /**
-     * The "Add Goal" Button.
-     */
     private Button addGoalButton;
 
-    /**
-     * The "Clear Goals" Button.
-     */
     private Button removeGoalButton;
 
-    /**
-     * Label to display goals.
-     */
-    private Label l;
+    private Label displayGoalsLabel;
 
     // When importing classes, MAKE SURE IT IS FROM FX, NOT JAVA AWT LIBRARY!
 
@@ -33,7 +23,6 @@ public class View extends StackPane implements Subscriber {
      * Initially constructs the UI (prior to any model changes).
      */
     public View() {
-
         // We use a VBox as a container to put the elements in a vertical structure
         VBox root = new VBox();
 
@@ -44,15 +33,16 @@ public class View extends StackPane implements Subscriber {
         // Make the UI components
         addGoalButton = new Button("Add Goal");
         removeGoalButton = new Button("Clear Goals");
-        l = new Label("My Goals: ");
+        displayGoalsLabel = new Label("My Goals: ");
 
         // Add the UI components to the VBox, and add the VBox to this view.
-        root.getChildren().addAll(l, addGoalButton, removeGoalButton);
+        root.getChildren().addAll(displayGoalsLabel, addGoalButton, removeGoalButton);
         this.getChildren().add(root);
     }
 
     public void setModel(GoalModel goalModel) {
         this.gm = goalModel;
+        update();
     }
 
     /**
@@ -80,6 +70,6 @@ public class View extends StackPane implements Subscriber {
      */
     public void update() {
         // Update the label to show the new goal list
-        l.setText("My Goals: " + gm.getGoals());
+        displayGoalsLabel.setText("My Goals: " + gm.getGoals());
     }
 }
