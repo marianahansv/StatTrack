@@ -12,7 +12,7 @@ public class MainUI extends StackPane {
         // Create MVC components
         GoalModel m = new GoalModel();
         Controller c = new Controller();
-        View v = new View();
+        DashboardView v = new DashboardView();
 
         // Connect MVC Components
 
