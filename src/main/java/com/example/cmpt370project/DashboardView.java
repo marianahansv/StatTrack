@@ -9,40 +9,45 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-/**
- * A dashboard view that displays the goals in a central List View
- * has a sidebar for navigation, and a footer with control buttons.
- */
 public class DashboardView extends BorderPane implements Subscriber {
     private GoalModel gm;
+
+    // buttons
+    private Button homeButton;
+    private Button goalsButton;
     private Button addGoalButton;
     private Button removeGoalButton;
+
+    // pages (for the center region)
+    private VBox homePage;
+    private VBox goalsPage;
+
+    // goals UI
     private ListView<String> goalListView;
 
-    // man this dashboard silly af
     public DashboardView() {
-        // left sidebar
+        // --- header ---
+        HBox header = new HBox(new Label("Goal Tracker Dashboard"));
+        header.setAlignment(Pos.CENTER);
+        header.setStyle("-fx-background-color: lightblue; -fx-padding: 5px;");
+        this.setTop(header);
+
+        // --- sidebar ---
         VBox sidebar = new VBox();
         sidebar.setSpacing(10);
         sidebar.setAlignment(Pos.CENTER);
-        Button homeButton = new Button("Home");
-        Button GoalsButton = new Button("Goals");
-        sidebar.getChildren().addAll(homeButton, GoalsButton);
+        homeButton = new Button("Home");
+        goalsButton = new Button("Goals");
+        sidebar.getChildren().addAll(homeButton, goalsButton);
         sidebar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;");
         this.setLeft(sidebar);
 
-        // main content area
-        VBox mainContent = new VBox();
-        mainContent.setSpacing(10);
-        mainContent.setAlignment(Pos.TOP_CENTER);
-        Label goalsLabel = new Label("My Goals:");
-        goalListView = new ListView<>();
-        mainContent.setSpacing(5);
-        mainContent.setPadding(new Insets(10, 10, 10, 10));
-        mainContent.getChildren().addAll(goalsLabel, goalListView);
-        this.setCenter(mainContent);
+        // --- center ---
+        createHomePage();
+        createGoalsPage();
+        this.setCenter(homePage);
 
-        // footer
+        // --- footer ---
         HBox footer = new HBox();
         footer.setSpacing(20);
         footer.setAlignment(Pos.CENTER);
@@ -51,6 +56,36 @@ public class DashboardView extends BorderPane implements Subscriber {
         footer.getChildren().addAll(addGoalButton, removeGoalButton);
         footer.setStyle("-fx-background-color: lightgray; -fx-padding: 10px;");
         this.setBottom(footer);
+
+        homeButton.setOnAction(e -> this.setCenter(homePage));
+        goalsButton.setOnAction(e -> this.setCenter(goalsPage));
+    }
+
+    /**
+     * Creates a simple Home page (blank for now).
+     */
+    private void createHomePage() {
+        homePage = new VBox();
+        homePage.setAlignment(Pos.CENTER);
+        homePage.setSpacing(10);
+        homePage.setPadding(new Insets(10));
+
+        Label welcomeLabel = new Label("Welcome to the Home Page!");
+        homePage.getChildren().add(welcomeLabel);
+    }
+
+    /**
+     * Creates the Goals page with a ListView of goals.
+     */
+    private void createGoalsPage() {
+        goalsPage = new VBox();
+        goalsPage.setAlignment(Pos.TOP_CENTER);
+        goalsPage.setSpacing(5);
+        goalsPage.setPadding(new Insets(10));
+
+        Label goalsLabel = new Label("My Goals:");
+        goalListView = new ListView<>();
+        goalsPage.getChildren().addAll(goalsLabel, goalListView);
     }
 
     public void setModel(GoalModel goalModel) {
@@ -69,9 +104,11 @@ public class DashboardView extends BorderPane implements Subscriber {
     }
 
     /**
-     * Update the List View with the current list of goals from the model.
+     * Updates the ListView of goals on the Goals page.
      */
-    public void update() {
+    private void update() {
+        if (gm == null) return;
+
         goalListView.getItems().clear();
         for (Goal goal : gm.getGoals()) {
             goalListView.getItems().add(goal.toString());
