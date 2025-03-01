@@ -3,7 +3,7 @@ package com.example.cmpt370project;
 /**
  * Represents a goal plan where the user's goal is to increase the number of goals they complete.
  */
-public class IncreaseGoalPlan implements GoalPlan{
+public class IncreaseGoalPlan implements IGoalPlan {
 
     /**
      * The current number of goals the user is to be completing.
@@ -57,5 +57,12 @@ public class IncreaseGoalPlan implements GoalPlan{
     @Override
     public boolean canEditMax() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Goal Plan Type: " + getClass().getSimpleName() +
+                " Current Goal Number: " + currentGoalNumber +
+                " Max Goal Number: " + maxGoalNumber;
     }
 }

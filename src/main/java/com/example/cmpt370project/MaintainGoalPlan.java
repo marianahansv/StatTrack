@@ -3,7 +3,7 @@ package com.example.cmpt370project;
 /**
  * Represents a goal plan where the user's goal is to maintain a consistent number of goals.
  */
-public class MaintainGoalPlan implements GoalPlan {
+public class MaintainGoalPlan implements IGoalPlan {
 
     /**
      * The number of goals the user wants to be complete on the regular.
@@ -28,7 +28,6 @@ public class MaintainGoalPlan implements GoalPlan {
         return goalMaintenanceNumber;
     }
 
-
     @Override
     public int getGoalPlanMax() {
         return goalMaintenanceNumber;
@@ -39,7 +38,6 @@ public class MaintainGoalPlan implements GoalPlan {
         this.goalMaintenanceNumber = goalPlanCurrent;
     }
 
-    // Probably should change the top class to abstract class that does these methods and attributes
     @Override
     public void setGoalPlanMax(int goalPlanMax) throws UnsupportedOperationException {
             throw new UnsupportedOperationException("You can not change the maximum goal number for this goal plan.");
@@ -48,5 +46,11 @@ public class MaintainGoalPlan implements GoalPlan {
     @Override
     public boolean canEditMax() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Goal Plan Type: " + getClass().getSimpleName() +
+                " Goals to Maintain: " + goalMaintenanceNumber;
     }
 }
