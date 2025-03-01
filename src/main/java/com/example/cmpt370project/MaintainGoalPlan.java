@@ -39,6 +39,12 @@ public class MaintainGoalPlan implements GoalPlan {
         this.goalMaintenanceNumber = goalPlanCurrent;
     }
 
+    // Probably should change the top class to abstract class that does these methods and attributes
+    @Override
+    public void setGoalPlanMax(int goalPlanMax) throws UnsupportedOperationException {
+            throw new UnsupportedOperationException("You can not change the maximum goal number for this goal plan.");
+    }
+
     @Override
     public boolean canEditMax() {
         return false;

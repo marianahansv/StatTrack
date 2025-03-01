@@ -46,15 +46,16 @@ public class IncreaseGoalPlan implements GoalPlan{
     }
 
     @Override
-    public boolean canEditMax() {
-        return true;
+    public void setGoalPlanMax(int goalPlanMax) throws UnsupportedOperationException {
+        if (canEditMax()) {
+            this.maxGoalNumber = goalPlanMax;
+        } else {
+            throw new UnsupportedOperationException("You can not change the maximum goal number for this goal plan.");
+        }
     }
 
-    /**
-     * Set the goals the user want to get to maintaining.
-     * @param maxGoalNumber the number of goals the user want to get to maintaining.
-     */
-    public void setMaxGoalNumber(int maxGoalNumber) {
-        this.maxGoalNumber = maxGoalNumber;
+    @Override
+    public boolean canEditMax() {
+        return true;
     }
 }

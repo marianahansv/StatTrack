@@ -9,6 +9,7 @@ public interface GoalPlan {
     int getGoalPlanCurrent();
     int getGoalPlanMax();
     void setGoalPlanCurrent(int goalPlanCurrent);
+    void setGoalPlanMax(int goalPlanMax) throws UnsupportedOperationException ;
     boolean canEditMax();
 
 }
