@@ -2,7 +2,8 @@ package com.example.cmpt370project;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.chart.PieChart;
+import javafx.scene.chart.*;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -10,34 +11,100 @@ import java.util.List;
 
 public class GoalProgress extends VBox {
     private GoalModel goalModel;
+    private ChoiceBox<String> chartTypeSelector;
     private PieChart pieChart;
+    private BarChart<String, Number> barChart;
+    private LineChart<String, Number> lineChart;
 
     public GoalProgress(GoalModel goalModel) {
         this.goalModel = goalModel;
+        setupChartSelector();
         setupChart();
-        updateChart();
+        updateChart();  // Initialize with data
+    }
+
+    private void setupChartSelector() {
+        chartTypeSelector = new ChoiceBox<>();
+        chartTypeSelector.getItems().addAll("Pie Chart", "Bar Chart", "Line Chart"); // Types of visualization
+        chartTypeSelector.setValue("Pie Chart"); // Defaulting to pie chart bc they are more epic
+
+        chartTypeSelector.setOnAction(e -> updateChart());
+        getChildren().add(chartTypeSelector);
     }
 
     private void setupChart() {
         pieChart = new PieChart();
         pieChart.setTitle("Time Remaining");
-        getChildren().add(pieChart);
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Time Remaining");
+
+        NumberAxis yAxisLine = new NumberAxis();
+        lineChart = new LineChart<>(xAxis, yAxisLine);
+        lineChart.setTitle("Time Remaining");
     }
 
-    public void updateChart() {
+    public void updateChart() { // Updates the chart type that needs to be updated
+        getChildren().removeIf(node -> node instanceof Chart); // Remove prior chart s new chart can be reborn
+        String selectedChart = chartTypeSelector.getValue();
+
+        if (selectedChart.equals("Pie Chart")) {
+            updatePieChart();
+            getChildren().add(pieChart);
+        } else if (selectedChart.equals("Bar Chart")) {
+            updateBarChart();
+            getChildren().add(barChart);
+        } else if (selectedChart.equals("Line Chart")) {
+            updateLineChart();
+            getChildren().add(lineChart);
+        }
+    }
+
+    private void updatePieChart() {
         pieChart.getData().clear();
         List<Goal> goals = goalModel.getGoals();
         ObservableList<PieChart.Data> chartData = FXCollections.observableArrayList();
 
         for (Goal goal : goals) {
-            long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
             long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
-            if (daysLeft < 0) daysLeft = 0;  // Avoid negative values if the goal is past due
-
+            if (daysLeft < 0) daysLeft = 0;
             chartData.add(new PieChart.Data(goal.getTitle(), daysLeft));
         }
 
         pieChart.setData(chartData);
+    }
+
+    private void updateBarChart() {
+        barChart.getData().clear();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Days Left");
+
+        for (Goal goal : goalModel.getGoals()) {
+            long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
+            if (daysLeft < 0) daysLeft = 0;
+            series.getData().add(new XYChart.Data<>(goal.getTitle(), daysLeft));
+        }
+
+        barChart.getData().add(series);
+    }
+
+    private void updateLineChart() {
+        lineChart.getData().clear();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Goal Progress");
+
+        for (Goal goal : goalModel.getGoals()) {
+            long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
+            long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
+            if (daysLeft < 0) daysLeft = 0;
+
+            series.getData().add(new XYChart.Data<>(goal.getStartDate().toString(), totalDays));
+            series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), daysLeft));
+        }
+
+        lineChart.getData().add(series);
     }
 }
 
