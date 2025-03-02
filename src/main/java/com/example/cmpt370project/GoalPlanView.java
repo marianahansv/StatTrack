@@ -15,11 +15,16 @@ public class GoalPlanView extends StackPane implements Subscriber {
      * The goal plan model that this view gets goal data from.
      */
     private GoalPlanModel goalPlanModel;
+    
+    /**
+     * Chart for visualizing goal progress.
+     */
+    private GoalProgress goalChartView;
 
     /**
      * Create a new goal plan page.
      */
-    public GoalPlanView() {
+    public GoalPlanView(GoalModel goalModel) {
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
@@ -27,6 +32,9 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
         Label welcomeLabel = new Label("Welcome to the Goal Plan Page!");
         root.getChildren().add(welcomeLabel);
+
+        goalChartView = new GoalProgress(goalModel);
+        root.getChildren().add(goalChartView);
 
         this.getChildren().add(root);
     }
@@ -36,6 +44,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
      */
     private void drawView() {
         // Add here later...
+        goalChartView.updateChart();
     }
 
     /**

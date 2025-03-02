@@ -12,9 +12,11 @@ import java.io.IOException;
 public class GoalApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        
+        GoalModel goalModel = new GoalModel();
 
         // Instantiate the main UI (DashboardView class, which sets up MVC and basic UI)
-        DashboardView root = new DashboardView();
+        DashboardView root = new DashboardView(goalModel);
 
         // Pass to the scene of the application
         Scene scene = new Scene(root, 1000, 600);

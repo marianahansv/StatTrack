@@ -13,6 +13,9 @@ import javafx.scene.layout.VBox;
  */
 public class DashboardView extends BorderPane {
 
+    private GoalProgress goalChartView;
+    private GoalChartController chartController;
+
     // ************************* APPLICATION MODELS *************************
     /**
      * The model that holds the goal data of the application.
@@ -70,7 +73,16 @@ public class DashboardView extends BorderPane {
     /**
      * Construct the dashboard view and MVC structure of the application.
      */
-    public DashboardView() {
+    public DashboardView(GoalModel goalModel) {
+
+        
+        
+        this.goalModel = goalModel;
+
+        goalChartView = new GoalProgress(goalModel);
+        chartController = new GoalChartController(goalChartView, goalModel);
+
+        setCenter(goalChartView);
 
         // ************************* MVC CONFIGURATION *************************
 
@@ -86,7 +98,7 @@ public class DashboardView extends BorderPane {
         // VIEWS
         this.homePage = new HomeView();
         this.goalsPage = new GoalView();
-        this.goalPlanPage = new GoalPlanView();
+        this.goalPlanPage = new GoalPlanView(goalModel);
 
         // ********* 2. Add subscribers to models *********
 
