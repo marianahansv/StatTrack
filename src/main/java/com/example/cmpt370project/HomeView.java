@@ -62,7 +62,7 @@ public class HomeView extends StackPane implements Subscriber {
      */
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
-        drawView();
+        modelUpdated();
     }
 
     @Override
@@ -74,9 +74,9 @@ public class HomeView extends StackPane implements Subscriber {
      * Set up interaction with a controller for this view.
      * @param c the controller that will handle changing model data for user interactions on this page.
      */
-    public void setupEvents(Controller c) {
+    public void setupEvents(HomeController c) {
 
-        // Right now wew have this Controller class just named generally, I think we should rename so its specific to
+        // Right now wew have this HomeController class just named generally, I think we should rename so its specific to
         // the home page. (other views get other controllers)
 
         addGoalButton.setOnAction(c::handleButtonPress);
