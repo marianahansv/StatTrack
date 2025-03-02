@@ -13,8 +13,8 @@ public class GoalApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        // Instantiate the MainUI (see MainUI class, which sets up MVC)
-        MainUI root = new MainUI();
+        // Instantiate the main UI (DashboardView class, which sets up MVC and basic UI)
+        DashboardView root = new DashboardView();
 
         // Pass to the scene of the application
         // (JavaFX application is composed of a Stage with a Scene, which holds all your UI elements)

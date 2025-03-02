@@ -7,25 +7,57 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class DashboardView extends BorderPane implements Subscriber {
-    private GoalModel gm;
 
-    // buttons
-    private Button homeButton;
-    private Button goalsButton;
-    private Button addGoalButton;
-    private Button removeGoalButton;
+public class DashboardView extends BorderPane {
+    private GoalModel goalModel;
+    private GoalPlanModel goalPlanModel;
+
+    private Controller controller;
 
     // pages (for the center region)
-    private VBox homePage;
-    private VBox goalsPage;
+    private HomeView homePage;
+    private GoalView goalsPage;
+    private GoalPlanView goalPlanPage;
 
-    // goals UI
-    private ListView<String> goalListView;
+    // Ui Elements for switching between views (should not adjust models)
+    private Button homeButton;
+    private Button goalsButton;
+    private Button goalPlanButton;
 
     public DashboardView() {
+
+        // Create MVC components
+        goalModel = new GoalModel();
+        goalPlanModel = new GoalPlanModel();
+        controller = new Controller();
+
+        // create the pages
+        this.homePage = new HomeView();
+        this.goalsPage = new GoalView();
+        this.goalPlanPage = new GoalPlanView();
+
+        goalPlanModel.addSubscriber(goalPlanPage);
+
+        goalModel.addSubscriber(goalsPage);
+        goalModel.addSubscriber(homePage);
+
+        homePage.setupEvents(controller);
+
+        // change this later
+        controller.setModel(goalModel);
+
+        goalPlanPage.setGpModel(goalPlanModel);
+        goalsPage.setModel(goalModel);
+        homePage.setModel(goalModel);
+
+        // set up this view
+        setupDashboardViewUI();
+    }
+
+    private void setupDashboardViewUI() {
         // --- header ---
         HBox header = new HBox(new Label("Goal Tracker Dashboard"));
         header.setAlignment(Pos.CENTER);
@@ -38,80 +70,23 @@ public class DashboardView extends BorderPane implements Subscriber {
         sidebar.setAlignment(Pos.CENTER);
         homeButton = new Button("Home");
         goalsButton = new Button("Goals");
-        sidebar.getChildren().addAll(homeButton, goalsButton);
+        goalPlanButton = new Button("Goal Plan");
+        sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton);
         sidebar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;");
         this.setLeft(sidebar);
 
         // --- center ---
-        createHomePage();
-        createGoalsPage();
         this.setCenter(homePage);
 
         // --- footer ---
         HBox footer = new HBox();
         footer.setSpacing(20);
         footer.setAlignment(Pos.CENTER);
-        addGoalButton = new Button("Add Goal");
-        removeGoalButton = new Button("Clear Goals");
-        footer.getChildren().addAll(addGoalButton, removeGoalButton);
         footer.setStyle("-fx-background-color: lightgray; -fx-padding: 10px;");
         this.setBottom(footer);
 
         homeButton.setOnAction(e -> this.setCenter(homePage));
         goalsButton.setOnAction(e -> this.setCenter(goalsPage));
-    }
-
-    /**
-     * Creates a simple Home page (blank for now).
-     */
-    private void createHomePage() {
-        homePage = new VBox();
-        homePage.setAlignment(Pos.CENTER);
-        homePage.setSpacing(10);
-        homePage.setPadding(new Insets(10));
-
-        Label welcomeLabel = new Label("Welcome to the Home Page!");
-        homePage.getChildren().add(welcomeLabel);
-    }
-
-    /**
-     * Creates the Goals page with a ListView of goals.
-     */
-    private void createGoalsPage() {
-        goalsPage = new VBox();
-        goalsPage.setAlignment(Pos.TOP_CENTER);
-        goalsPage.setSpacing(5);
-        goalsPage.setPadding(new Insets(10));
-
-        Label goalsLabel = new Label("My Goals:");
-        goalListView = new ListView<>();
-        goalsPage.getChildren().addAll(goalsLabel, goalListView);
-    }
-
-    public void setModel(GoalModel goalModel) {
-        this.gm = goalModel;
-        update();
-    }
-
-    public void setupEvents(Controller c) {
-        addGoalButton.setOnAction(c::handleButtonPress);
-        removeGoalButton.setOnAction(c::removeButtonPress);
-    }
-
-    @Override
-    public void modelUpdated() {
-        update();
-    }
-
-    /**
-     * Updates the ListView of goals on the Goals page.
-     */
-    private void update() {
-        if (gm == null) return;
-
-        goalListView.getItems().clear();
-        for (Goal goal : gm.getGoals()) {
-            goalListView.getItems().add(goal.toString());
-        }
+        goalPlanButton.setOnAction(e -> this.setCenter(goalPlanPage));
     }
 }
