@@ -1,62 +1,135 @@
 package com.example.cmpt370project;
 
-import javafx.geometry.Insets;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-
+/**
+ * Represents the base UI of the application that holds different views and sets up the MVC structure.
+ */
 public class DashboardView extends BorderPane {
+
+    // ************************* APPLICATION MODELS *************************
+    /**
+     * The model that holds the goal data of the application.
+     */
     private GoalModel goalModel;
+
+    /**
+     * The model that holds the goal plan data of the application.
+     */
     private GoalPlanModel goalPlanModel;
 
-    private Controller controller;
+    // ************************* APPLICATION CONTROLLERS *************************
 
-    // pages (for the center region)
+    /**
+     * The controller of this application.
+     */
+    private Controller controller; // We can add/rename this one later if we want to have diff controllers for each view.
+
+    // ************************* APPLICATION VIEWS *************************
+
+    /**
+     * The homepage of the application.
+     */
     private HomeView homePage;
+
+    /**
+     * The goals page of the application.
+     */
     private GoalView goalsPage;
+
+    /**
+     * The goal plan page of the application.
+     */
     private GoalPlanView goalPlanPage;
 
-    // Ui Elements for switching between views (should not adjust models)
+    // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
+
+    // UI elements here should not make any major changes to the models, they should only be for aesthetic or page changes
+
+    /**
+     * The button for going to the homepage.
+     */
     private Button homeButton;
+
+    /**
+     * The button for going to the goals page.
+     */
     private Button goalsButton;
+
+    /**
+     * The button for going to the goal plan page.
+     */
     private Button goalPlanButton;
 
+    /**
+     * Construct the dashboard view and MVC structure of the application.
+     */
     public DashboardView() {
 
-        // Create MVC components
+        // ************************* MVC CONFIGURATION *************************
+
+        // ********* 1. Create all the MVC components *********
+
+        // MODElS
         goalModel = new GoalModel();
         goalPlanModel = new GoalPlanModel();
+
+        // CONTROLLERS
         controller = new Controller();
 
-        // create the pages
+        // VIEWS
         this.homePage = new HomeView();
         this.goalsPage = new GoalView();
         this.goalPlanPage = new GoalPlanView();
 
-        goalPlanModel.addSubscriber(goalPlanPage);
+        // ********* 2. Add subscribers to models *********
 
+        // GOAL MODEL SUBS
         goalModel.addSubscriber(goalsPage);
         goalModel.addSubscriber(homePage);
 
+        // GOAL PLAN MODEL SUBS
+        goalPlanModel.addSubscriber(goalPlanPage);
+
+        // ********* 3. Setup controller with each view *********
+
+        // HOMEPAGE CONTROLLER
         homePage.setupEvents(controller);
 
-        // change this later
+        // GOAL PAGE CONTROLLER
+
+        // GOAL PLAN PAGE CONTROLLER
+
+        // ********* 4. Set models of each controller *********
+
+        // SET HOME PAGE CONTROLLER MODEL
         controller.setModel(goalModel);
 
-        goalPlanPage.setGpModel(goalPlanModel);
-        goalsPage.setModel(goalModel);
-        homePage.setModel(goalModel);
+        // ********* 5. Set the required models of each view *********
+        goalPlanPage.setGoalPlanModel(goalPlanModel);
+        goalsPage.setGoalModel(goalModel);
+        homePage.setGoalModel(goalModel);
 
-        // set up this view
+        // ************************* END MVC CONFIGURATION *************************
+
+        // Set up the UI components of the dashboard
         setupDashboardViewUI();
+
+        // Set up page change interactions on button press
+        homeButton.setOnAction(e -> this.setCenter(homePage));
+        goalsButton.setOnAction(e -> this.setCenter(goalsPage));
+        goalPlanButton.setOnAction(e -> this.setCenter(goalPlanPage));
     }
 
+    /**
+     * Configures the basic UI components for the dashboard.
+     */
     private void setupDashboardViewUI() {
         // --- header ---
         HBox header = new HBox(new Label("Goal Tracker Dashboard"));
@@ -84,9 +157,5 @@ public class DashboardView extends BorderPane {
         footer.setAlignment(Pos.CENTER);
         footer.setStyle("-fx-background-color: lightgray; -fx-padding: 10px;");
         this.setBottom(footer);
-
-        homeButton.setOnAction(e -> this.setCenter(homePage));
-        goalsButton.setOnAction(e -> this.setCenter(goalsPage));
-        goalPlanButton.setOnAction(e -> this.setCenter(goalPlanPage));
     }
 }

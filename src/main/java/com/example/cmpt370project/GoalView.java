@@ -7,17 +7,30 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * View to handle organization of UI elements and page(s) related to viewing Goals.
+ */
 public class GoalView extends StackPane implements Subscriber {
 
-    // Add the models that this view requires here
+    // ********* The models that this view requires data from are to be added here! *********
+
+    /**
+     * The goal model that this view gets goal data from.
+     */
     private GoalModel goalModel;
 
+    /**
+     * The root of this view.
+     */
     private VBox root;
+
+    // ********* Add other ui elements as attributes here if needed (i.e. if they need to change in drawView()) *********
+
     private ListView<String> goalListView;
 
-    // Add other ui elements (buttons, labels) as attributes here if needed (aka if they need to change in drawView)
-
-
+    /**
+     * Create a new goal view page.
+     */
     public GoalView() {
         root = new VBox();
         root.setAlignment(Pos.TOP_CENTER);
@@ -28,10 +41,13 @@ public class GoalView extends StackPane implements Subscriber {
         goalListView = new ListView<>();
         root.getChildren().addAll(goalsLabel, goalListView);
 
-        // Add the root to this view
+        // Add the root UI element to this view
         this.getChildren().add(root);
     }
 
+    /**
+     * Update the UI elements of this page when the model changes.
+     */
     private void drawView() {
         if (goalModel == null) return;
 
@@ -41,7 +57,11 @@ public class GoalView extends StackPane implements Subscriber {
         }
     }
 
-    public void setModel(GoalModel goalModel) {
+    /**
+     * Set the goal model of this view.
+     * @param goalModel the goal model that this view will pull data from.
+     */
+    public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
         drawView();
     }
@@ -51,13 +71,15 @@ public class GoalView extends StackPane implements Subscriber {
         drawView();
     }
 
+    /**
+     * Set up interaction with a controller for this view.
+     * @param c the controller that will handle changing model data for user interactions on this page.
+     */
     public void setupEvents(Controller c) {
 
-        // Do something like this for whatever ui control elements there are.
-        // Make a separate controller for this view? (not use the same one?)
-
-//        addGoalButton.setOnAction(c::handleButtonPress);
-//        removeGoalButton.setOnAction(c::removeButtonPress);
+        // See HomeView class for what to put here.
+        // i.e. when ready to change data in interface based on user interactions, make a new controller class
+        // and pass the button handler methods (and other interactive ui elements) of the buttons in this view to the controller
 
     }
 }
