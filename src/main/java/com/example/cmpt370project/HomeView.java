@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -31,10 +32,12 @@ public class HomeView extends StackPane implements Subscriber {
 
     // ********* INTERACTIVE UI ELEMENTS (i.e. they change in drawView()) *********
     // ********* HOME PAGE ELEMENTS *********
-    private Button addGoalButton;
-    private Label welcomeLabel;
+    private final Button addGoalButton;
+    private final Label welcomeLabel;
     // ********* ADD GOAL PAGE ELEMENTS *********
-    private Button submitGoalButton;
+    private TextField titleInput;
+    private Button cancelAddGoalButton;
+    private final Button submitGoalButton;
 
     /**
      * Create a new home view page.
@@ -42,11 +45,15 @@ public class HomeView extends StackPane implements Subscriber {
     public HomeView() {
         root = new VBox();
         addGoalButton = new Button("Add Goal"); //on main page
+        welcomeLabel = new Label("Welcome to the Home Page!");
+        //add goal page elements
         submitGoalButton = new Button("Add Goal");
+        titleInput = new TextField("Title");
+        cancelAddGoalButton = new Button("Cancel");
+
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
         root.setPadding(new Insets(10));
-        welcomeLabel = new Label("Welcome to the Home Page!");
         root.getChildren().addAll(welcomeLabel, addGoalButton);
 
         // Add the root UI element to this view
@@ -107,6 +114,7 @@ public class HomeView extends StackPane implements Subscriber {
             c.handleButtonPress(e);
             changePage(HomeViewPage.HOME); // Return to the summary page after submission
         });
+        cancelAddGoalButton.setOnAction(e -> changePage(HomeViewPage.HOME));
     }
     /**
      * Draws the UI of the Home page.
@@ -130,6 +138,6 @@ public class HomeView extends StackPane implements Subscriber {
         root.setSpacing(20);
         root.setPadding(new Insets(20));
         this.getChildren().add(root);
-        root.getChildren().addAll(submitGoalButton);
+        root.getChildren().addAll(titleInput,submitGoalButton,cancelAddGoalButton);
     }
 }
