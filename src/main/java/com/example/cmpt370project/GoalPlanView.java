@@ -339,6 +339,22 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 }
             });
 
+            // Set the fields to the previous value if a goal plan already exists (i.e. if editing the plan)
+            if (goalPlanModel.goalPlanExists()) {
+                // Set Maintain Plan previous values
+                if (goalPlanModel.getGoalPlan() instanceof MaintainGoalPlan) {
+                    planStyleSelect.selectToggle(maintainPlan);
+                    endGoalNumberInput.getValueFactory().setValue(goalPlanModel.getGoalPlanCurrent());
+                }
+
+                // Set Increase Plan previous values
+                else if (goalPlanModel.getGoalPlan() instanceof IncreaseGoalPlan) {
+                    planStyleSelect.selectToggle(increasePlan);
+                    endGoalNumberInput.getValueFactory().setValue(goalPlanModel.getGoalPlanMax());
+                    startGoalNumberInput.getValueFactory().setValue(goalPlanModel.getGoalPlanCurrent());
+                }
+            }
+
             // Add all form elements to the form layout
             formGoalPlanModule.getChildren().addAll(planSelectLayout,
                     planNumbersInputLayout,
