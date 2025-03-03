@@ -31,7 +31,7 @@ public class GoalVisView extends StackPane implements Subscriber {
         root.setSpacing(10);
         root.setPadding(new Insets(10));
 
-        Label welcomeLabel = new Label("Welcome to the Data Vis Page!");
+        Label welcomeLabel = new Label("Welcome to the Data Visssssss Page!");
         root.getChildren().add(welcomeLabel);
 
         goalChartView = new GoalProgress(goalModel);

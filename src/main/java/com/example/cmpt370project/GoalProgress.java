@@ -9,13 +9,40 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/*
+ * View class for visualizing the progress of goals.
+ * This view displays each goal's progress using separate charts.
+ */
 public class GoalProgress extends VBox {
+ /**
+     * The goal model that provides goal data.
+     */
     private GoalModel goalModel;
+
+    /**
+     * ChoiceBox for selecting the type of chart to display.
+     */
     private ChoiceBox<String> chartTypeSelector;
+
+    /**
+     * PieChart for visualization
+     */
     private PieChart pieChart;
+
+    /**
+     * BarChart for visualization
+     */
     private BarChart<String, Number> barChart;
+
+    /**
+     * LineChart for visualization
+     */
     private LineChart<String, Number> lineChart;
 
+   /**
+     * Constructs a new GoalProgress view with the specified goal model.
+     * @param goalModel the model containing goal data.
+     */ 
     public GoalProgress(GoalModel goalModel) {
         this.goalModel = goalModel;
         setupChartSelector();
@@ -23,6 +50,9 @@ public class GoalProgress extends VBox {
         updateChart();  // Initialize with data
     }
 
+    /**
+     * Sets up the chart type selector allowing the user to choose the visualization type.
+     */
     private void setupChartSelector() {
         chartTypeSelector = new ChoiceBox<>();
         chartTypeSelector.getItems().addAll("Pie Chart", "Bar Chart", "Line Chart"); // Types of visualization
@@ -32,6 +62,10 @@ public class GoalProgress extends VBox {
         getChildren().add(chartTypeSelector);
     }
 
+
+    /**
+     * Sets up the charts with the chosen visualization type.
+     */
     private void setupChart() {
         pieChart = new PieChart();
         pieChart.setTitle("Time Remaining");
@@ -46,6 +80,11 @@ public class GoalProgress extends VBox {
         lineChart.setTitle("Time Remaining");
     }
 
+
+    /**
+     * Updates the view by removing existing charts and adding new charts for each goal 
+     * based on the selected chart type.
+     */
     public void updateChart() { // Updates the chart type that needs to be updated
         getChildren().removeIf(node -> node instanceof Chart); // Remove prior chart s new chart can be reborn
         String selectedChart = chartTypeSelector.getValue();
@@ -62,6 +101,9 @@ public class GoalProgress extends VBox {
         }
     }
 
+    /**
+     * Creates and adds a PieChart for each goal in the model.
+     */
     private void updatePieChart() {
         for (Goal goal : goalModel.getGoals()) {
             PieChart pieChart = createPieChartForGoal(goal);
@@ -69,6 +111,12 @@ public class GoalProgress extends VBox {
         }
     }
 
+
+    /**
+     * Creates a PieChart for the specified goal.
+     * @param goal the goal for which to create the chart.
+     * @return a PieChart representing the goal's progress.
+     */    
     private PieChart createPieChartForGoal(Goal goal) {
         PieChart pieChart = new PieChart();
         pieChart.setTitle(goal.getTitle());
@@ -86,6 +134,9 @@ public class GoalProgress extends VBox {
         return pieChart;
     }
 
+    /**
+     * Creates and adds a BarChart.
+     */
     private void updateBarChart() {
         barChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -100,6 +151,9 @@ public class GoalProgress extends VBox {
         barChart.getData().add(series);
     }
 
+    /**
+     * Creates and adds a LineChart.
+     */
     private void updateLineChart() {
         lineChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();

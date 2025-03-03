@@ -89,10 +89,10 @@ public class DashboardView extends BorderPane {
         
         this.goalModel = goalModel;
 
-        goalChartView = new GoalProgress(goalModel);
-        chartController = new GoalChartController(goalChartView, goalModel);
+        
+        
 
-        setCenter(goalChartView);
+
 
         // ************************* MVC CONFIGURATION *************************
 
@@ -104,12 +104,14 @@ public class DashboardView extends BorderPane {
 
         // CONTROLLERS
         controller = new Controller();
+        chartController = new GoalChartController(goalChartView, goalModel);
 
         // VIEWS
         this.homePage = new HomeView();
         this.goalsPage = new GoalView();
         this.goalPlanPage = new GoalPlanView();
         this.goalVisPage = new GoalVisView(goalModel);
+        //goalChartView = new GoalProgress(goalModel);
 
         // ********* 2. Add subscribers to models *********
 
