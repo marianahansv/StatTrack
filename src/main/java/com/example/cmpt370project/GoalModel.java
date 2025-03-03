@@ -18,16 +18,11 @@ import java.util.List;
  */
 public class GoalModel {
     private static final String FILE_NAME = System.getProperty("user.home") + "/GoalApplication/goals.json";
-    private HashMap<String, Goal> goals; // I went with a dictionary for easier lookup
-    //okay guys apparently gson doesn't know how to convert LocalDate into json so I had to this reformatting thing to define
-    //the json conversion :)
+    private HashMap<String, Goal> goals;
     private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
-    //this creates a custom gson instance (with the format for the date) I'll try to find a better way to do this but stack overflow told me to do this :(
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
             context.serialize(src.format(format))).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
-            LocalDate.parse(json.getAsJsonPrimitive().getAsString(), format)).create(); //basically this is saying...
-            //when saving a LocalDate, convert it to a string ("2025-02-21") and when loading a LocalDate, read the string and convert it back
-
+            LocalDate.parse(json.getAsJsonPrimitive().getAsString(), format)).create();
     /**
      * The subscriber list (i.e. the view), which will update when the view changes.
      */
@@ -44,9 +39,41 @@ public class GoalModel {
     }
 
     /**
-     * Create a new goal and add it to the dictionary.
+     * add goal to the dictionary.
+     * Note: this method does not handle the creation of the goal
+     * @param newGoal : Goal to be added
      */
     public void addGoal(Goal newGoal){
+        goals.put(newGoal.getTitle(),newGoal);
+        save_goals_to_file();
+        notifySubscribers();
+    }
+
+    /**
+     * Create a new goal and add it to the dictionary.
+     * Note: This method handles the creation of the goal
+     * @param title title of the goal to be added
+     * @param section section the goal belongs to
+     * @param difficulty difficulty (easy-medium-hard)
+     * @param startDate start date of goal
+     * @param endDate end date of goal
+     */
+    public void addGoal(String title, String section, String difficulty, LocalDate startDate, LocalDate endDate){
+        Goal newGoal = new Goal(title,section,difficulty,startDate,endDate);
+        goals.put(newGoal.getTitle(),newGoal);
+        save_goals_to_file();
+        notifySubscribers();
+    }
+
+    /**
+     * Create a new goal and add it to the dictionary.
+     * Note: This method handles the creation of the goal
+     * @param title title of the goal to be added
+     * @param startDate start date of goal
+     * @param endDate end date of goal
+     */
+    public void addGoal(String title, LocalDate startDate, LocalDate endDate){
+        Goal newGoal = new Goal(title,startDate,endDate);
         goals.put(newGoal.getTitle(),newGoal);
         save_goals_to_file();
         notifySubscribers();
