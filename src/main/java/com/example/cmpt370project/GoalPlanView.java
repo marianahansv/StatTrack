@@ -142,7 +142,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
         // Set up root element for page
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_LEFT);
-        root.setSpacing(10);
+        root.setSpacing(20);
         root.setPadding(new Insets(20));
         this.getChildren().add(root);
 
@@ -174,7 +174,50 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
             // ********* GOAL PLAN EXIST VIEW *********
             else {
-                root.getChildren().add(new Label("YOU HAVE A PLAN YAYYY!"));
+
+                HBox goalSummaryHeaderModule = new HBox(20);
+                goalSummaryHeaderModule.setAlignment(Pos.CENTER_LEFT);
+                Label currentPlanTitle = new Label();
+                currentPlanTitle.setMinWidth(300);
+                currentPlanTitle.setMaxWidth(500);
+                currentPlanTitle.setWrapText(true);
+
+                if (goalPlanModel.getGoalPlan() instanceof MaintainGoalPlan) {
+                    currentPlanTitle.setText("Your current plan is to maintain completing " +
+                            goalPlanModel.getGoalPlan().getGoalPlanCurrent() + " goals each day.");
+                }
+
+                else if (goalPlanModel.getGoalPlan() instanceof IncreaseGoalPlan) {
+                    currentPlanTitle.setText("Your current plan is to increase the number of goals you complete each " +
+                            "day until you get to completing " +
+                            goalPlanModel.getGoalPlan().getGoalPlanMax() + " goals each day.");
+                }
+
+                goCreateEditGoalPlanButton.setText("Change Your Plan Details");
+
+                goalSummaryHeaderModule.getChildren().addAll(currentPlanTitle, goCreateEditGoalPlanButton);
+                root.getChildren().add(goalSummaryHeaderModule);
+
+                Label progressTitle = new Label("Here's your current progress on your plan:");
+                progressTitle.setStyle("-fx-font-weight: bold;");
+                root.getChildren().add(progressTitle);
+
+                VBox goalProgressModule = new VBox(20);
+                goalProgressModule.setAlignment(Pos.CENTER_LEFT);
+                goalProgressModule.setMaxWidth(670);
+                goalProgressModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 10;");
+                goalProgressModule.setPadding(new Insets(20));
+
+
+                Label currentProgressSum = new Label("Your current number of goals completed for the day: XXX");
+                Label targetProgressSum = new Label("Your current target number of goals to complete for the day: " +
+                        goalPlanModel.getGoalPlan().getGoalPlanCurrent());
+
+                Label progressFeedback = new Label("You need to complete XX more goals today to stay on track with you goal plan. Time to complete some goals!");
+                progressFeedback.setWrapText(true);
+
+                goalProgressModule.getChildren().addAll(currentProgressSum, targetProgressSum, progressFeedback);
+                root.getChildren().add(goalProgressModule);
             }
         }
     }
@@ -249,7 +292,12 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
             // Create container for submission and cancel buttons
             HBox buttonGroupLayout = new HBox(20); // 20px of spacing
-            savePlanChangesButton.setText("Create My Plan");
+            if (!goalPlanModel.goalPlanExists()) {
+                savePlanChangesButton.setText("Create My Plan");
+            } else {
+                savePlanChangesButton.setText("Update My Plan");
+            }
+
             cancelEditGoalPlanButton.setText("Cancel Plan " + titleString);
             buttonGroupLayout.getChildren().addAll(savePlanChangesButton, cancelEditGoalPlanButton);
 
