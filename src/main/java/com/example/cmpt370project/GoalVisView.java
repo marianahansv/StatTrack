@@ -8,7 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
- * View to handle organization of page(s) related to the Goal Plan feature.
+ * View
  */
 public class GoalVisView extends StackPane implements Subscriber {
 
@@ -23,7 +23,7 @@ public class GoalVisView extends StackPane implements Subscriber {
     private GoalProgress goalChartView;
 
     /**
-     * Create a new goal plan page.
+     * Create a new goal vis page.
      */
     public GoalVisView(GoalModel goalModel) {
         VBox root = new VBox();
@@ -31,7 +31,7 @@ public class GoalVisView extends StackPane implements Subscriber {
         root.setSpacing(10);
         root.setPadding(new Insets(10));
 
-        Label welcomeLabel = new Label("Welcome to the Goal Plan Page!");
+        Label welcomeLabel = new Label("Welcome to the Data Vis Page!");
         root.getChildren().add(welcomeLabel);
 
         goalChartView = new GoalProgress(goalModel);

@@ -51,6 +51,11 @@ public class DashboardView extends BorderPane {
      */
     private GoalPlanView goalPlanPage;
 
+    /**
+     * The goal plan page of the application.
+     */
+    private GoalVisView goalVisPage;
+
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
     // UI elements here should not make any major changes to the models, they should only be for aesthetic or page changes
@@ -69,6 +74,11 @@ public class DashboardView extends BorderPane {
      * The button for going to the goal plan page.
      */
     private Button goalPlanButton;
+
+    /**
+     * The button for going to the goal plan page.
+     */
+    private Button goalVisButton;
 
     /**
      * Construct the dashboard view and MVC structure of the application.
@@ -98,7 +108,8 @@ public class DashboardView extends BorderPane {
         // VIEWS
         this.homePage = new HomeView();
         this.goalsPage = new GoalView();
-        this.goalPlanPage = new GoalPlanView(goalModel);
+        this.goalPlanPage = new GoalPlanView();
+        this.goalVisPage = new GoalVisView(goalModel);
 
         // ********* 2. Add subscribers to models *********
 
@@ -127,6 +138,7 @@ public class DashboardView extends BorderPane {
         goalPlanPage.setGoalPlanModel(goalPlanModel);
         goalsPage.setGoalModel(goalModel);
         homePage.setGoalModel(goalModel);
+        goalVisPage.setGoalPlanModel(goalPlanModel);
 
         // ************************* END MVC CONFIGURATION *************************
 
@@ -137,6 +149,8 @@ public class DashboardView extends BorderPane {
         homeButton.setOnAction(e -> this.setCenter(homePage));
         goalsButton.setOnAction(e -> this.setCenter(goalsPage));
         goalPlanButton.setOnAction(e -> this.setCenter(goalPlanPage));
+        goalVisButton.setOnAction(e -> this.setCenter(goalVisPage));
+
     }
 
     /**
@@ -156,7 +170,8 @@ public class DashboardView extends BorderPane {
         homeButton = new Button("Home");
         goalsButton = new Button("Goals");
         goalPlanButton = new Button("Goal Plan");
-        sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton);
+        goalVisButton = new Button("Goal Vis");
+        sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton);
         sidebar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;");
         this.setLeft(sidebar);
 
