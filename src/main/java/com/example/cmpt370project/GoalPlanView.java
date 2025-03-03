@@ -64,8 +64,9 @@ public class GoalPlanView extends StackPane implements Subscriber {
         // ********* Draw the initial view *********
         drawView();
 
-        // ********* Wire up events for Interactive UI Components *********
-        setupEvents();
+        // ********* Wire up page change events non-controller based events *********
+        goCreateEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT); });
+        cancelEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.SUMMARY); });
     }
 
     /**
@@ -113,16 +114,24 @@ public class GoalPlanView extends StackPane implements Subscriber {
     }
 
     /**
-     * Set up events and interaction with a controller for this view.
+     * Set up events and interaction that need interaction with a controller for this view.
+     * @param controller the controller that will handle changing model data for user interactions on this page.
      */
-    //     * @param c the controller that will handle changing model data for user interactions on this page.
-    public void setupEvents() {
-
+    public void setupEvents(GoalPlanController controller) {
         // ********* SUMMARY PAGE EVENTS *********
-        goCreateEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT); });
+
 
         // ********* CREATE/EDIT PAGE EVENTS *********
-        cancelEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.SUMMARY); });
+        savePlanChangesButton.setOnAction(e-> {
+            // Create whichever goal plan is selected (pass to the controller)
+            if (planStyleSelect.getSelectedToggle() == maintainPlan) {
+                controller.handleSaveMaintainGoalPlan(endGoalNumberInput.getValue());
+            } else {
+                controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue());
+            }
+
+            changePage(GoalPlanViewPage.SUMMARY);
+        });
 
     }
 
@@ -165,7 +174,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
             // ********* GOAL PLAN EXIST VIEW *********
             else {
-
+                root.getChildren().add(new Label("YOU HAVE A PLAN YAYYY!"));
             }
         }
     }
