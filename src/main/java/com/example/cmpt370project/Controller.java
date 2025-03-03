@@ -29,6 +29,7 @@ public class Controller {
         gm.addGoal(newGoal);
     }
 
+
     /**
      * Handles making the model change when the user clears their goals using the button.
      * @param actionEvent the event that happens when the button is pressed.
@@ -36,4 +37,5 @@ public class Controller {
     public void removeButtonPress(ActionEvent actionEvent) {
         gm.clearGoals();
     }
+
 }
