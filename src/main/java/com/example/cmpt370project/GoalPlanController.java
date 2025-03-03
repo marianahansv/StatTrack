@@ -40,4 +40,11 @@ public class GoalPlanController {
         goalPlanModel.setGoalPlan(newPlan);
     }
 
+    /**
+     * Handle deleting the user's Goal Plan.
+     */
+    public void handleDeleteGoalPlan() {
+        goalPlanModel.clearGoalPlan();
+    }
+
 }

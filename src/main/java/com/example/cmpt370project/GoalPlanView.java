@@ -3,10 +3,7 @@ package com.example.cmpt370project;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 /**
  * View to handle organization of page(s) related to the Goal Plan feature.
@@ -43,6 +40,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
     private Button cancelEditGoalPlanButton;
     private Button savePlanChangesButton;
+    private Button deletePlanButton;
 
     /**
      * Create a new goal plan page.
@@ -60,6 +58,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
         cancelEditGoalPlanButton = new Button();
         savePlanChangesButton = new Button();
+        deletePlanButton = new Button();
 
         // ********* Draw the initial view *********
         drawView();
@@ -122,6 +121,8 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
 
         // ********* CREATE/EDIT PAGE EVENTS *********
+
+        // GOAL PLAN CREATE/EDIT
         savePlanChangesButton.setOnAction(e-> {
             // Create whichever goal plan is selected (pass to the controller)
             if (planStyleSelect.getSelectedToggle() == maintainPlan) {
@@ -133,6 +134,11 @@ public class GoalPlanView extends StackPane implements Subscriber {
             changePage(GoalPlanViewPage.SUMMARY);
         });
 
+        // GOAL PLAN DELETE
+        deletePlanButton.setOnAction(e-> {
+            controller.handleDeleteGoalPlan();
+            changePage(GoalPlanViewPage.SUMMARY);
+        });
     }
 
     /**
@@ -158,9 +164,8 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 // Populate data if the user has no goal plan
                 VBox startGoalPlanModule = new VBox();
                 VBox.setVgrow(startGoalPlanModule, Priority.ALWAYS);
-                startGoalPlanModule.setAlignment(Pos.CENTER);
+                startGoalPlanModule.setAlignment(Pos.TOP_LEFT);
                 startGoalPlanModule.setSpacing(20);
-                startGoalPlanModule.setPadding(new Insets(20));
 
                 // Info Label
                 startGoalPlanModule.getChildren().add(new Label("You do not currently have a goal plan set up yet. Create one to get started!"));
@@ -205,7 +210,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 VBox goalProgressModule = new VBox(20);
                 goalProgressModule.setAlignment(Pos.CENTER_LEFT);
                 goalProgressModule.setMaxWidth(670);
-                goalProgressModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 10;");
+                goalProgressModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
                 goalProgressModule.setPadding(new Insets(20));
 
 
@@ -299,7 +304,19 @@ public class GoalPlanView extends StackPane implements Subscriber {
             }
 
             cancelEditGoalPlanButton.setText("Cancel Plan " + titleString);
-            buttonGroupLayout.getChildren().addAll(savePlanChangesButton, cancelEditGoalPlanButton);
+            deletePlanButton.setText("Delete My Plan");
+
+            if (!goalPlanModel.goalPlanExists()) {
+                deletePlanButton.setVisible(false);
+            } else {
+                deletePlanButton.setVisible(true);
+            }
+
+            // Add space between delete button and the others
+            Region spacer = new Region();
+            spacer.setPrefWidth(110);
+
+            buttonGroupLayout.getChildren().addAll(savePlanChangesButton, cancelEditGoalPlanButton, spacer, deletePlanButton);
 
             // Initially hide the fields unapplicable fields based on the plan selection
             goalsPerDayLabel.setVisible(true);
