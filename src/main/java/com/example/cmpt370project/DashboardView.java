@@ -124,7 +124,10 @@ public class DashboardView extends BorderPane {
         // Set up page change interactions on button press
         homeButton.setOnAction(e -> this.setCenter(homePage));
         goalsButton.setOnAction(e -> this.setCenter(goalsPage));
-        goalPlanButton.setOnAction(e -> this.setCenter(goalPlanPage));
+        goalPlanButton.setOnAction(e -> {
+            goalPlanPage.setPageToSummaryView();
+            this.setCenter(goalPlanPage);
+        });
     }
 
     /**
