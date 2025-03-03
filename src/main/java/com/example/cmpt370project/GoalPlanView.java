@@ -18,11 +18,24 @@ public class GoalPlanView extends StackPane implements Subscriber {
      */
     private GoalPlanModel goalPlanModel;
 
+    /**
+     * All the possible pages of the goal plan view.
+     */
     private enum GoalPlanViewPage {SUMMARY, CREATE_EDIT}
 
+    /**
+     * The current page that the goal plan view should show.
+     */
     private GoalPlanViewPage currentViewPage = GoalPlanViewPage.SUMMARY;
 
+    // ****************** INTERACTIVE UI ELEMENTS ******************
+
+    // ********* SUMMARY PAGE ELEMENTS *********
+
     private Button createEditGoalPlanButton;
+
+    // ********* EDIT/CREATE PAGE ELEMENTS *********
+
 
     /**
      * Create a new goal plan page.
@@ -46,17 +59,25 @@ public class GoalPlanView extends StackPane implements Subscriber {
         // Clear whatever elements were previously stored in this view
         getChildren().clear();
 
+        // Draw the current page that is to be shown
         switch(currentViewPage) {
             case SUMMARY -> drawGoalPlanSummaryView();
             case CREATE_EDIT -> drawGoalPlanCreateEditView();
         }
     }
 
+    /**
+     * Switch to a different page of this view.
+     * @param newPage the page this view should switch to.
+     */
     private void changePage(GoalPlanViewPage newPage) {
         currentViewPage = newPage;
         drawView();
     }
 
+    /**
+     * Sets the current page of this view to the summary view.
+     */
     public void setPageToSummaryView() {
         changePage(GoalPlanViewPage.SUMMARY);
     }
@@ -87,31 +108,37 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
     }
 
+    /**
+     * Draws the UI of the Summary page.
+     */
     private void drawGoalPlanSummaryView() {
+        // Set up root element for page
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(10);
         root.setPadding(new Insets(20));
         this.getChildren().add(root);
 
-        Label titleLabel = new Label("Here's Your Personalized Goal Plan:");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-
-        root.getChildren().add(titleLabel);
-
         if (goalPlanModel != null) {
+            // Add page title
+            Label titleLabel = new Label("Here's Your Personalized Goal Plan:");
+            titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+            root.getChildren().add(titleLabel);
 
             // ********* GOAL PLAN NOT EXIST VIEW *********
             if (!goalPlanModel.goalPlanExists()) {
 
+                // Populate data if the user has no goal plan
                 VBox startGoalPlanModule = new VBox();
                 VBox.setVgrow(startGoalPlanModule, Priority.ALWAYS);
                 startGoalPlanModule.setAlignment(Pos.CENTER);
                 startGoalPlanModule.setSpacing(20);
                 startGoalPlanModule.setPadding(new Insets(20));
 
+                // Info Label
                 startGoalPlanModule.getChildren().add(new Label("You do not currently have a goal plan set up yet. Create one to get started!"));
 
+                // Set Goal Plan Button
                 createEditGoalPlanButton.setText("Set Up Your Goal Plan");
                 startGoalPlanModule.getChildren().add(createEditGoalPlanButton);
 
@@ -119,14 +146,17 @@ public class GoalPlanView extends StackPane implements Subscriber {
             }
 
             // ********* GOAL PLAN EXIST VIEW *********
-
             else {
 
             }
         }
     }
 
+    /**
+     * Draws the UI of the Create/Edit page.
+     */
     private void drawGoalPlanCreateEditView() {
+        // Set up root element for page
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(20);
@@ -135,6 +165,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
         if (goalPlanModel != null) {
 
+            // Add page title (different wording based on if editing/creating)
             String titleString;
             if (!goalPlanModel.goalPlanExists()) {
                 titleString = "Set Up";
@@ -147,57 +178,63 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
             root.getChildren().add(titleLabel);
 
-            // form
+            // ********* GOAL PLAN EDIT/CREATE FORM *********
 
+            // Create base form container
             VBox formGoalPlanModule = new VBox();
             VBox.setVgrow(formGoalPlanModule, Priority.ALWAYS);
             formGoalPlanModule.setAlignment(Pos.TOP_LEFT);
             formGoalPlanModule.setSpacing(30);
 
+            // Create container for plan selection form element
             VBox planSelectLayout = new VBox(10);
             Label planStyleLabel = new Label("Select your plan style:");
 
-            // Create a ToggleGroup for the radio buttons
+            // Options for plan selection
             ToggleGroup toggleGroup = new ToggleGroup();
 
-            // Radio Buttons
             RadioButton maintainPlan = new RadioButton("Maintain a Set Number of Goals");
             maintainPlan.setToggleGroup(toggleGroup);
-            toggleGroup.selectToggle(maintainPlan); // set as default
+            toggleGroup.selectToggle(maintainPlan); // Set Maintain Plan as default option
+
             RadioButton increasePlan = new RadioButton("Increase the Amount of Goals You Complete");
             increasePlan.setToggleGroup(toggleGroup);
 
+            // Put radio button options in a group
             HBox toggleGroupLayout = new HBox(20); // 20px of spacing
             toggleGroupLayout.getChildren().addAll(maintainPlan, increasePlan);
+
             planSelectLayout.getChildren().addAll(planStyleLabel,toggleGroupLayout);
 
-            // Additional fields (start off hidden)
+            // Create container for goal number input form element
             VBox currentGoalNumberInputLayout = new VBox(10);
             Label goalsPerDayLabel = new Label("How many goals would you like to complete every day?");
             Spinner<Integer> endingGoalsSpinner = new Spinner<>(1, 100, 1);
             currentGoalNumberInputLayout.getChildren().addAll(goalsPerDayLabel, endingGoalsSpinner);
 
+            // Create container for starting goal number input form element
             VBox maxGoalNumberInputLayout = new VBox(10);
             Label startingGoalsLabel = new Label("How many goals would you like to start with completing every day?");
             Spinner<Integer> startingGoalsSpinner = new Spinner<>(1, 100, 1);
             maxGoalNumberInputLayout.getChildren().addAll(startingGoalsLabel, startingGoalsSpinner);
 
+            // Put all goal input fields in a container
             HBox planNumbersInputLayout = new HBox(20); // 20px of spacing
             planNumbersInputLayout.getChildren().addAll(currentGoalNumberInputLayout, maxGoalNumberInputLayout);
 
-            // Button at the bottom
+            // Create container for submission and cancel buttons
             HBox buttonGroupLayout = new HBox(20); // 20px of spacing
             Button createPlanButton = new Button("Create My Plan");
             Button cancelButton = new Button("Cancel Plan " + titleString);
             buttonGroupLayout.getChildren().addAll(createPlanButton, cancelButton);
 
-            // Initially hide the fields based on the selection
+            // Initially hide the fields unapplicable fields based on the plan selection
             goalsPerDayLabel.setVisible(true);
             endingGoalsSpinner.setVisible(true);
             startingGoalsLabel.setVisible(false);
             startingGoalsSpinner.setVisible(false);
 
-            // Change visibility based on the selected radio button
+            // Control change in visibility based on the selected radio button
             toggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue == maintainPlan) {
                     goalsPerDayLabel.setVisible(true);
@@ -212,14 +249,13 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 }
             });
 
-            // Add components to the layout
+            // Add all form elements to the form layout
             formGoalPlanModule.getChildren().addAll(planSelectLayout,
                     planNumbersInputLayout,
                     buttonGroupLayout);
 
+            // Add the form to the root page
             root.getChildren().add(formGoalPlanModule);
         }
-
     }
-
 }
