@@ -31,25 +31,41 @@ public class GoalPlanView extends StackPane implements Subscriber {
     // ****************** INTERACTIVE UI ELEMENTS ******************
 
     // ********* SUMMARY PAGE ELEMENTS *********
-
-    private Button createEditGoalPlanButton;
+    private Button goCreateEditGoalPlanButton;
 
     // ********* EDIT/CREATE PAGE ELEMENTS *********
+    private ToggleGroup planStyleSelect;
+    private RadioButton maintainPlan;
+    private RadioButton increasePlan;
 
+    private Spinner<Integer> endGoalNumberInput;
+    private Spinner<Integer> startGoalNumberInput;
+
+    private Button cancelEditGoalPlanButton;
+    private Button savePlanChangesButton;
 
     /**
      * Create a new goal plan page.
      */
     public GoalPlanView() {
         // ********* Initialize Interactive UI Components *********
-        createEditGoalPlanButton = new Button();
+        goCreateEditGoalPlanButton = new Button();
+
+        planStyleSelect = new ToggleGroup();
+        maintainPlan = new RadioButton();
+        increasePlan = new RadioButton();
+
+        endGoalNumberInput = new Spinner<>();
+        startGoalNumberInput = new Spinner<>();
+
+        cancelEditGoalPlanButton = new Button();
+        savePlanChangesButton = new Button();
 
         // ********* Draw the initial view *********
         drawView();
 
         // ********* Wire up events for Interactive UI Components *********
-        createEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT);
-        });
+        setupEvents();
     }
 
     /**
@@ -97,14 +113,16 @@ public class GoalPlanView extends StackPane implements Subscriber {
     }
 
     /**
-     * Set up interaction with a controller for this view.
-     * @param c the controller that will handle changing model data for user interactions on this page.
+     * Set up events and interaction with a controller for this view.
      */
-    public void setupEvents(HomeController c) {
+    //     * @param c the controller that will handle changing model data for user interactions on this page.
+    public void setupEvents() {
 
-        // See HomeView class for what to put here.
-        // i.e. when ready to change data in interface based on user interactions, make a new controller class
-        // and pass the button handler methods (and other interactive ui elements) of the buttons in this view to the controller
+        // ********* SUMMARY PAGE EVENTS *********
+        goCreateEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT); });
+
+        // ********* CREATE/EDIT PAGE EVENTS *********
+        cancelEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.SUMMARY); });
 
     }
 
@@ -139,8 +157,8 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 startGoalPlanModule.getChildren().add(new Label("You do not currently have a goal plan set up yet. Create one to get started!"));
 
                 // Set Goal Plan Button
-                createEditGoalPlanButton.setText("Set Up Your Goal Plan");
-                startGoalPlanModule.getChildren().add(createEditGoalPlanButton);
+                goCreateEditGoalPlanButton.setText("Set Up Your Goal Plan");
+                startGoalPlanModule.getChildren().add(goCreateEditGoalPlanButton);
 
                 root.getChildren().add(startGoalPlanModule);
             }
@@ -191,14 +209,12 @@ public class GoalPlanView extends StackPane implements Subscriber {
             Label planStyleLabel = new Label("Select your plan style:");
 
             // Options for plan selection
-            ToggleGroup toggleGroup = new ToggleGroup();
+            maintainPlan.setText("Maintain a Set Number of Goals");
+            maintainPlan.setToggleGroup(planStyleSelect);
+            planStyleSelect.selectToggle(maintainPlan); // Set Maintain Plan as default option
 
-            RadioButton maintainPlan = new RadioButton("Maintain a Set Number of Goals");
-            maintainPlan.setToggleGroup(toggleGroup);
-            toggleGroup.selectToggle(maintainPlan); // Set Maintain Plan as default option
-
-            RadioButton increasePlan = new RadioButton("Increase the Amount of Goals You Complete");
-            increasePlan.setToggleGroup(toggleGroup);
+            increasePlan.setText("Increase the Amount of Goals You Complete");
+            increasePlan.setToggleGroup(planStyleSelect);
 
             // Put radio button options in a group
             HBox toggleGroupLayout = new HBox(20); // 20px of spacing
@@ -207,45 +223,45 @@ public class GoalPlanView extends StackPane implements Subscriber {
             planSelectLayout.getChildren().addAll(planStyleLabel,toggleGroupLayout);
 
             // Create container for goal number input form element
-            VBox currentGoalNumberInputLayout = new VBox(10);
+            VBox endGoalNumberInputLayout = new VBox(10);
             Label goalsPerDayLabel = new Label("How many goals would you like to complete every day?");
-            Spinner<Integer> endingGoalsSpinner = new Spinner<>(1, 100, 1);
-            currentGoalNumberInputLayout.getChildren().addAll(goalsPerDayLabel, endingGoalsSpinner);
+            endGoalNumberInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1));
+            endGoalNumberInputLayout.getChildren().addAll(goalsPerDayLabel, endGoalNumberInput);
 
             // Create container for starting goal number input form element
-            VBox maxGoalNumberInputLayout = new VBox(10);
+            VBox startGoalNumberInputLayout = new VBox(10);
             Label startingGoalsLabel = new Label("How many goals would you like to start with completing every day?");
-            Spinner<Integer> startingGoalsSpinner = new Spinner<>(1, 100, 1);
-            maxGoalNumberInputLayout.getChildren().addAll(startingGoalsLabel, startingGoalsSpinner);
+            startGoalNumberInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1));
+            startGoalNumberInputLayout.getChildren().addAll(startingGoalsLabel, startGoalNumberInput);
 
             // Put all goal input fields in a container
             HBox planNumbersInputLayout = new HBox(20); // 20px of spacing
-            planNumbersInputLayout.getChildren().addAll(currentGoalNumberInputLayout, maxGoalNumberInputLayout);
+            planNumbersInputLayout.getChildren().addAll(endGoalNumberInputLayout, startGoalNumberInputLayout);
 
             // Create container for submission and cancel buttons
             HBox buttonGroupLayout = new HBox(20); // 20px of spacing
-            Button createPlanButton = new Button("Create My Plan");
-            Button cancelButton = new Button("Cancel Plan " + titleString);
-            buttonGroupLayout.getChildren().addAll(createPlanButton, cancelButton);
+            savePlanChangesButton.setText("Create My Plan");
+            cancelEditGoalPlanButton.setText("Cancel Plan " + titleString);
+            buttonGroupLayout.getChildren().addAll(savePlanChangesButton, cancelEditGoalPlanButton);
 
             // Initially hide the fields unapplicable fields based on the plan selection
             goalsPerDayLabel.setVisible(true);
-            endingGoalsSpinner.setVisible(true);
+            endGoalNumberInput.setVisible(true);
             startingGoalsLabel.setVisible(false);
-            startingGoalsSpinner.setVisible(false);
+            startGoalNumberInput.setVisible(false);
 
             // Control change in visibility based on the selected radio button
-            toggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            planStyleSelect.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue == maintainPlan) {
                     goalsPerDayLabel.setVisible(true);
-                    endingGoalsSpinner.setVisible(true);
+                    endGoalNumberInput.setVisible(true);
                     startingGoalsLabel.setVisible(false);
-                    startingGoalsSpinner.setVisible(false);
+                    startGoalNumberInput.setVisible(false);
                 } else if (newValue == increasePlan) {
                     goalsPerDayLabel.setVisible(true);
-                    endingGoalsSpinner.setVisible(true);
+                    endGoalNumberInput.setVisible(true);
                     startingGoalsLabel.setVisible(true);
-                    startingGoalsSpinner.setVisible(true);
+                    startGoalNumberInput.setVisible(true);
                 }
             });
 
