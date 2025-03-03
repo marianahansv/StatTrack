@@ -52,7 +52,7 @@ public class GoalProgress extends VBox {
 
         if (selectedChart.equals("Pie Chart")) {
             updatePieChart();
-            getChildren().add(pieChart);
+           // getChildren().add(pieChart);
         } else if (selectedChart.equals("Bar Chart")) {
             updateBarChart();
             getChildren().add(barChart);
@@ -63,17 +63,27 @@ public class GoalProgress extends VBox {
     }
 
     private void updatePieChart() {
-        pieChart.getData().clear();
-        List<Goal> goals = goalModel.getGoals();
-        ObservableList<PieChart.Data> chartData = FXCollections.observableArrayList();
-
-        for (Goal goal : goals) {
-            long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
-            if (daysLeft < 0) daysLeft = 0;
-            chartData.add(new PieChart.Data(goal.getTitle(), daysLeft));
+        for (Goal goal : goalModel.getGoals()) {
+            PieChart pieChart = createPieChartForGoal(goal);
+            getChildren().add(pieChart);
         }
+    }
 
-        pieChart.setData(chartData);
+    private PieChart createPieChartForGoal(Goal goal) {
+        PieChart pieChart = new PieChart();
+        pieChart.setTitle(goal.getTitle());
+        // Calculate total days, days left, and days completed.
+        long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
+        long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
+        if (daysLeft < 0) daysLeft = 0;
+        long daysCompleted = totalDays - daysLeft;
+
+        ObservableList<PieChart.Data> data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed", daysCompleted),
+            new PieChart.Data("Remaining", daysLeft)
+        );
+        pieChart.setData(data);
+        return pieChart;
     }
 
     private void updateBarChart() {
