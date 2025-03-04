@@ -96,7 +96,6 @@ public class HomeView extends StackPane implements Subscriber {
         // Add the root UI element to this view
         this.getChildren().add(root);
 
-
         // ********* Wire up page change events non-controller based events *********
         addGoalButton.setOnAction(e -> changePage(HomeViewPage.ADD_GOAL));
         cancelAddGoalButton.setOnAction(e -> changePage(HomeViewPage.HOME));
@@ -138,7 +137,7 @@ public class HomeView extends StackPane implements Subscriber {
      * Set up interaction with a controller for this view.
      * @param c the controller that will handle changing model data for user interactions on this page.
      */
-    public void setupEvents(Controller c) {
+    public void setupEvents(HomeController c) {
         // ********* HOME PAGE EVENTS *********
         // No events needed for the home page yet.
 
