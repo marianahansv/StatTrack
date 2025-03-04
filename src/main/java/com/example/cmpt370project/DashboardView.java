@@ -30,9 +30,14 @@ public class DashboardView extends BorderPane {
     // ************************* APPLICATION CONTROLLERS *************************
 
     /**
-     * The controller of this application.
+     * The homeController of this application (goes with the home page).
      */
-    private Controller controller; // We can add/rename this one later if we want to have diff controllers for each view.
+    private HomeController homeController;
+
+    /**
+     * The goalPlanController of this application (goes with the goal plan page).
+     */
+    private GoalPlanController goalPlanController;
 
     // ************************* APPLICATION VIEWS *************************
 
@@ -85,12 +90,12 @@ public class DashboardView extends BorderPane {
      */
     public DashboardView(GoalModel goalModel) {
 
-        
-        
+
+
         this.goalModel = goalModel;
 
-        
-        
+
+
 
 
 
@@ -103,7 +108,8 @@ public class DashboardView extends BorderPane {
         goalPlanModel = new GoalPlanModel();
 
         // CONTROLLERS
-        controller = new Controller();
+        homeController = new HomeController();
+        goalPlanController = new GoalPlanController();
         chartController = new GoalChartController(goalChartView, goalModel);
 
         // VIEWS
@@ -125,16 +131,20 @@ public class DashboardView extends BorderPane {
         // ********* 3. Setup controller with each view *********
 
         // HOMEPAGE CONTROLLER
-        homePage.setupEvents(controller);
+        homePage.setupEvents(homeController);
 
         // GOAL PAGE CONTROLLER
 
         // GOAL PLAN PAGE CONTROLLER
+        goalPlanPage.setupEvents(goalPlanController);
 
-        // ********* 4. Set models of each controller *********
+        // ********* 4. Set models of each Controller *********
 
         // SET HOME PAGE CONTROLLER MODEL
-        controller.setModel(goalModel);
+        homeController.setModel(goalModel);
+
+        // SET GOAL PLAN PAGE CONTROLLER MODEL
+        goalPlanController.setModel(goalPlanModel);
 
         // ********* 5. Set the required models of each view *********
         goalPlanPage.setGoalPlanModel(goalPlanModel);
@@ -150,9 +160,11 @@ public class DashboardView extends BorderPane {
         // Set up page change interactions on button press
         homeButton.setOnAction(e -> this.setCenter(homePage));
         goalsButton.setOnAction(e -> this.setCenter(goalsPage));
-        goalPlanButton.setOnAction(e -> this.setCenter(goalPlanPage));
+        goalPlanButton.setOnAction(e -> {
+            goalPlanPage.setPageToSummaryView();
+            this.setCenter(goalPlanPage);
+        });
         goalVisButton.setOnAction(e -> this.setCenter(goalVisPage));
-
     }
 
     /**
