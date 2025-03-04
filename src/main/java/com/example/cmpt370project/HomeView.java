@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -37,6 +38,8 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private HomeViewPage currentViewPage = HomeViewPage.HOME;
 
+    // field to store the currently selected section.
+    private String currentSelectedSection = null;
 
     // ********* INTERACTIVE UI ELEMENTS (i.e. they change in drawView()) *********
     // ********* HOME PAGE ELEMENTS *********
@@ -52,9 +55,8 @@ public class HomeView extends StackPane implements Subscriber {
     private ToggleGroup sectionToggleGroup;
     private final DatePicker startDatePicker;
     private final DatePicker endDatePicker;
-
-    // New button for creating a new section
     private final Button createSectionButton;
+    private final VBox goalsBox;
 
     /**
      * Create a new home view page.
@@ -90,6 +92,10 @@ public class HomeView extends StackPane implements Subscriber {
         for (String section : sectionsList) {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
+            sectionButton.setOnAction(e -> {
+                currentSelectedSection = section; // update the currently selected section
+                updateGoalsDisplay(section);
+            });
             sectionButtons.getChildren().add(sectionButton);
         }
         // DatePickers for start and end date
@@ -109,11 +115,19 @@ public class HomeView extends StackPane implements Subscriber {
                 sectionsList.add(newSection);
                 ToggleButton sectionButton = new ToggleButton(newSection);
                 sectionButton.setToggleGroup(sectionToggleGroup);
+                sectionButton.setOnAction(ev -> {
+                    currentSelectedSection = newSection;
+                    updateGoalsDisplay(newSection);
+                });
                 sectionButtons.getChildren().add(sectionButton);
             }
         });
 
-        // Add the root UI element to this view
+        // initialize the goals display container
+        goalsBox = new VBox();
+        goalsBox.setSpacing(10);
+        goalsBox.setPadding(new Insets(10));
+        goalsBox.setStyle("-fx-border-color: blue; -fx-border-width: 1px; -fx-background-color: #eef;");
         this.getChildren().add(root);
 
         // ********* Wire up page change events non-controller based events *********
@@ -150,7 +164,13 @@ public class HomeView extends StackPane implements Subscriber {
     }
     @Override
     public void modelUpdated() {
-        drawView();
+        // If a section is currently selected, update its goals display; otherwise, redraw the view.
+        if (currentViewPage == HomeViewPage.HOME && sectionToggleGroup.getSelectedToggle() != null) {
+            String selectedSection = ((ToggleButton) sectionToggleGroup.getSelectedToggle()).getText();
+            updateGoalsDisplay(selectedSection);
+        } else {
+            drawView();
+        }
     }
     /**
      * Set up interaction with a controller for this view.
@@ -183,7 +203,6 @@ public class HomeView extends StackPane implements Subscriber {
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(20);
         root.setPadding(new Insets(20));
-
         // create a box to display sections
         VBox sectionBox = new VBox();
         sectionBox.setSpacing(10);
@@ -191,10 +210,23 @@ public class HomeView extends StackPane implements Subscriber {
         sectionBox.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
         Label sectionLabel = new Label("Sections:");
         sectionBox.getChildren().addAll(sectionLabel, sectionButtons);
-
         // add the section box and the create section button separately to the root
-        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton, sectionBox, createSectionButton);
+        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton, sectionBox, createSectionButton, goalsBox);
         this.getChildren().add(root);
+
+        // restore the selected toggle if a section was previously selected.
+        if (currentSelectedSection != null) {
+            for (javafx.scene.Node node : sectionButtons.getChildren()) {
+                if (node instanceof ToggleButton) {
+                    ToggleButton tb = (ToggleButton) node;
+                    if (tb.getText().equalsIgnoreCase(currentSelectedSection)) {
+                        tb.setSelected(true);
+                        updateGoalsDisplay(currentSelectedSection);
+                        break;
+                    }
+                }
+            }
+        }
     }
     /**
      * Draws the UI of the Add Goal page.
@@ -214,5 +246,28 @@ public class HomeView extends StackPane implements Subscriber {
                 new Label("End Date:"), endDatePicker,
                 submitGoalButton, cancelAddGoalButton
         );
+    }
+
+    /**
+     * Updates the goalsBox to display all goals in the given section.
+     * Assumes goalModel.getGoalsForSection(section) returns a List of Goal objects.
+     * If there are no goals, displays a default message.
+     * @param section the section whose goals should be displayed.
+     */
+    private void updateGoalsDisplay(String section) {
+        currentSelectedSection = section; // update the field so we know which section is active
+        goalsBox.getChildren().clear();
+        // retrieve goals for the selected section from the model
+        List<Goal> goals = goalModel.getGoalsForSection(section);
+        // debug: print out number of goals found for this section
+        System.out.println("Updating goals display for section '" + section + "': " + goals.size() + " goal(s) found.");
+        if (goals.isEmpty()){
+            goalsBox.getChildren().add(new Label("No goals in this section."));
+        } else {
+            for (Goal goal : goals){
+                Label goalLabel = new Label(goal.toString());
+                goalsBox.getChildren().add(goalLabel);
+            }
+        }
     }
 }
