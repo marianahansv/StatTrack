@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * View to handle organization UI elements of the home page.
@@ -53,6 +53,9 @@ public class HomeView extends StackPane implements Subscriber {
     private final DatePicker startDatePicker;
     private final DatePicker endDatePicker;
 
+    // New button for creating a new section
+    private final Button createSectionButton;
+
     /**
      * Create a new home view page.
      */
@@ -93,6 +96,23 @@ public class HomeView extends StackPane implements Subscriber {
         startDatePicker = new DatePicker(LocalDate.now());
         endDatePicker = new DatePicker(LocalDate.now().plusDays(7));
 
+        //  "Create New Section" feature
+        createSectionButton = new Button("Create New Section");
+        createSectionButton.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("New Section");
+            dialog.setHeaderText("Create a New Section");
+            dialog.setContentText("Enter section name:");
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent() && !result.get().isBlank()) {
+                String newSection = result.get();
+                sectionsList.add(newSection);
+                ToggleButton sectionButton = new ToggleButton(newSection);
+                sectionButton.setToggleGroup(sectionToggleGroup);
+                sectionButtons.getChildren().add(sectionButton);
+            }
+        });
+
         // Add the root UI element to this view
         this.getChildren().add(root);
 
@@ -120,7 +140,6 @@ public class HomeView extends StackPane implements Subscriber {
         this.currentViewPage = newPage;
         drawView();
     }
-
     /**
      * Set the goal model of this view.
      * @param goalModel the goal model that this view will pull data from.
@@ -164,8 +183,18 @@ public class HomeView extends StackPane implements Subscriber {
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(20);
         root.setPadding(new Insets(20));
+
+        // create a box to display sections
+        VBox sectionBox = new VBox();
+        sectionBox.setSpacing(10);
+        sectionBox.setPadding(new Insets(10));
+        sectionBox.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
+        Label sectionLabel = new Label("Sections:");
+        sectionBox.getChildren().addAll(sectionLabel, sectionButtons);
+
+        // add the section box and the create section button separately to the root
+        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton, sectionBox, createSectionButton);
         this.getChildren().add(root);
-        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton);
     }
     /**
      * Draws the UI of the Add Goal page.
