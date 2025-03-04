@@ -2,11 +2,14 @@ package com.example.cmpt370project;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * View to handle organization UI elements of the home page.
@@ -16,6 +19,11 @@ public class HomeView extends StackPane implements Subscriber {
      * The goal model that this view gets goal data from.
      */
     private GoalModel goalModel;
+    /**
+     * List of sections
+     */
+    private ArrayList<String> sectionsList;
+
     /**
      * The root of this view.
      */
@@ -32,35 +40,66 @@ public class HomeView extends StackPane implements Subscriber {
 
     // ********* INTERACTIVE UI ELEMENTS (i.e. they change in drawView()) *********
     // ********* HOME PAGE ELEMENTS *********
+    private final Button clearGoalsButton;
     private final Button addGoalButton;
     private final Label welcomeLabel;
     // ********* ADD GOAL PAGE ELEMENTS *********
-    private TextField titleInput;
-    private Button cancelAddGoalButton;
+    private final TextField titleInput;
+    private final Button cancelAddGoalButton;
     private final Button submitGoalButton;
+    private final ComboBox<String> difficultyComboBox;
+    private HBox sectionButtons;
+    private ToggleGroup sectionToggleGroup;
+    private final DatePicker startDatePicker;
+    private final DatePicker endDatePicker;
 
     /**
      * Create a new home view page.
      */
     public HomeView() {
         root = new VBox();
+        // Home page element
         addGoalButton = new Button("Add Goal"); //on main page
         welcomeLabel = new Label("Welcome to the Home Page!");
-        //add goal page elements
-        submitGoalButton = new Button("Add Goal");
-        titleInput = new TextField("Title");
+        clearGoalsButton = new Button("Clear Goals");
+
+        // Add goal page element
+        submitGoalButton = new Button("Add Goal"); //to database
+        titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
+        difficultyComboBox = new ComboBox<>();
+        difficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
         root.setPadding(new Insets(10));
         root.getChildren().addAll(welcomeLabel, addGoalButton);
 
+        // ToggleGroup for sections
+        sectionsList = new ArrayList<String>();
+        sectionsList.add("General");
+        sectionsList.add("Personal");
+        sectionsList.add("Fitness");
+        // Group for toggle buttons for sections
+        sectionToggleGroup = new ToggleGroup();
+        sectionButtons = new HBox(10);
+        sectionButtons.setAlignment(Pos.CENTER);
+        for (String section : sectionsList) {
+            ToggleButton sectionButton = new ToggleButton(section);
+            sectionButton.setToggleGroup(sectionToggleGroup);
+            sectionButtons.getChildren().add(sectionButton);
+        }
+        // DatePickers for start and end date
+        startDatePicker = new DatePicker(LocalDate.now());
+        endDatePicker = new DatePicker(LocalDate.now().plusDays(7));
+
         // Add the root UI element to this view
         this.getChildren().add(root);
 
+
         // ********* Wire up page change events non-controller based events *********
         addGoalButton.setOnAction(e -> changePage(HomeViewPage.ADD_GOAL));
+        cancelAddGoalButton.setOnAction(e -> changePage(HomeViewPage.HOME));
 
         drawView();
     }
@@ -82,12 +121,7 @@ public class HomeView extends StackPane implements Subscriber {
         this.currentViewPage = newPage;
         drawView();
     }
-    /**
-     * Sets the current page of this view to the home view.
-     */
-    public void setPageToHomeView() {
-        changePage(HomeViewPage.HOME);
-    }
+
     /**
      * Set the goal model of this view.
      * @param goalModel the goal model that this view will pull data from.
@@ -111,10 +145,16 @@ public class HomeView extends StackPane implements Subscriber {
         // ********* ADD GOAL PAGE EVENTS *********
         submitGoalButton.setOnAction(e -> {
             // Handle the submission of a new goal (pass to the controller)
-            c.handleButtonPress(e);
+            String difficulty = difficultyComboBox.getValue();
+            Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
+            String section = ((ToggleButton)selectedToggle).getText();
+            LocalDate startDate = startDatePicker.getValue();
+            LocalDate endDate = endDatePicker.getValue();
+            c.handleButtonPress(e, titleInput.getText(), difficulty, section, startDate, endDate);
             changePage(HomeViewPage.HOME); // Return to the summary page after submission
         });
-        cancelAddGoalButton.setOnAction(e -> changePage(HomeViewPage.HOME));
+
+        clearGoalsButton.setOnAction(c::removeButtonPress);
     }
     /**
      * Draws the UI of the Home page.
@@ -126,7 +166,7 @@ public class HomeView extends StackPane implements Subscriber {
         root.setSpacing(20);
         root.setPadding(new Insets(20));
         this.getChildren().add(root);
-        root.getChildren().addAll(welcomeLabel, addGoalButton);
+        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton);
     }
     /**
      * Draws the UI of the Add Goal page.
@@ -138,6 +178,13 @@ public class HomeView extends StackPane implements Subscriber {
         root.setSpacing(20);
         root.setPadding(new Insets(20));
         this.getChildren().add(root);
-        root.getChildren().addAll(titleInput,submitGoalButton,cancelAddGoalButton);
+        root.getChildren().addAll(
+                new Label("Goal Title:"), titleInput,
+                new Label("Difficulty:"), difficultyComboBox,
+                new Label("Sections:"), sectionButtons,
+                new Label("Start Date:"), startDatePicker,
+                new Label("End Date:"), endDatePicker,
+                submitGoalButton, cancelAddGoalButton
+        );
     }
 }

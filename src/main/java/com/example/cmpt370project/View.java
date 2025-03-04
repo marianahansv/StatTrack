@@ -45,16 +45,6 @@ public class View extends StackPane implements Subscriber {
         update();
     }
 
-    /**
-     * Set up the "passing of the events" from the UI elements to the controller.
-     * @param c the controller.
-     */
-    public void setupEvents(Controller c) {
-        // For each of these, there is a method in the controller that is executed for each button.
-        // i.e. we pass the action event of the button to a method in the controller to be dealt with there.
-        addGoalButton.setOnAction(c::handleButtonPress);
-        removeGoalButton.setOnAction(c::removeButtonPress);
-    }
 
     /**
      * What happens when the model is updated? This view updates itself.

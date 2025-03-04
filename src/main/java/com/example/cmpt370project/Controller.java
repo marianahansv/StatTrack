@@ -24,9 +24,8 @@ public class Controller {
      * Handles making the model change when the user adds a goal using the button.
      * @param actionEvent the event that happens when the button is pressed.
      */
-    public void handleButtonPress(ActionEvent actionEvent) {
-        Goal newGoal = new Goal("Goal #" + gm.getGoalCount(), LocalDate.now(), LocalDate.now().plusDays(3));
-        gm.addGoal(newGoal);
+    public void handleButtonPress(ActionEvent actionEvent, String title, String difficulty, String section, LocalDate start, LocalDate end) {
+        gm.addGoal(title,difficulty,section,start,end);
     }
 
 
