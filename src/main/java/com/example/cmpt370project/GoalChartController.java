@@ -34,6 +34,6 @@ public class GoalChartController {
         this.goalModel = goalModel;
         
         // Subscribe to model updates so that the chart view is refreshed whenever the model changes.
-        goalModel.addSubscriber(() -> chartView.updateChart()); // Updates the view
+//        goalModel.addSubscriber(() -> chartView.updateChart()); // Updates the view
     }
 }

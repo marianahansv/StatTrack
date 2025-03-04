@@ -35,7 +35,7 @@ public class HomeView extends StackPane implements Subscriber {
     public HomeView() {
         root = new VBox();
         addGoalButton = new Button("Add Goal");
-        removeGoalButton = new Button("Remove Goal");
+        removeGoalButton = new Button("Clear Goals");
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
