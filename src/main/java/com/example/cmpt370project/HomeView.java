@@ -21,6 +21,10 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private GoalModel goalModel;
     /**
+     * The section model that this view gets section data from.
+     */
+    private SectionModel sectionModel;
+    /**
      * List of sections
      */
     private ArrayList<String> sectionsList;
@@ -80,12 +84,11 @@ public class HomeView extends StackPane implements Subscriber {
         root.setPadding(new Insets(10));
         root.getChildren().addAll(welcomeLabel, addGoalButton);
 
+        // Initialize SectionModel and load sections from file
+        sectionModel = new SectionModel();
+        sectionsList = new ArrayList<>(sectionModel.getSections());
+
         // ToggleGroup for sections
-        sectionsList = new ArrayList<String>();
-        sectionsList.add("General");
-        sectionsList.add("Personal");
-        sectionsList.add("Fitness");
-        // Group for toggle buttons for sections
         sectionToggleGroup = new ToggleGroup();
         sectionButtons = new HBox(10);
         sectionButtons.setAlignment(Pos.CENTER);
@@ -112,6 +115,8 @@ public class HomeView extends StackPane implements Subscriber {
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent() && !result.get().isBlank()) {
                 String newSection = result.get();
+                // persist the new section using SectionModel
+                sectionModel.addSection(newSection);
                 sectionsList.add(newSection);
                 ToggleButton sectionButton = new ToggleButton(newSection);
                 sectionButton.setToggleGroup(sectionToggleGroup);
@@ -214,7 +219,7 @@ public class HomeView extends StackPane implements Subscriber {
         root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton, sectionBox, createSectionButton, goalsBox);
         this.getChildren().add(root);
 
-        // restore the selected toggle if a section was previously selected.
+        //restore the selected toggle if a section was previously selected.
         if (currentSelectedSection != null) {
             for (javafx.scene.Node node : sectionButtons.getChildren()) {
                 if (node instanceof ToggleButton) {
@@ -259,8 +264,6 @@ public class HomeView extends StackPane implements Subscriber {
         goalsBox.getChildren().clear();
         // retrieve goals for the selected section from the model
         List<Goal> goals = goalModel.getGoalsForSection(section);
-        // debug: print out number of goals found for this section
-        System.out.println("Updating goals display for section '" + section + "': " + goals.size() + " goal(s) found.");
         if (goals.isEmpty()){
             goalsBox.getChildren().add(new Label("No goals in this section."));
         } else {
