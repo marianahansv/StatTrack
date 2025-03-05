@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * View to handle organization UI elements of the home page.
@@ -20,7 +21,11 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private GoalModel goalModel;
     /**
-     * List of sections
+     * The section model that this view gets section data from.
+     */
+    private SectionModel sectionModel;
+    /**
+     * List of sections.
      */
     private ArrayList<String> sectionsList;
 
@@ -37,6 +42,10 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private HomeViewPage currentViewPage = HomeViewPage.HOME;
 
+    /**
+     * Field to store the currently selected section.
+     */
+    private String currentSelectedSection = null;
 
     // ********* INTERACTIVE UI ELEMENTS (i.e. they change in drawView()) *********
     // ********* HOME PAGE ELEMENTS *********
@@ -52,6 +61,12 @@ public class HomeView extends StackPane implements Subscriber {
     private ToggleGroup sectionToggleGroup;
     private final DatePicker startDatePicker;
     private final DatePicker endDatePicker;
+    private final Button createSectionButton;
+    private final Button deleteSectionButton;
+    /**
+     * The container that displays goals for the selected section.
+     */
+    private final VBox goalsBox;
 
     /**
      * Create a new home view page.
@@ -59,12 +74,12 @@ public class HomeView extends StackPane implements Subscriber {
     public HomeView() {
         root = new VBox();
         // Home page element
-        addGoalButton = new Button("Add Goal"); //on main page
+        addGoalButton = new Button("Add Goal");
         welcomeLabel = new Label("Welcome to the Home Page!");
         clearGoalsButton = new Button("Clear Goals");
 
         // Add goal page element
-        submitGoalButton = new Button("Add Goal"); //to database
+        submitGoalButton = new Button("Add Goal");
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
         difficultyComboBox = new ComboBox<>();
@@ -75,25 +90,80 @@ public class HomeView extends StackPane implements Subscriber {
         root.setPadding(new Insets(10));
         root.getChildren().addAll(welcomeLabel, addGoalButton);
 
+        // Initialize SectionModel and load sections from file
+        sectionModel = new SectionModel();
+        sectionsList = new ArrayList<>(sectionModel.getSections());
+
         // ToggleGroup for sections
-        sectionsList = new ArrayList<String>();
-        sectionsList.add("General");
-        sectionsList.add("Personal");
-        sectionsList.add("Fitness");
-        // Group for toggle buttons for sections
         sectionToggleGroup = new ToggleGroup();
         sectionButtons = new HBox(10);
         sectionButtons.setAlignment(Pos.CENTER);
         for (String section : sectionsList) {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
+            sectionButton.setOnAction(e -> {
+                currentSelectedSection = section; // update the currently selected section
+                updateGoalsDisplay(section);
+            });
             sectionButtons.getChildren().add(sectionButton);
         }
         // DatePickers for start and end date
         startDatePicker = new DatePicker(LocalDate.now());
         endDatePicker = new DatePicker(LocalDate.now().plusDays(7));
 
-        // Add the root UI element to this view
+        //  "Create New Section" feature
+        createSectionButton = new Button("Create New Section");
+        createSectionButton.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("New Section");
+            dialog.setHeaderText("Create a New Section");
+            dialog.setContentText("Enter section name:");
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent() && !result.get().isBlank()) {
+                String newSection = result.get();
+                // Persist the new section using SectionModel
+                sectionModel.addSection(newSection);
+                sectionsList.add(newSection);
+                ToggleButton sectionButton = new ToggleButton(newSection);
+                sectionButton.setToggleGroup(sectionToggleGroup);
+                sectionButton.setOnAction(ev -> {
+                    currentSelectedSection = newSection;
+                    updateGoalsDisplay(newSection);
+                });
+                sectionButtons.getChildren().add(sectionButton);
+            }
+        });
+
+        // "Delete Section" feature
+        deleteSectionButton = new Button("Delete Section");
+        deleteSectionButton.setOnAction(e -> {
+            // ChoiceDialog to let the user select a section to delete
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(null, new ArrayList<>(sectionModel.getSections()));
+            dialog.setTitle("Delete Section");
+            dialog.setHeaderText("Select a section to delete:");
+            dialog.setContentText("Section:");
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(selectedSection -> {
+                // Delete the section from the model
+                boolean deleted = sectionModel.deleteSection(selectedSection);
+                if (deleted) {
+                    // Remove section from the local list and remove its toggle button from the UI
+                    sectionsList.remove(selectedSection);
+                    sectionButtons.getChildren().removeIf(node ->
+                            node instanceof ToggleButton && ((ToggleButton)node).getText().equals(selectedSection)
+                    );
+                }
+            });
+        });
+
+        // initialize the goals display container
+        goalsBox = new VBox();
+        goalsBox.setSpacing(10);
+        goalsBox.setPadding(new Insets(10));
+        goalsBox.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: #cdb6f3;");
+        goalsBox.setVisible(false);
+        goalsBox.setManaged(false);
+
         this.getChildren().add(root);
 
         // ********* Wire up page change events non-controller based events *********
@@ -107,7 +177,7 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private void drawView() {
         getChildren().clear();
-        switch (currentViewPage){
+        switch (currentViewPage) {
             case HOME -> drawHomeView();
             case ADD_GOAL -> drawAddGoalView();
         }
@@ -120,7 +190,6 @@ public class HomeView extends StackPane implements Subscriber {
         this.currentViewPage = newPage;
         drawView();
     }
-
     /**
      * Set the goal model of this view.
      * @param goalModel the goal model that this view will pull data from.
@@ -131,7 +200,13 @@ public class HomeView extends StackPane implements Subscriber {
     }
     @Override
     public void modelUpdated() {
-        drawView();
+        // If a section is currently selected, update its goals display; otherwise, redraw the view.
+        if (currentViewPage == HomeViewPage.HOME && sectionToggleGroup.getSelectedToggle() != null) {
+            String selectedSection = ((ToggleButton) sectionToggleGroup.getSelectedToggle()).getText();
+            updateGoalsDisplay(selectedSection);
+        } else {
+            drawView();
+        }
     }
     /**
      * Set up interaction with a controller for this view.
@@ -146,10 +221,10 @@ public class HomeView extends StackPane implements Subscriber {
             // Handle the submission of a new goal (pass to the controller)
             String difficulty = difficultyComboBox.getValue();
             Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
-            String section = ((ToggleButton)selectedToggle).getText();
+            String section = ((ToggleButton) selectedToggle).getText();
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
-            c.handleButtonPress(e, titleInput.getText(), difficulty, section, startDate, endDate);
+            c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate);
             changePage(HomeViewPage.HOME); // Return to the summary page after submission
         });
 
@@ -159,19 +234,38 @@ public class HomeView extends StackPane implements Subscriber {
      * Draws the UI of the Home page.
      */
     private void drawHomeView() {
-        // Set up root element for page
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(20);
         root.setPadding(new Insets(20));
+        // create a box to display sections
+        VBox sectionBox = new VBox();
+        sectionBox.setSpacing(10);
+        sectionBox.setPadding(new Insets(10));
+        sectionBox.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
+        Label sectionLabel = new Label("Sections:");
+        sectionBox.getChildren().addAll(sectionLabel, sectionButtons);
+        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton, sectionBox, createSectionButton, deleteSectionButton, goalsBox);
         this.getChildren().add(root);
-        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton);
+
+        //restore the selected toggle if a section was previously selected.
+        if (currentSelectedSection != null) {
+            for (javafx.scene.Node node : sectionButtons.getChildren()) {
+                if (node instanceof ToggleButton) {
+                    ToggleButton tb = (ToggleButton) node;
+                    if (tb.getText().equalsIgnoreCase(currentSelectedSection)) {
+                        tb.setSelected(true);
+                        updateGoalsDisplay(currentSelectedSection);
+                        break;
+                    }
+                }
+            }
+        }
     }
     /**
      * Draws the UI of the Add Goal page.
      */
     private void drawAddGoalView() {
-        // Set up root element for page
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(20);
@@ -185,5 +279,31 @@ public class HomeView extends StackPane implements Subscriber {
                 new Label("End Date:"), endDatePicker,
                 submitGoalButton, cancelAddGoalButton
         );
+    }
+
+    /**
+     * Updates the goalsBox to display all goals in the given section.
+     * Assumes goalModel.getGoalsForSection(section) returns a List of Goal objects.
+     * If there are no goals, displays a default message.
+     * @param section the section whose goals should be displayed.
+     */
+    private void updateGoalsDisplay(String section) {
+        currentSelectedSection = section;
+        goalsBox.getChildren().clear();
+
+        // the section box only shows up when the section is selected
+        goalsBox.setVisible(true);
+        goalsBox.setManaged(true);
+
+        List<Goal> goals = goalModel.getGoalsForSection(section);
+        System.out.println("Updating goals display for section '" + section + "': " + goals.size() + " goal(s) found.");
+        if (goals.isEmpty()) {
+            goalsBox.getChildren().add(new Label("No goals in this section."));
+        } else {
+            for (Goal goal : goals) {
+                Label goalLabel = new Label(goal.toString());
+                goalsBox.getChildren().add(goalLabel);
+            }
+        }
     }
 }

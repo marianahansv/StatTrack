@@ -184,6 +184,21 @@ public class GoalModel {
     }
 
     /**
+     * Returns a list of goals that belong to the given section.
+     * @param section the section name
+     * @return list of goals in that section
+     */
+    public List<Goal> getGoalsForSection(String section) {
+        List<Goal> sectionGoals = new ArrayList<>();
+        for (Goal goal : goals.values()) {
+            if (goal.getSection().equalsIgnoreCase(section)) {
+                sectionGoals.add(goal);
+            }
+        }
+        return sectionGoals;
+    }
+
+    /**
      * Notify th subscribers of this model that the data has changed.
      */
     public void notifySubscribers() {
