@@ -48,6 +48,20 @@ public class SectionModel {
     }
 
     /**
+     * Deletes the specified section from the model if it exists, then saves the updated list.
+     *
+     * @param section the name of the section to delete
+     * @return true if the section was deleted, false otherwise
+     */
+    public boolean deleteSection(String section) {
+        boolean removed = sections.remove(section);
+        if (removed) {
+            saveSectionsToFile();
+        }
+        return removed;
+    }
+
+    /**
      * Returns the list of sections.
      *
      * @return a {@code List<String>} containing all sections
