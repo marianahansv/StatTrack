@@ -42,7 +42,9 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private HomeViewPage currentViewPage = HomeViewPage.HOME;
 
-    // field to store the currently selected section.
+    /**
+     * Field to store the currently selected section.
+     */
     private String currentSelectedSection = null;
 
     // ********* INTERACTIVE UI ELEMENTS (i.e. they change in drawView()) *********
@@ -61,6 +63,9 @@ public class HomeView extends StackPane implements Subscriber {
     private final DatePicker endDatePicker;
     private final Button createSectionButton;
     private final Button deleteSectionButton;
+    /**
+     * The container that displays goals for the selected section.
+     */
     private final VBox goalsBox;
 
     /**
@@ -69,12 +74,12 @@ public class HomeView extends StackPane implements Subscriber {
     public HomeView() {
         root = new VBox();
         // Home page element
-        addGoalButton = new Button("Add Goal"); //on main page
+        addGoalButton = new Button("Add Goal");
         welcomeLabel = new Label("Welcome to the Home Page!");
         clearGoalsButton = new Button("Clear Goals");
 
         // Add goal page element
-        submitGoalButton = new Button("Add Goal"); //to database
+        submitGoalButton = new Button("Add Goal");
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
         difficultyComboBox = new ComboBox<>();
@@ -155,7 +160,10 @@ public class HomeView extends StackPane implements Subscriber {
         goalsBox = new VBox();
         goalsBox.setSpacing(10);
         goalsBox.setPadding(new Insets(10));
-        goalsBox.setStyle("-fx-border-color: blue; -fx-border-width: 1px; -fx-background-color: #eef;");
+        goalsBox.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: #cdb6f3;");
+        goalsBox.setVisible(false);
+        goalsBox.setManaged(false);
+
         this.getChildren().add(root);
 
         // ********* Wire up page change events non-controller based events *********
@@ -282,12 +290,17 @@ public class HomeView extends StackPane implements Subscriber {
     private void updateGoalsDisplay(String section) {
         currentSelectedSection = section;
         goalsBox.getChildren().clear();
+
+        // the section box only shows up when the section is selected
+        goalsBox.setVisible(true);
+        goalsBox.setManaged(true);
+
         List<Goal> goals = goalModel.getGoalsForSection(section);
         System.out.println("Updating goals display for section '" + section + "': " + goals.size() + " goal(s) found.");
-        if (goals.isEmpty()){
+        if (goals.isEmpty()) {
             goalsBox.getChildren().add(new Label("No goals in this section."));
         } else {
-            for (Goal goal : goals){
+            for (Goal goal : goals) {
                 Label goalLabel = new Label(goal.toString());
                 goalsBox.getChildren().add(goalLabel);
             }
