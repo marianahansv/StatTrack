@@ -185,7 +185,8 @@ private void updateLineChart() {
     today.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 0));
     today.setName("Today");
     // Today also should be a category
-    categories.add(today.toString());
+    //String today = LocalDate.now().toString();
+    categories.add(LocalDate.now().toString());
 
     // Sort categories in chronological order (That is the default thank god I would have killed myself otherwise)
     FXCollections.sort(categories);
