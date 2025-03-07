@@ -77,6 +77,7 @@ public class GoalProgress extends VBox {
         barChart.setTitle("Time Remaining");
 
         NumberAxis yAxisLine = new NumberAxis();
+        NumberAxis xAxisLine = new NumberAxis();
         lineChart = new LineChart<>(xAxis, yAxisLine);
         lineChart.setTitle("Time Remaining");
     }
@@ -140,6 +141,7 @@ public class GoalProgress extends VBox {
      */
     private void updateBarChart() {
         barChart.getData().clear();
+        // lineChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Days Left");
 
@@ -165,31 +167,51 @@ private void updateLineChart() {
     // List to hold dates as categories (so they can overlap and not connect)
     ObservableList<String> categories = FXCollections.observableArrayList();
 
-    // Loop through each goal and add its start and end dates as categories
+    LocalDate maxDate = LocalDate.now();
+    LocalDate minDate = LocalDate.now();
+
+    // Loop through each goal and get the earliest date and latest date for parameters for the graph
     for (Goal goal : goalModel.getGoals()) {
-        String start = goal.getStartDate().toString();
-        String end = goal.getEndDate().toString();
-        if (!categories.contains(start)) {
-            categories.add(start);
+        if (goal.getStartDate().isBefore(minDate)) {
+            minDate = goal.getStartDate();
         }
-        if (!categories.contains(end)) {
-            categories.add(end);
+        if (goal.getEndDate().isBefore(minDate)) {
+            minDate = goal.getEndDate();
+        }
+        if (goal.getStartDate().isAfter(maxDate)) {
+            maxDate = goal.getStartDate();
+        }
+        if (goal.getEndDate().isAfter(maxDate)) {
+            maxDate = goal.getEndDate();
         }
     }
     
     // List to hold a separate series for each goal
     ArrayList<XYChart.Series<String, Number>> list = new ArrayList<>();
     // A line to indicate today
-    XYChart.Series<String, Number> today = new XYChart.Series<>();
-    today.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 40));
-    today.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 0));
-    today.setName("Today");
-    // Today also should be a category
+    XYChart.Series<String, Number> todayLine = new XYChart.Series<>();
+    todayLine.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 40));
+    todayLine.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 0));
+    todayLine.setName("Today");
+
+    LocalDate today = LocalDate.now();
+    // Today also should also be checked if it should be the start or end time
+    if (today.isBefore(minDate)) {
+        minDate = today;
+    }
+    if (today.isAfter(maxDate)) {
+        maxDate = today;
+    }
     //String today = LocalDate.now().toString();
-    categories.add(LocalDate.now().toString());
+    //categories.add(LocalDate.now().toString());
 
     // Sort categories in chronological order (That is the default thank god I would have killed myself otherwise)
-    FXCollections.sort(categories);
+    //FXCollections.sort(categories); //Doesnt need to be sorted anymore
+    
+    // Gets every date between the min and max and adds them to the categories list as they will act as their own category making the x axis even
+    for (LocalDate i = minDate; !i.isAfter(maxDate); i = i.plusDays(1)) { // Potentially change the one to someothing else or make it different depending on the span of days
+        categories.add(i.toString());
+    }
     // Set the sorted categories on the X axis
     xAxis.setCategories(categories);
     
@@ -209,7 +231,7 @@ private void updateLineChart() {
         // Add the newly created series to the list
         list.add(series);
     }
-    list.add(today);
+    list.add(todayLine);
     // System.out.println(list);
     
     // Add all series to the LineChart so each goal appears as its own line
