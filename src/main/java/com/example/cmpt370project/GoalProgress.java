@@ -144,7 +144,8 @@ public class GoalProgress extends VBox {
 
         for (Goal goal : goalModel.getGoals()) {
             long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
-            if (daysLeft < 0) daysLeft = 0;
+            if (daysLeft < 0) {continue;}
+            
             series.getData().add(new XYChart.Data<>(goal.getTitle(), daysLeft));
         }
 
@@ -168,7 +169,7 @@ public class GoalProgress extends VBox {
             series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), daysLeft));
         }
 
-        lineChart.getData().add(series);
+        lineChart.getData().addAll(series);
     }
 }
 
