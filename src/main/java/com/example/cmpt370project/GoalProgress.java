@@ -77,8 +77,8 @@ public class GoalProgress extends VBox {
         barChart.setTitle("Time Remaining");
 
         NumberAxis yAxisLine = new NumberAxis();
-        NumberAxis xAxisLine = new NumberAxis();
-        lineChart = new LineChart<>(xAxis, yAxisLine);
+        CategoryAxis xAxisLine = new CategoryAxis();
+        lineChart = new LineChart<>(xAxisLine, yAxisLine);
         lineChart.setTitle("Time Remaining");
     }
 
