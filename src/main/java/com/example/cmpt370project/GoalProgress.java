@@ -7,6 +7,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -152,24 +153,42 @@ public class GoalProgress extends VBox {
         barChart.getData().add(series);
     }
 
-    /**
-     * Creates and adds a LineChart.
-     */
-    private void updateLineChart() {
-        lineChart.getData().clear();
+  /**
+ * Updates the LineChart so that each goal is displayed as its own line.
+ * Each goal gets a separate series with its own start and end data points.
+ */
+private void updateLineChart() {
+    // Clear any existing data from the LineChart
+    lineChart.getData().clear();
+    
+    // List to hold a separate series for each goal
+    ArrayList<XYChart.Series<String, Number>> list = new ArrayList<>();
+    XYChart.Series<String, Number> today = new XYChart.Series<>();
+    today.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 40));
+    today.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 0));
+    today.setName("Today");
+    
+    
+    // Loop through each goal in the model
+    for (Goal goal : goalModel.getGoals()) {
+        // Create a new series for the current goal
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Goal Progress");
-
-        for (Goal goal : goalModel.getGoals()) {
-            long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
-            long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
-            if (daysLeft < 0) daysLeft = 0;
-
-            series.getData().add(new XYChart.Data<>(goal.getStartDate().toString(), totalDays));
-            series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), daysLeft));
-        }
-
-        lineChart.getData().add(series);
+        series.setName(goal.getTitle()); // Set the series name to the goal's title
+        
+        // Calculate the total days from the start date to the end date
+        long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
+        // Add the start point (at total days value) and the end point (0 progress)
+        series.getData().add(new XYChart.Data<>(goal.getStartDate().toString(), totalDays));
+        series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), 0));
+        
+        // Add the newly created series to the list
+        list.add(series);
+    }
+    list.add(today);
+    // System.out.println(list);
+    
+    // Add all series to the LineChart so each goal appears as its own line
+    lineChart.getData().addAll(list);
     }
 }
 
