@@ -160,13 +160,37 @@ public class GoalProgress extends VBox {
 private void updateLineChart() {
     // Clear any existing data from the LineChart
     lineChart.getData().clear();
+    // Makes the X Axis consistent
+    CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
+    // List to hold dates as categories (so they can overlap and not connect)
+    ObservableList<String> categories = FXCollections.observableArrayList();
+
+    // Loop through each goal and add its start and end dates as categories
+    for (Goal goal : goalModel.getGoals()) {
+        String start = goal.getStartDate().toString();
+        String end = goal.getEndDate().toString();
+        if (!categories.contains(start)) {
+            categories.add(start);
+        }
+        if (!categories.contains(end)) {
+            categories.add(end);
+        }
+    }
     
     // List to hold a separate series for each goal
     ArrayList<XYChart.Series<String, Number>> list = new ArrayList<>();
+    // A line to indicate today
     XYChart.Series<String, Number> today = new XYChart.Series<>();
     today.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 40));
     today.getData().add(new XYChart.Data<>(LocalDate.now().toString(), 0));
     today.setName("Today");
+    // Today also should be a category
+    categories.add(today.toString());
+
+    // Sort categories in chronological order (That is the default thank god I would have killed myself otherwise)
+    FXCollections.sort(categories);
+    // Set the sorted categories on the X axis
+    xAxis.setCategories(categories);
     
     
     // Loop through each goal in the model
@@ -177,7 +201,7 @@ private void updateLineChart() {
         
         // Calculate the total days from the start date to the end date
         long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
-        // Add the start point (at total days value) and the end point (0 progress)
+        // Add the start point (at total days value) and the end point (0 ie the bottom of the graph)
         series.getData().add(new XYChart.Data<>(goal.getStartDate().toString(), totalDays));
         series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), 0));
         
