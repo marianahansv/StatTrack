@@ -202,11 +202,11 @@ private void updateLineChart() {
     if (today.isAfter(maxDate)) {
         maxDate = today;
     }
-    //String today = LocalDate.now().toString();
-    //categories.add(LocalDate.now().toString());
+    // String today = LocalDate.now().toString();
+    // categories.add(LocalDate.now().toString());
 
     // Sort categories in chronological order (That is the default thank god I would have killed myself otherwise)
-    //FXCollections.sort(categories); //Doesnt need to be sorted anymore
+    // FXCollections.sort(categories); //Doesnt need to be sorted anymore
     
     // Gets every date between the min and max and adds them to the categories list as they will act as their own category making the x axis even
     for (LocalDate i = minDate; !i.isAfter(maxDate); i = i.plusDays(1)) { // Potentially change the one to someothing else or make it different depending on the span of days
