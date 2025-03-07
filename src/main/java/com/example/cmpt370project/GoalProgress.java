@@ -169,7 +169,7 @@ public class GoalProgress extends VBox {
             series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), daysLeft));
         }
 
-        lineChart.getData().addAll(series);
+        lineChart.getData().add(series);
     }
 }
 
