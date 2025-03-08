@@ -1,5 +1,7 @@
 package com.example.cmpt370project;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -314,21 +316,43 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
             planSelectLayout.getChildren().addAll(planStyleLabel,toggleGroupLayout);
 
+            // Create containers for goal plan timeline input
+            VBox dayWeekSelectInputLayout = new VBox(10);
+            Label dayWeekLabel = new Label("How would you like your goal plan to measure and improve your goal completion habits?");
+
+            // Create ComboBox for Weekly/ Daily selection
+            ComboBox<String> timelineSelectBox = new ComboBox<>();
+            timelineSelectBox.getItems().addAll("DAILY Basis", "WEEKLY Basis");
+            timelineSelectBox.setValue("DAILY Basis"); // Default value
+
+            dayWeekSelectInputLayout.getChildren().addAll(dayWeekLabel, timelineSelectBox);
+
+
             // Create container for goal number input form element
             VBox endGoalNumberInputLayout = new VBox(10);
-            Label goalsPerDayLabel = new Label("How many goals would you like to complete every day?");
+            Label goalsPerDayLabel = new Label("How many goals would you like to complete every DAY?");
             endGoalNumberInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1));
             endGoalNumberInputLayout.getChildren().addAll(goalsPerDayLabel, endGoalNumberInput);
 
             // Create container for starting goal number input form element
             VBox startGoalNumberInputLayout = new VBox(10);
-            Label startingGoalsLabel = new Label("How many goals would you like to start with completing every day?");
+            Label startingGoalsLabel = new Label("How many goals would you like to start with completing every DAY?");
             startGoalNumberInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1));
             startGoalNumberInputLayout.getChildren().addAll(startingGoalsLabel, startGoalNumberInput);
 
             // Put all goal input fields in a container
             HBox planNumbersInputLayout = new HBox(20); // 20px of spacing
             planNumbersInputLayout.getChildren().addAll(endGoalNumberInputLayout, startGoalNumberInputLayout);
+
+
+            // Create containers for goal plan timeline input
+            VBox endDateSelectLayout = new VBox(10);
+            Label endDateLabel= new Label("When would you like to reach your target number of goals to complete?");
+
+            DatePicker endDatePicker = new DatePicker();
+
+            endDateSelectLayout.getChildren().addAll(endDateLabel, endDatePicker);
+
 
             // Create container for submission and cancel buttons
             HBox buttonGroupLayout = new HBox(20); // 20px of spacing
@@ -358,6 +382,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
             endGoalNumberInput.setVisible(true);
             startingGoalsLabel.setVisible(false);
             startGoalNumberInput.setVisible(false);
+            endDateSelectLayout.setVisible(false);
 
             // Control change in visibility based on the selected radio button
             planStyleSelect.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
@@ -366,11 +391,24 @@ public class GoalPlanView extends StackPane implements Subscriber {
                     endGoalNumberInput.setVisible(true);
                     startingGoalsLabel.setVisible(false);
                     startGoalNumberInput.setVisible(false);
+                    endDateSelectLayout.setVisible(false);
                 } else if (newValue == increasePlan) {
                     goalsPerDayLabel.setVisible(true);
                     endGoalNumberInput.setVisible(true);
                     startingGoalsLabel.setVisible(true);
                     startGoalNumberInput.setVisible(true);
+                    endDateSelectLayout.setVisible(true);
+                }
+            });
+
+            // Listener to update labels based on ComboBox selection
+            timelineSelectBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+                if ("DAILY Basis".equals(newValue)) {
+                    goalsPerDayLabel.setText("How many goals would you like to complete every DAY?");
+                    startingGoalsLabel.setText("How many goals would you like to start with completing every DAY?");
+                } else if ("WEEKLY Basis".equals(newValue)) {
+                    goalsPerDayLabel.setText("How many goals would you like to complete every WEEK?");
+                    startingGoalsLabel.setText("How many goals would you like to start with completing every WEEK?");
                 }
             });
 
@@ -391,8 +429,8 @@ public class GoalPlanView extends StackPane implements Subscriber {
             }
 
             // Add all form elements to the form layout
-            formGoalPlanModule.getChildren().addAll(planSelectLayout,
-                    planNumbersInputLayout,
+            formGoalPlanModule.getChildren().addAll(planSelectLayout, dayWeekSelectInputLayout,
+                    planNumbersInputLayout, endDateSelectLayout,
                     buttonGroupLayout);
 
             // Add the form to the root page
