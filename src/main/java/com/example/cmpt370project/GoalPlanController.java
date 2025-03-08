@@ -1,6 +1,8 @@
 package com.example.cmpt370project;
 
 
+import java.time.LocalDate;
+
 /**
  * Handles changing GoalPlanModel according to the users actions.
  */
@@ -35,8 +37,8 @@ public class GoalPlanController {
      * @param inputEndGoalNumber the current number of goals the user will be completing.
      * @param inputStartGoalNumber the eventual number of goals the user wants to get to completing.
      */
-    public void handleSaveIncreaseGoalPlan(int inputEndGoalNumber, int inputStartGoalNumber, IGoalPlan.Timeline timeline) {
-        IncreaseGoalPlan newPlan = new IncreaseGoalPlan(inputStartGoalNumber, inputEndGoalNumber, timeline);
+    public void handleSaveIncreaseGoalPlan(int inputEndGoalNumber, int inputStartGoalNumber, IGoalPlan.Timeline timeline, LocalDate endDate) {
+        IncreaseGoalPlan newPlan = new IncreaseGoalPlan(inputStartGoalNumber, inputEndGoalNumber, timeline, endDate);
         goalPlanModel.setGoalPlan(newPlan);
     }
 

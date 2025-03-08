@@ -6,6 +6,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,10 @@ public class GoalPlanModel {
     /**
      * Handles JSON serialization and deserialization.
      */
-    private static final Gson gson = new GsonBuilder().create();
+    private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
+            context.serialize(src.format(format))).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
+            LocalDate.parse(json.getAsJsonPrimitive().getAsString(), format)).create();
 
     /**
      * The current IGoalPlan the user has set up
@@ -368,7 +373,7 @@ public class GoalPlanModel {
         }
 
         // Test 9: Test save of maintain goal plan (write and read)
-        IGoalPlan igp = new IncreaseGoalPlan(3, 8, com.example.cmpt370project.IGoalPlan.Timeline.DAILY);
+        IGoalPlan igp = new IncreaseGoalPlan(3, 8, com.example.cmpt370project.IGoalPlan.Timeline.DAILY, LocalDate.now());
         emptyGoalPlanModel.setGoalPlan(igp);
 
         emptyGoalPlanModel = new GoalPlanModel();

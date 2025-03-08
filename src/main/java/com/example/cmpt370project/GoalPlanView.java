@@ -50,6 +50,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
     private Button deletePlanButton;
 
     private ComboBox<String> timelineSelectBox;
+    private DatePicker endDatePicker;
     /**
      * Create a new goal plan page.
      */
@@ -69,6 +70,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
         deletePlanButton = new Button();
 
         timelineSelectBox = new ComboBox<>();
+        endDatePicker = new DatePicker();
 
         // ********* Draw the initial view *********
 
@@ -160,9 +162,9 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
             } else {
                 if (timelineSelectBox.getValue().equals("DAILY Basis")) {
-                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.DAILY);
+                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.DAILY, endDatePicker.getValue());
                 } else {
-                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.WEEKLY);
+                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.WEEKLY, endDatePicker.getValue());
                 }
             }
 
@@ -376,7 +378,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
             VBox endDateSelectLayout = new VBox(10);
             Label endDateLabel= new Label("When would you like to reach your target number of goals to complete?");
 
-            DatePicker endDatePicker = new DatePicker();
+            endDatePicker = new DatePicker();
 
             endDateSelectLayout.getChildren().addAll(endDateLabel, endDatePicker);
 

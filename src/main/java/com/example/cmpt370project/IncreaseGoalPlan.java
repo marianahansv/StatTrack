@@ -1,5 +1,7 @@
 package com.example.cmpt370project;
 
+import java.time.LocalDate;
+
 /**
  * Represents a goal plan where the user's goal is to increase the number of goals they complete.
  */
@@ -21,14 +23,20 @@ public class IncreaseGoalPlan implements IGoalPlan {
     private int maxGoalNumber;
 
     /**
+     * The date at which the increase plan will end (target should be reached at this time).
+     */
+    private LocalDate endDate;
+
+    /**
      * Create this goal plan.
      * @param currentGoalNumber current number of goals the user is to be completing.
      * @param maxGoalNumber eventual number of goals the user wants to get to completing.
      */
-    public IncreaseGoalPlan(int currentGoalNumber, int maxGoalNumber, Timeline timeline) {
+    public IncreaseGoalPlan(int currentGoalNumber, int maxGoalNumber, Timeline timeline, LocalDate endDate) {
         this.currentGoalNumber = currentGoalNumber;
         this.maxGoalNumber = maxGoalNumber;
         this.timeline = timeline;
+        this.endDate = endDate;
     }
 
     @Override
@@ -75,5 +83,13 @@ public class IncreaseGoalPlan implements IGoalPlan {
     @Override
     public Timeline getTimeline() {
         return timeline;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
     }
 }
