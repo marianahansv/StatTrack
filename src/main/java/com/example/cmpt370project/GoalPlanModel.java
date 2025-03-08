@@ -153,6 +153,18 @@ public class GoalPlanModel {
     }
 
     /**
+     * Get the timeline for the goal plan, if it exists.
+     * @return the timeline (DAILY or WEEKLY) for the goal plan, if it exists.
+     */
+    public com.example.cmpt370project.IGoalPlan.Timeline getGoalPlanTimeline() {
+        if (goalPlanExists()) {
+            return this.IGoalPlan.getTimeline();
+        } else {
+            throw new IllegalStateException("Goal plan does not yet exist.");
+        }
+    }
+
+    /**
      * Notify the subscribers of this model that the data has changed.
      */
     public void notifySubscribers() {
@@ -339,7 +351,7 @@ public class GoalPlanModel {
         }
 
         // Test 7: Set goal plan
-        IGoalPlan mgp = new MaintainGoalPlan(10);
+        IGoalPlan mgp = new MaintainGoalPlan(10, com.example.cmpt370project.IGoalPlan.Timeline.DAILY);
         goalPlanModel.setGoalPlan(mgp);
 
         if (!goalPlanModel.goalPlanExists()) {
@@ -356,7 +368,7 @@ public class GoalPlanModel {
         }
 
         // Test 9: Test save of maintain goal plan (write and read)
-        IGoalPlan igp = new IncreaseGoalPlan(3, 8);
+        IGoalPlan igp = new IncreaseGoalPlan(3, 8, com.example.cmpt370project.IGoalPlan.Timeline.DAILY);
         emptyGoalPlanModel.setGoalPlan(igp);
 
         emptyGoalPlanModel = new GoalPlanModel();

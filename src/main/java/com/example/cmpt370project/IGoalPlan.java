@@ -6,6 +6,11 @@ package com.example.cmpt370project;
 public interface IGoalPlan {
 
     /**
+     * How is this goal plan progress measured?
+     */
+    enum Timeline {DAILY, WEEKLY};
+
+    /**
      * Get the name of this goal plan.
      * @return the name of this goal plan.
      */
@@ -41,5 +46,10 @@ public interface IGoalPlan {
      * @return true if it can be edited, false otherwise.
      */
     boolean canEditMax();
+
+    /**
+     * Get the timeline for how this goal plan is measured.
+     */
+    Timeline getTimeline();
 
 }

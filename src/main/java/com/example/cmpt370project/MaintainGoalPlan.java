@@ -6,6 +6,11 @@ package com.example.cmpt370project;
 public class MaintainGoalPlan implements IGoalPlan {
 
     /**
+     * How is this goal plan progress measured?
+     */
+    private Timeline timeline;
+
+    /**
      * The number of goals the user wants to be complete on the regular.
      */
     private int goalMaintenanceNumber;
@@ -14,8 +19,9 @@ public class MaintainGoalPlan implements IGoalPlan {
      * Create this goal plan.
      * @param goalMaintenanceNumber The number of goals the user wants to maintain on the regular.
      */
-    public MaintainGoalPlan(int goalMaintenanceNumber) {
+    public MaintainGoalPlan(int goalMaintenanceNumber, Timeline timeline) {
         this.goalMaintenanceNumber = goalMaintenanceNumber;
+        this.timeline = timeline;
     }
 
     @Override
@@ -52,5 +58,10 @@ public class MaintainGoalPlan implements IGoalPlan {
     public String toString() {
         return "Goal Plan Type: " + getClass().getSimpleName() +
                 " Goals to Maintain: " + goalMaintenanceNumber;
+    }
+
+    @Override
+    public Timeline getTimeline() {
+        return timeline;
     }
 }

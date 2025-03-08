@@ -49,6 +49,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
     private Button savePlanChangesButton;
     private Button deletePlanButton;
 
+    private ComboBox<String> timelineSelectBox;
     /**
      * Create a new goal plan page.
      */
@@ -66,6 +67,8 @@ public class GoalPlanView extends StackPane implements Subscriber {
         cancelEditGoalPlanButton = new Button();
         savePlanChangesButton = new Button();
         deletePlanButton = new Button();
+
+        timelineSelectBox = new ComboBox<>();
 
         // ********* Draw the initial view *********
 
@@ -149,9 +152,18 @@ public class GoalPlanView extends StackPane implements Subscriber {
         savePlanChangesButton.setOnAction(e-> {
             // Create whichever goal plan is selected (pass to the controller)
             if (planStyleSelect.getSelectedToggle() == maintainPlan) {
-                controller.handleSaveMaintainGoalPlan(endGoalNumberInput.getValue());
+                if (timelineSelectBox.getValue().equals("DAILY Basis")) {
+                    controller.handleSaveMaintainGoalPlan(endGoalNumberInput.getValue(), IGoalPlan.Timeline.DAILY);
+                } else {
+                    controller.handleSaveMaintainGoalPlan(endGoalNumberInput.getValue(), IGoalPlan.Timeline.WEEKLY);
+                }
+
             } else {
-                controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue());
+                if (timelineSelectBox.getValue().equals("DAILY Basis")) {
+                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.DAILY);
+                } else {
+                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.WEEKLY);
+                }
             }
 
             changePage(GoalPlanViewPage.SUMMARY);
@@ -321,7 +333,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
             Label dayWeekLabel = new Label("How would you like your goal plan to measure and improve your goal completion habits?");
 
             // Create ComboBox for Weekly/ Daily selection
-            ComboBox<String> timelineSelectBox = new ComboBox<>();
+            timelineSelectBox = new ComboBox<>();
             timelineSelectBox.getItems().addAll("DAILY Basis", "WEEKLY Basis");
             timelineSelectBox.setValue("DAILY Basis"); // Default value
 
@@ -425,6 +437,15 @@ public class GoalPlanView extends StackPane implements Subscriber {
                     planStyleSelect.selectToggle(increasePlan);
                     endGoalNumberInput.getValueFactory().setValue(goalPlanModel.getGoalPlanMax());
                     startGoalNumberInput.getValueFactory().setValue(goalPlanModel.getGoalPlanCurrent());
+                }
+
+                switch(goalPlanModel.getGoalPlanTimeline()) {
+                    case DAILY -> {
+                        timelineSelectBox.setValue("DAILY Basis");
+                    }
+                    case WEEKLY -> {
+                        timelineSelectBox.setValue("WEEKLY Basis");
+                    }
                 }
             }
 

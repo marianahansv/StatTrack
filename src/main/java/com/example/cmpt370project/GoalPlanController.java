@@ -25,8 +25,8 @@ public class GoalPlanController {
      * Handle updating the user's Goal Plan when they edit/create a Maintain Goal Plan.
      * @param inputEndGoalNumber the input number of goals that the user wants to maintain on the regular.
      */
-    public void handleSaveMaintainGoalPlan(int inputEndGoalNumber) {
-        MaintainGoalPlan newPlan = new MaintainGoalPlan(inputEndGoalNumber);
+    public void handleSaveMaintainGoalPlan(int inputEndGoalNumber, IGoalPlan.Timeline timeline) {
+        MaintainGoalPlan newPlan = new MaintainGoalPlan(inputEndGoalNumber, timeline);
         goalPlanModel.setGoalPlan(newPlan);
     }
 
@@ -35,8 +35,8 @@ public class GoalPlanController {
      * @param inputEndGoalNumber the current number of goals the user will be completing.
      * @param inputStartGoalNumber the eventual number of goals the user wants to get to completing.
      */
-    public void handleSaveIncreaseGoalPlan(int inputEndGoalNumber, int inputStartGoalNumber) {
-        IncreaseGoalPlan newPlan = new IncreaseGoalPlan(inputStartGoalNumber, inputEndGoalNumber);
+    public void handleSaveIncreaseGoalPlan(int inputEndGoalNumber, int inputStartGoalNumber, IGoalPlan.Timeline timeline) {
+        IncreaseGoalPlan newPlan = new IncreaseGoalPlan(inputStartGoalNumber, inputEndGoalNumber, timeline);
         goalPlanModel.setGoalPlan(newPlan);
     }
 

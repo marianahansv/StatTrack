@@ -6,6 +6,11 @@ package com.example.cmpt370project;
 public class IncreaseGoalPlan implements IGoalPlan {
 
     /**
+     * How is this goal plan progress measured?
+     */
+    private Timeline timeline;
+
+    /**
      * The current number of goals the user is to be completing.
      */
     private int currentGoalNumber;
@@ -20,9 +25,10 @@ public class IncreaseGoalPlan implements IGoalPlan {
      * @param currentGoalNumber current number of goals the user is to be completing.
      * @param maxGoalNumber eventual number of goals the user wants to get to completing.
      */
-    public IncreaseGoalPlan(int currentGoalNumber, int maxGoalNumber) {
+    public IncreaseGoalPlan(int currentGoalNumber, int maxGoalNumber, Timeline timeline) {
         this.currentGoalNumber = currentGoalNumber;
         this.maxGoalNumber = maxGoalNumber;
+        this.timeline = timeline;
     }
 
     @Override
@@ -64,5 +70,10 @@ public class IncreaseGoalPlan implements IGoalPlan {
         return "Goal Plan Type: " + getClass().getSimpleName() +
                 " Current Goal Number: " + currentGoalNumber +
                 " Max Goal Number: " + maxGoalNumber;
+    }
+
+    @Override
+    public Timeline getTimeline() {
+        return timeline;
     }
 }
