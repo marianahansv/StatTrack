@@ -16,6 +16,11 @@ public class GoalPlanView extends StackPane implements Subscriber {
     private GoalPlanModel goalPlanModel;
 
     /**
+     * The user data model that this view gets goals completed data.
+     */
+    private UserHistoryDataModel userHistoryDataModel;
+
+    /**
      * All the possible pages of the goal plan view.
      */
     private enum GoalPlanViewPage {SUMMARY, CREATE_EDIT}
@@ -61,7 +66,8 @@ public class GoalPlanView extends StackPane implements Subscriber {
         deletePlanButton = new Button();
 
         // ********* Draw the initial view *********
-        drawView();
+
+//        drawView();
 
         // ********* Wire up page change events non-controller based events *********
         goCreateEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT); });
@@ -104,7 +110,22 @@ public class GoalPlanView extends StackPane implements Subscriber {
      */
     public void setGoalPlanModel(GoalPlanModel gpModel) {
         this.goalPlanModel = gpModel;
-        modelUpdated();
+
+        if (userHistoryDataModel != null) {
+            modelUpdated();
+        }
+    }
+
+    /**
+     * Set the user data model for this view.
+     * @param userHistoryDataModel the user data model for this view.
+     */
+    public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
+        this.userHistoryDataModel = userHistoryDataModel;
+
+        if (goalPlanModel != null) {
+            modelUpdated();
+        }
     }
 
     @Override
@@ -214,11 +235,25 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 goalProgressModule.setPadding(new Insets(20));
 
 
-                Label currentProgressSum = new Label("Your current number of goals completed for the day: XXX");
+                Label currentProgressSum = new Label("Your current number of goals completed for the day: " + userHistoryDataModel.getDailyCompletedGoals());
                 Label targetProgressSum = new Label("Your current target number of goals to complete for the day: " +
                         goalPlanModel.getGoalPlan().getGoalPlanCurrent());
 
-                Label progressFeedback = new Label("You need to complete XX more goals today to stay on track with you goal plan. Time to complete some goals!");
+                int progressDiff = goalPlanModel.getGoalPlan().getGoalPlanCurrent() - userHistoryDataModel.getDailyCompletedGoals();
+                String progressMessage = "";
+
+                if (progressDiff > 0) {
+                    progressMessage = "You need to complete " + progressDiff + " more goals today to stay on track with you goal plan. Time to complete some goals!";
+                } else if (progressDiff == 0){
+                    progressMessage = "You have met your target for the day and are currently on track with you goal plan. Props to you!";
+                } else {
+                    progressMessage = "You have completed " + -progressDiff + " more goals than your target number of goals. Overachiever!";
+                }
+
+                System.out.println(-progressDiff);
+                System.out.println(goalPlanModel.getGoalPlan().getGoalPlanCurrent());
+
+                Label progressFeedback = new Label(progressMessage);
                 progressFeedback.setWrapText(true);
 
                 goalProgressModule.getChildren().addAll(currentProgressSum, targetProgressSum, progressFeedback);

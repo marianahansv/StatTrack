@@ -27,6 +27,11 @@ public class DashboardView extends BorderPane {
      */
     private GoalPlanModel goalPlanModel;
 
+    /**
+     * The model that holds the user's name and current/past goal trend/behaviour data of the application.
+     */
+    private UserHistoryDataModel userHistoryDataModel;
+
     // ************************* APPLICATION CONTROLLERS *************************
 
     /**
@@ -106,6 +111,7 @@ public class DashboardView extends BorderPane {
         // MODElS
         goalModel = new GoalModel();
         goalPlanModel = new GoalPlanModel();
+        userHistoryDataModel = new UserHistoryDataModel();
 
         // CONTROLLERS
         homeController = new HomeController();
@@ -128,6 +134,9 @@ public class DashboardView extends BorderPane {
         // GOAL PLAN MODEL SUBS
         goalPlanModel.addSubscriber(goalPlanPage);
 
+        // USER MODEL SUBS
+        userHistoryDataModel.addSubscriber(goalPlanPage);
+
         // ********* 3. Setup controller with each view *********
 
         // HOMEPAGE CONTROLLER
@@ -147,9 +156,14 @@ public class DashboardView extends BorderPane {
         goalPlanController.setModel(goalPlanModel);
 
         // ********* 5. Set the required models of each view *********
+
         goalPlanPage.setGoalPlanModel(goalPlanModel);
+        goalPlanPage.setUserHistoryDataModel(userHistoryDataModel);
+
         goalsPage.setGoalModel(goalModel);
+
         homePage.setGoalModel(goalModel);
+
         goalVisPage.setGoalPlanModel(goalPlanModel);
 
         // ************************* END MVC CONFIGURATION *************************
@@ -165,6 +179,13 @@ public class DashboardView extends BorderPane {
             this.setCenter(goalPlanPage);
         });
         goalVisButton.setOnAction(e -> this.setCenter(goalVisPage));
+
+
+        // ************************* POPULATE DUMMY DATA *************************
+        // Here is where we can manually set data to show for testing/demo purposes!!
+
+        // Set completed goals to test on GoalPlan page
+        userHistoryDataModel.setDailyCompletedGoals(12);
     }
 
     /**
