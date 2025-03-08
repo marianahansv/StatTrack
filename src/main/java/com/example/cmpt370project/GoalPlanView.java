@@ -222,15 +222,30 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 currentPlanTitle.setMaxWidth(500);
                 currentPlanTitle.setWrapText(true);
 
+                // Get the completed goal values whether it is the week/day
+                String planTimelineString = "";
+                int timelineCompleted = 0;
+
+                switch(goalPlanModel.getGoalPlanTimeline()) {
+                    case DAILY -> {
+                        planTimelineString = "DAY";
+                        timelineCompleted = userHistoryDataModel.getDailyCompletedGoals();
+                    }
+                    case WEEKLY -> {
+                        planTimelineString = "WEEK";
+                        timelineCompleted = userHistoryDataModel.getWeeklyCompletedGoals();
+                    }
+                }
+
                 if (goalPlanModel.getGoalPlan() instanceof MaintainGoalPlan) {
                     currentPlanTitle.setText("Your current plan is to maintain completing " +
-                            goalPlanModel.getGoalPlan().getGoalPlanCurrent() + " goals each day.");
+                            goalPlanModel.getGoalPlan().getGoalPlanCurrent() + " goals each " + planTimelineString + " .");
                 }
 
                 else if (goalPlanModel.getGoalPlan() instanceof IncreaseGoalPlan) {
-                    currentPlanTitle.setText("Your current plan is to increase the number of goals you complete each " +
-                            "day until you get to completing " +
-                            goalPlanModel.getGoalPlan().getGoalPlanMax() + " goals each day.");
+                    currentPlanTitle.setText("Your current plan is to increase the number of goals you complete each "
+                            + planTimelineString + " until you get to completing " +
+                            goalPlanModel.getGoalPlan().getGoalPlanMax() + " goals each " + planTimelineString + " .");
                 }
 
                 goCreateEditGoalPlanButton.setText("Change Your Plan Details");
@@ -249,17 +264,17 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 goalProgressModule.setPadding(new Insets(20));
 
 
-                Label currentProgressSum = new Label("Your current number of goals completed for the day: " + userHistoryDataModel.getDailyCompletedGoals());
-                Label targetProgressSum = new Label("Your current target number of goals to complete for the day: " +
-                        goalPlanModel.getGoalPlan().getGoalPlanCurrent());
+                Label currentProgressSum = new Label("Your current number of goals completed for the " + planTimelineString + " : " + timelineCompleted);
+                Label targetProgressSum = new Label("Your current target number of goals to complete for the "
+                        + planTimelineString + " : " + goalPlanModel.getGoalPlan().getGoalPlanCurrent());
 
-                int progressDiff = goalPlanModel.getGoalPlan().getGoalPlanCurrent() - userHistoryDataModel.getDailyCompletedGoals();
+                int progressDiff = goalPlanModel.getGoalPlan().getGoalPlanCurrent() - timelineCompleted;
                 String progressMessage = "";
 
                 if (progressDiff > 0) {
                     progressMessage = "You need to complete " + progressDiff + " more goals today to stay on track with you goal plan. Time to complete some goals!";
                 } else if (progressDiff == 0){
-                    progressMessage = "You have met your target for the day and are currently on track with you goal plan. Props to you!";
+                    progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with you goal plan. Props to you!";
                 } else {
                     progressMessage = "You have completed " + -progressDiff + " more goals than your target number of goals. Overachiever!";
                 }

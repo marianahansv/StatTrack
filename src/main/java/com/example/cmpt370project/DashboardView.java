@@ -179,6 +179,7 @@ public class DashboardView extends BorderPane {
 
         // Set completed goals to test on GoalPlan page
         userHistoryDataModel.setDailyCompletedGoals(12);
+        userHistoryDataModel.setWeeklyCompletedGoals(2);
     }
 
     /**
