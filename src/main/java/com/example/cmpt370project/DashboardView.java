@@ -13,9 +13,6 @@ import javafx.scene.layout.VBox;
  */
 public class DashboardView extends BorderPane {
 
-    private GoalProgress goalChartView;
-    private GoalChartController chartController;
-
     // ************************* APPLICATION MODELS *************************
     /**
      * The model that holds the goal data of the application.
@@ -44,6 +41,9 @@ public class DashboardView extends BorderPane {
      */
     private GoalPlanController goalPlanController;
 
+    // Consider removing this later since it is not really doing anything now
+    private GoalChartController chartController;
+
     // ************************* APPLICATION VIEWS *************************
 
     /**
@@ -65,6 +65,8 @@ public class DashboardView extends BorderPane {
      * The goal plan page of the application.
      */
     private GoalVisView goalVisPage;
+
+    private GoalProgress goalChartView;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
@@ -93,16 +95,7 @@ public class DashboardView extends BorderPane {
     /**
      * Construct the dashboard view and MVC structure of the application.
      */
-    public DashboardView(GoalModel goalModel) {
-
-
-
-        this.goalModel = goalModel;
-
-
-
-
-
+    public DashboardView() {
 
         // ************************* MVC CONFIGURATION *************************
 
