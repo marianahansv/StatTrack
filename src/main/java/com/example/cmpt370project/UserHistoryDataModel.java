@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Holds all data related to the user and their current/previous goa behaviours.
@@ -94,7 +93,7 @@ public class UserHistoryDataModel {
     }
 
     /**
-     * Sets the number of goals completed today.
+     * Sets the number of goals completed today (i.e. for the date stored in this model).
      * @param dailyCompletedGoals the number of goals completed today.
      */
     public void setDailyCompletedGoals(int dailyCompletedGoals) {
@@ -111,7 +110,7 @@ public class UserHistoryDataModel {
     }
 
     /**
-     * Sets the number of goals completed this week.
+     * Sets the number of goals completed this week (i.e. for the date stored in this model).
      * @param weeklyCompletedGoals the number of goals completed this week.
      */
     public void setWeeklyCompletedGoals(int weeklyCompletedGoals) {
@@ -128,17 +127,8 @@ public class UserHistoryDataModel {
     }
 
     /**
-     * Sets the date for the daily data.
-     * @param dataDay the date to set for the daily data
-     */
-    public void setDataDay(LocalDate dataDay) {
-        this.dataDay = dataDay;
-        notifySubscribers();
-    }
-
-    /**
-     * Gets the start of the week (Sunday) for the current week data.
-     * @return the start of the week (Sunday) for the data.
+     * Gets the date for when the weekly data is stored for.
+     * @return the date for when the weekly data is stored for.
      */
     public LocalDate getDataWeek() {
         return dataWeek;
@@ -148,7 +138,7 @@ public class UserHistoryDataModel {
      * Hard resets the daily data to the specified current date.
      * @param currentDate the date to set as the new data day and reset the daily goals.
      */
-    public void hardResetDayData(LocalDate currentDate) {
+    public void hardSetDayData(LocalDate currentDate) {
         dailyCompletedGoals = 0;
         dataDay = currentDate;
         notifySubscribers();
@@ -158,12 +148,21 @@ public class UserHistoryDataModel {
      * Hard resets the weekly data to the specified current date, setting the data week to the most recent Sunday.
      * @param currentDate the date to set as the new data week and reset the weekly goals.
      */
-    public void hardResetWeeklyData(LocalDate currentDate) {
+    public void hardSetWeeklyData(LocalDate currentDate) {
         weeklyCompletedGoals = 0;
 
         // Get the Sunday (start of the week) for the new start of week
         dataWeek = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
         notifySubscribers();
+    }
+
+    /**
+     * Hard sets all the dates for which the data will be accurate for.
+     * @param currentDate the current date for which the data should now begin to reflect.
+     */
+    public void hardSetDataDates(LocalDate currentDate) {
+        hardSetDayData(currentDate);
+        hardSetWeeklyData(currentDate);
     }
 
     /**
@@ -175,18 +174,36 @@ public class UserHistoryDataModel {
         boolean updateMade = false;
 
         if (currentDate.isAfter(dataDay)) {
-            hardResetDayData(currentDate);
+            hardSetDayData(currentDate);
             updateMade = true;
         }
 
         LocalDate currWeek = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
 
         if (currWeek.isAfter(dataWeek)) {
-            hardResetWeeklyData(currentDate);
+            hardSetWeeklyData(currentDate);
             updateMade = true;
         }
 
         return updateMade;
+    }
+
+    /**
+     * Mark a goal as completed, and track it to the history.
+     * @param currentDate the date when this goal was  marked as completed.
+     */
+    public void completeGoal(LocalDate currentDate) {
+        updateCompletedValues(currentDate);
+
+        if (currentDate.equals(dataDay)) {
+            dailyCompletedGoals += 1;
+        }
+
+        LocalDate currWeek = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+
+        if (currWeek.equals(dataWeek)) {
+            weeklyCompletedGoals += 1;
+        }
     }
 
     /**
@@ -312,5 +329,50 @@ public class UserHistoryDataModel {
 //                System.err.println("Error loading goals from file: " + e.getMessage());
 //            }
 //        }
+    }
+
+    public static void main(String[] args) {
+
+        // *************************************** UNIT TESTING ***************************************
+
+        UserHistoryDataModel dataModel = new UserHistoryDataModel();
+        dataModel.hardSetDataDates(LocalDate.of(2020, 1, 1));
+
+        // Test 1: Test initialization of values on creation
+        if (dataModel.getDailyCompletedGoals() != 0 || dataModel.getWeeklyCompletedGoals() != 0) {
+            System.out.println("Test 1 Error: completed goal numbers not zero on initialization.");
+        }
+
+        if (!dataModel.getDataDay().equals(LocalDate.of(2020, 1, 1))) {
+            System.out.println("Test 1 Error: data day does not match initialization date.");
+        }
+
+        if (!dataModel.getDataWeek().equals(LocalDate.of(2019, 12, 29))) {
+            System.out.println("Test 1 Error: data week does not initialize to correct data week.");
+        }
+
+        // Test 2: Test mark goal as completed, and updating of day and week if the date in the model is outdated
+        dataModel.completeGoal(LocalDate.of(2019, 12, 29));
+
+        if (dataModel.getDailyCompletedGoals() != 0 || dataModel.getWeeklyCompletedGoals() != 1) {
+            System.out.println("Test 2 Error: goal increment did not work properly for week only.");
+        }
+
+        dataModel.hardSetDataDates(LocalDate.of(2020, 1, 1));
+        dataModel.completeGoal(LocalDate.of(2020, 1, 2));
+
+        if (dataModel.getDailyCompletedGoals() != 1 || dataModel.getWeeklyCompletedGoals() != 1 || !dataModel.getDataDay().equals(LocalDate.of(2020, 1, 2))) {
+            System.out.println("Test 2 Error: goal increment did not work properly for week and day, where day must be updated.");
+        }
+
+        dataModel.hardSetDataDates(LocalDate.of(2020, 1, 1));
+        dataModel.completeGoal(LocalDate.of(2020, 1, 6));
+
+        if (dataModel.getDailyCompletedGoals() != 1 || dataModel.getWeeklyCompletedGoals() != 1 ||
+                !dataModel.getDataDay().equals(LocalDate.of(2020, 1, 6)) || !dataModel.getDataWeek().equals(LocalDate.of(2020, 1, 5))) {
+            System.out.println("Test 2 Error: goal increment did not work properly for week and day, where day and week must be updated.");
+        }
+
+        System.out.println("Test Script Completed.");
     }
 }
