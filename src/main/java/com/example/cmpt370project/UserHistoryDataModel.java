@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,15 @@ public class UserHistoryDataModel {
      */
     public UserHistoryDataModel() {
         subscribers = new ArrayList<Subscriber>();
-//        loadDataFromFile();
+
+        // set default values in case there is no data to load
+        dailyCompletedGoals = 0;
+        weeklyCompletedGoals = 0;
+        dataDay = LocalDate.now();
+        dataWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        userName = "User";
+
+        loadDataFromFile();
     }
 
     /**
@@ -82,6 +91,7 @@ public class UserHistoryDataModel {
     public void setUserName(String userName) {
         this.userName = userName;
         notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -99,6 +109,7 @@ public class UserHistoryDataModel {
     public void setDailyCompletedGoals(int dailyCompletedGoals) {
         this.dailyCompletedGoals = dailyCompletedGoals;
         notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -116,6 +127,7 @@ public class UserHistoryDataModel {
     public void setWeeklyCompletedGoals(int weeklyCompletedGoals) {
         this.weeklyCompletedGoals = weeklyCompletedGoals;
         notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -142,6 +154,7 @@ public class UserHistoryDataModel {
         dailyCompletedGoals = 0;
         dataDay = currentDate;
         notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -153,7 +166,9 @@ public class UserHistoryDataModel {
 
         // Get the Sunday (start of the week) for the new start of week
         dataWeek = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+
         notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -163,6 +178,9 @@ public class UserHistoryDataModel {
     public void hardSetDataDates(LocalDate currentDate) {
         hardSetDayData(currentDate);
         hardSetWeeklyData(currentDate);
+
+        notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -185,6 +203,9 @@ public class UserHistoryDataModel {
             updateMade = true;
         }
 
+        notifySubscribers();
+        saveDataToFile();
+
         return updateMade;
     }
 
@@ -204,6 +225,9 @@ public class UserHistoryDataModel {
         if (currWeek.equals(dataWeek)) {
             weeklyCompletedGoals += 1;
         }
+
+        notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -264,73 +288,58 @@ public class UserHistoryDataModel {
      * Save the data to the file of this class (in JSON format).
      */
     public void saveDataToFile() {
-//        checkIfFileExists();
-//        try (Writer writer = new FileWriter(fileName)) {
-//            // Save the Goal Plan to the file
-//
-//            // Is there a current goal pla active?
-//            if (IGoalPlan == null) {
-//                // If IGoalPlan is null, write an empty JSON object to clear the file
-//                gson.toJson(new JsonObject(), writer);
-//                return;
-//            }
-//
-//            JsonObject jsonObject = new JsonObject();
-//
-//            // Add a "type" field based on the class of the IGoalPlan (to be used for deserialization)
-//            if (IGoalPlan instanceof MaintainGoalPlan) {
-//                jsonObject.addProperty("type", "MaintainGoalPlan");
-//            } else if (IGoalPlan instanceof IncreaseGoalPlan) {
-//                jsonObject.addProperty("type", "IncreaseGoalPlan");
-//            }
-//
-//            // Serialize the IGoalPlan object and add all other properties to the jsonObject
-//            JsonObject goalPlanJson = gson.toJsonTree(IGoalPlan).getAsJsonObject();
-//
-//            // Add all properties from goalPlanJson to the jsonObject (so "type" attribute appears first)
-//            for (Map.Entry<String, JsonElement> entry : goalPlanJson.entrySet()) {
-//                jsonObject.add(entry.getKey(), entry.getValue());
-//            }
-//
-//            gson.toJson(jsonObject, writer);
-//
-//        } catch (IOException e) {
-//            System.err.println("Error saving data to file: " + e.getMessage());
-//        }
+        checkIfFileExists();
+        try (Writer writer = new FileWriter(fileName)) {
+            JsonObject jsonObject = new JsonObject();
+
+            // Save userName, dailyCompletedGoals, weeklyCompletedGoals, dataDay, dataWeek
+            jsonObject.addProperty("userName", userName);
+            jsonObject.addProperty("dailyCompletedGoals", dailyCompletedGoals);
+            jsonObject.addProperty("weeklyCompletedGoals", weeklyCompletedGoals);
+
+            // Convert LocalDate to String (using ISO_LOCAL_DATE format for simplicity)
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+            jsonObject.addProperty("dataDay", dataDay.format(formatter));
+            jsonObject.addProperty("dataWeek", dataWeek.format(formatter));
+
+            // Serialize the JsonObject to JSON and write it to the file
+            gson.toJson(jsonObject, writer);
+
+        } catch (IOException e) {
+            System.err.println("Error saving data to file: " + e.getMessage());
+        }
     }
 
     /**
      * Load goals from file (in JSON format).
      */
     public void loadDataFromFile() {
-//        checkIfFileExists();
-//        // Only load if file is not empty, otherwise skip because there's nothing to read
-//        if (!isJsonFileEmpty(fileName)) {
-//            try (Reader reader = new FileReader(fileName)){
-//
-//                JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
-//                String type = jsonObject.get("type").getAsString();
-//
-//                IGoalPlan dataFromJson = null;
-//
-//                // Choose the appropriate class based on the "type" field
-//                if ("MaintainGoalPlan".equals(type)) {
-//                    dataFromJson = gson.fromJson(jsonObject, MaintainGoalPlan.class);
-//                } else if ("IncreaseGoalPlan".equals(type)) {
-//                    dataFromJson = gson.fromJson(jsonObject, IncreaseGoalPlan.class);
-//                } else {
-//                    System.err.println("Unknown goal plan type: " + type);
-//                }
-//
-//                // Load into the model data
-//                setGoalPlan(dataFromJson);
-//            }
-//            catch (IOException e){
-//                System.err.println("Error loading goals from file: " + e.getMessage());
-//            }
-//        }
+        checkIfFileExists();
+        // Only load if file is not empty, otherwise skip because there's nothing to read
+        if (!isJsonFileEmpty(fileName)) {
+            try (Reader reader = new FileReader(fileName)) {
+
+                JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
+
+                // Load the attributes from the JSON object
+                userName = jsonObject.get("userName").getAsString();
+                dailyCompletedGoals = jsonObject.get("dailyCompletedGoals").getAsInt();
+                weeklyCompletedGoals = jsonObject.get("weeklyCompletedGoals").getAsInt();
+
+                // Convert string back to LocalDate using the ISO_LOCAL_DATE format
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                dataDay = LocalDate.parse(jsonObject.get("dataDay").getAsString(), formatter);
+                dataWeek = LocalDate.parse(jsonObject.get("dataWeek").getAsString(), formatter);
+
+            } catch (IOException e) {
+                System.err.println("Error loading data from file: " + e.getMessage());
+            }
+        }
     }
 
+    /**
+     * Unit and Regression Testing for this class's data, methods, and JSON methods.
+     */
     public static void main(String[] args) {
 
         // *************************************** UNIT TESTING ***************************************
@@ -371,6 +380,26 @@ public class UserHistoryDataModel {
         if (dataModel.getDailyCompletedGoals() != 1 || dataModel.getWeeklyCompletedGoals() != 1 ||
                 !dataModel.getDataDay().equals(LocalDate.of(2020, 1, 6)) || !dataModel.getDataWeek().equals(LocalDate.of(2020, 1, 5))) {
             System.out.println("Test 2 Error: goal increment did not work properly for week and day, where day and week must be updated.");
+        }
+
+        // *************************************** JSON TESTING ***************************************
+
+        // Test 3: Test save of data after hard setting dates and completing a goal
+        dataModel = new UserHistoryDataModel();
+        dataModel.hardSetDataDates(LocalDate.of(2020, 1, 1));
+
+        if (dataModel.getDailyCompletedGoals() != 0 || dataModel.getWeeklyCompletedGoals() != 0 ||
+                !dataModel.getDataDay().equals(LocalDate.of(2020, 1, 1)) || !dataModel.getDataWeek().equals(LocalDate.of(2019, 12, 29))) {
+            System.out.println("Test 3 Error: JSON file save did not work correctly for setting the data dates.");
+        }
+
+        dataModel.completeGoal(LocalDate.of(2020, 1, 2));
+
+        // Test loading from JSON
+        dataModel = new UserHistoryDataModel();
+
+        if (dataModel.getDailyCompletedGoals() != 1 || dataModel.getWeeklyCompletedGoals() != 1 || !dataModel.getDataDay().equals(LocalDate.of(2020, 1, 2))) {
+            System.out.println("Test 3 Error: JSON file save did not work correctly for goal increment where day must be updated.");
         }
 
         System.out.println("Test Script Completed.");

@@ -279,7 +279,7 @@ public class GoalPlanModel {
 
 
     /**
-     * Unit and Regression Testing for this class's and the Goal Plan features and JSON methods.
+     * Unit and Regression Testing for this class's Goal Plan features and JSON methods.
      */
     public static void main(String[] args) {
 
