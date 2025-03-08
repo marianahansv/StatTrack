@@ -6,6 +6,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.Callback;
+
+import java.time.LocalDate;
 
 /**
  * View to handle organization of page(s) related to the Goal Plan feature.
@@ -311,7 +314,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
             if (!goalPlanModel.goalPlanExists()) {
                 titleString = "Set Up";
             } else {
-                titleString = "Edit";
+                titleString = "Change";
             }
 
             Label titleLabel = new Label("Let's " + titleString + " Your Personalized Goal Plan:");
@@ -356,7 +359,6 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
             dayWeekSelectInputLayout.getChildren().addAll(dayWeekLabel, timelineSelectBox);
 
-
             // Create container for goal number input form element
             VBox endGoalNumberInputLayout = new VBox(10);
             Label goalsPerDayLabel = new Label("How many goals would you like to complete every DAY?");
@@ -379,6 +381,28 @@ public class GoalPlanView extends StackPane implements Subscriber {
             Label endDateLabel= new Label("When would you like to reach your target number of goals to complete?");
 
             endDatePicker = new DatePicker();
+
+            // Set default value of date picker
+            endDatePicker.setValue(LocalDate.now().plusWeeks(1));
+
+            // Set date picker to limit endDate to one week in advance for daily plan based on DAILY as default value
+            endDatePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+                @Override
+                public DateCell call(DatePicker datePicker) {
+                    return new DateCell() {
+                        @Override
+                        public void updateItem(LocalDate date, boolean empty) {
+                            super.updateItem(date, empty);
+
+                            // Disable dates before one week from today
+                            if (date.isBefore(LocalDate.now().plusWeeks(1))) {
+                                setDisable(true);
+                                setStyle("-fx-background-color: #ffcccc;"); // Optional: style disabled dates
+                            }
+                        }
+                    };
+                }
+            });
 
             endDateSelectLayout.getChildren().addAll(endDateLabel, endDatePicker);
 
@@ -435,9 +459,48 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 if ("DAILY Basis".equals(newValue)) {
                     goalsPerDayLabel.setText("How many goals would you like to complete every DAY?");
                     startingGoalsLabel.setText("How many goals would you like to start with completing every DAY?");
+
+                    // Set date picker to limit endDate to one week in advance for daily plan
+                    endDatePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+                        @Override
+                        public DateCell call(DatePicker datePicker) {
+                            return new DateCell() {
+                                @Override
+                                public void updateItem(LocalDate date, boolean empty) {
+                                    super.updateItem(date, empty);
+
+                                    // Disable dates before one week from today
+                                    if (date.isBefore(LocalDate.now().plusWeeks(1))) {
+                                        setDisable(true);
+                                        setStyle("-fx-background-color: #ffcccc;"); // Optional: style disabled dates
+                                    }
+                                }
+                            };
+                        }
+                    });
+
                 } else if ("WEEKLY Basis".equals(newValue)) {
                     goalsPerDayLabel.setText("How many goals would you like to complete every WEEK?");
                     startingGoalsLabel.setText("How many goals would you like to start with completing every WEEK?");
+
+                    // Set date picker to limit endDate to two weeks in advance for weekly plan
+                    endDatePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+                        @Override
+                        public DateCell call(DatePicker datePicker) {
+                            return new DateCell() {
+                                @Override
+                                public void updateItem(LocalDate date, boolean empty) {
+                                    super.updateItem(date, empty);
+
+                                    // Disable dates before one week from today
+                                    if (date.isBefore(LocalDate.now().plusWeeks(2))) {
+                                        setDisable(true);
+                                        setStyle("-fx-background-color: #ffcccc;"); // Optional: style disabled dates
+                                    }
+                                }
+                            };
+                        }
+                    });
                 }
             });
 
