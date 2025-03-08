@@ -19,7 +19,7 @@ public class GoalPlanModel {
     /**
      * The file where the json goal plan data will be stored.
      */
-    private static final String fileName = System.getProperty("user.home") + "/GoalApplication/IGoalPlan.json";
+    private static final String fileName = System.getProperty("user.home") + "/GoalApplication/goalPlan.json";
 
     /**
      * Handles JSON serialization and deserialization.
