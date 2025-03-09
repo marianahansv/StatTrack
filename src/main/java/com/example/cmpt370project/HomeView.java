@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * View to handle organization UI elements of the home page.
@@ -24,6 +25,11 @@ public class HomeView extends StackPane implements Subscriber {
      * The section model that this view gets section data from.
      */
     private SectionModel sectionModel;
+
+    /**
+     * The user data model that this view gets goals completed data.
+     */
+    private UserHistoryDataModel userHistoryDataModel;
     /**
      * List of sections.
      */
@@ -48,10 +54,43 @@ public class HomeView extends StackPane implements Subscriber {
     private String currentSelectedSection = null;
 
     // ********* INTERACTIVE UI ELEMENTS (i.e. they change in drawView()) *********
+
     // ********* HOME PAGE ELEMENTS *********
     private final Button clearGoalsButton;
     private final Button addGoalButton;
     private final Label welcomeLabel;
+    private VBox motivationModule;
+    private Label userGreeting;
+    private Label motivationalLabel;
+    private String[] motivationalMessages = {
+            "Every step counts, keep moving forward!",
+            "Success starts with the first step—let's make it count!",
+            "Your goals are within reach—stay focused and keep pushing!",
+            "Dream big, work hard, and make it happen!",
+            "Progress is progress, no matter how small.",
+            "The journey to success begins with the decision to try.",
+            "Turn your dreams into goals and your goals into achievements!",
+            "Believe in yourself—every goal is possible!",
+            "Small daily improvements lead to stunning results!",
+            "Start today, your future self will thank you!",
+            "The hardest part is starting. The rest is just consistency!",
+            "Set your goals, stay determined, and embrace the process!",
+            "Success is the sum of small efforts repeated day in and day out.",
+            "Push yourself because no one else is going to do it for you.",
+            "The only limit to your success is the amount of effort you put in!",
+            "Be proud of how far you’ve come, but keep going!",
+            "Goals are dreams with deadlines. Let’s make them happen!"
+    };
+    private String[] greetings = {
+            "Hi",
+            "Hello",
+            "Hey",
+            "Hey There",
+            "Howdy",
+            "Hiya"
+    };
+    private String currentGreeting;
+
     // ********* ADD GOAL PAGE ELEMENTS *********
     private final TextField titleInput;
     private final Button cancelAddGoalButton;
@@ -63,6 +102,8 @@ public class HomeView extends StackPane implements Subscriber {
     private final DatePicker endDatePicker;
     private final Button createSectionButton;
     private final Button deleteSectionButton;
+
+
     /**
      * The container that displays goals for the selected section.
      */
@@ -78,6 +119,28 @@ public class HomeView extends StackPane implements Subscriber {
         welcomeLabel = new Label("Welcome to the Home Page!");
         clearGoalsButton = new Button("Clear Goals");
 
+        // Motivational Message module
+        motivationModule = new VBox(20);
+        motivationModule.setAlignment(Pos.CENTER_LEFT);
+        motivationModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
+        motivationModule.setPadding(new Insets(20));
+
+        // Greeting text configuration
+        userGreeting = new Label();
+        userGreeting.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        motivationModule.getChildren().add(userGreeting);
+
+        // Get randomized motivational message and greeting
+        Random random = new Random();
+        int randomIndex = random.nextInt(motivationalMessages.length);
+        motivationalLabel = new Label();
+        motivationalLabel.setText(motivationalMessages[randomIndex]);
+        motivationModule.getChildren().add(motivationalLabel);
+
+        randomIndex = random.nextInt(greetings.length);
+        currentGreeting = greetings[randomIndex];
+        userGreeting.setText(currentGreeting + ", User! Let's complete some goals.");
+
         // Add goal page element
         submitGoalButton = new Button("Add Goal");
         titleInput = new TextField();
@@ -88,7 +151,7 @@ public class HomeView extends StackPane implements Subscriber {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
         root.setPadding(new Insets(10));
-        root.getChildren().addAll(welcomeLabel, addGoalButton);
+        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton);
 
         // Initialize SectionModel and load sections from file
         sectionModel = new SectionModel();
@@ -196,8 +259,24 @@ public class HomeView extends StackPane implements Subscriber {
      */
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
-        modelUpdated();
+
+        if (userHistoryDataModel != null) {
+            modelUpdated();
+        }
     }
+
+    /**
+     * Set the user data model for this view.
+     * @param userHistoryDataModel the user data model for this view.
+     */
+    public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
+        this.userHistoryDataModel = userHistoryDataModel;
+
+        if (goalModel != null) {
+            modelUpdated();
+        }
+    }
+
     @Override
     public void modelUpdated() {
         // If a section is currently selected, update its goals display; otherwise, redraw the view.
@@ -245,7 +324,13 @@ public class HomeView extends StackPane implements Subscriber {
         sectionBox.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
         Label sectionLabel = new Label("Sections:");
         sectionBox.getChildren().addAll(sectionLabel, sectionButtons);
-        root.getChildren().addAll(welcomeLabel, addGoalButton, clearGoalsButton, sectionBox, createSectionButton, deleteSectionButton, goalsBox);
+
+        // Get and population user's name (once it has been set in the model)
+        if (userHistoryDataModel != null) {
+            userGreeting.setText(currentGreeting + ", " + userHistoryDataModel.getUserName() + "! Let's complete some goals.");
+        }
+
+        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton, clearGoalsButton, sectionBox, createSectionButton, deleteSectionButton, goalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.

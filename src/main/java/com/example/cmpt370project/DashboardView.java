@@ -133,6 +133,7 @@ public class DashboardView extends BorderPane {
         // USER MODEL SUBS
         userHistoryDataModel.addSubscriber(goalPlanPage);
         userHistoryDataModel.addSubscriber(goalsPage);
+        userHistoryDataModel.addSubscriber(homePage);
 
         // ********* 3. Setup controller with each view *********
 
@@ -162,6 +163,7 @@ public class DashboardView extends BorderPane {
         goalsPage.setUserHistoryDataModel(userHistoryDataModel);
 
         homePage.setGoalModel(goalModel);
+        homePage.setUserHistoryDataModel(userHistoryDataModel);
 
         goalVisPage.setGoalPlanModel(goalPlanModel);
 
@@ -186,6 +188,9 @@ public class DashboardView extends BorderPane {
         // Set completed goals to test on GoalPlan page
         userHistoryDataModel.setDailyCompletedGoals(12);
         userHistoryDataModel.setWeeklyCompletedGoals(2);
+
+        // Set username to test on the HomeView page
+        userHistoryDataModel.setUserName("HasAPlanFran");
     }
 
     /**
