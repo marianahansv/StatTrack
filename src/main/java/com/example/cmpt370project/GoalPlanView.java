@@ -1,5 +1,6 @@
 package com.example.cmpt370project;
 
+import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
@@ -7,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Callback;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 
@@ -54,6 +56,8 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
     private ComboBox<String> timelineSelectBox;
     private DatePicker endDatePicker;
+
+    private Label errorLabel;
     /**
      * Create a new goal plan page.
      */
@@ -75,13 +79,19 @@ public class GoalPlanView extends StackPane implements Subscriber {
         timelineSelectBox = new ComboBox<>();
         endDatePicker = new DatePicker();
 
+        errorLabel = new Label();
+
         // ********* Draw the initial view *********
 
-//        drawView();
+        // This will get called later in the chain when model adds subscribers, because calling this here causes null issue
+        // drawView();
+
 
         // ********* Wire up page change events non-controller based events *********
         goCreateEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT); });
         cancelEditGoalPlanButton.setOnAction(e-> {
+            errorLabel.setVisible(false);
+
             changePage(GoalPlanViewPage.SUMMARY);
             goalPlanModel.syncGoalPlanToNow(); // show most up-to-date goal data
         });
@@ -170,15 +180,28 @@ public class GoalPlanView extends StackPane implements Subscriber {
                     controller.handleSaveMaintainGoalPlan(endGoalNumberInput.getValue(), IGoalPlan.Timeline.WEEKLY);
                 }
 
+                // Change page if goal numbers are valid
+                changePage(GoalPlanViewPage.SUMMARY);
             } else {
-                if (timelineSelectBox.getValue().equals("DAILY Basis")) {
-                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.DAILY, endDatePicker.getValue());
+
+                // Validate the input goal numbers so that the endGoal number is greater than the start amount
+                if (endGoalNumberInput.getValue() > startGoalNumberInput.getValue() ) {
+                    if (timelineSelectBox.getValue().equals("DAILY Basis")) {
+                        controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.DAILY, endDatePicker.getValue());
+                    } else {
+                        controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.WEEKLY, endDatePicker.getValue());
+                    }
+
+                    // Change page if goal numbers are valid
+                    changePage(GoalPlanViewPage.SUMMARY);
+                    errorLabel.setVisible(false);
                 } else {
-                    controller.handleSaveIncreaseGoalPlan(endGoalNumberInput.getValue(), startGoalNumberInput.getValue(), IGoalPlan.Timeline.WEEKLY, endDatePicker.getValue());
+                    errorLabel.setVisible(true);
+                    errorLabel.setText("Your target number of goals to complete must be larger than your starting number of goals to complete!");
+                    errorLabel.setStyle("-fx-text-fill: red;");
                 }
             }
 
-            changePage(GoalPlanViewPage.SUMMARY);
             goalPlanModel.syncGoalPlanToNow(); // show most up-to-date goal data
         });
 
@@ -544,7 +567,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
             // Add all form elements to the form layout
             formGoalPlanModule.getChildren().addAll(planSelectLayout, dayWeekSelectInputLayout,
                     planNumbersInputLayout, endDateSelectLayout,
-                    buttonGroupLayout);
+                    buttonGroupLayout, errorLabel);
 
             // Add the form to the root page
             root.getChildren().add(formGoalPlanModule);
