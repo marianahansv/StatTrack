@@ -8,10 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * View to handle organization UI elements of the home page.
@@ -141,12 +138,34 @@ public class HomeView extends StackPane implements Subscriber {
         currentGreeting = greetings[randomIndex];
         userGreeting.setText(currentGreeting + ", User! Let's complete some goals.");
 
-        // Add goal page element
+        // Add goal page elements
         submitGoalButton = new Button("Add Goal");
+        // Add goal form
+        submitGoalButton.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("New Section");
+            dialog.setHeaderText("Create a New Section");
+            dialog.setContentText("Enter section name:");
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent() && !result.get().isBlank()) {
+                String newSection = result.get();
+                // Persist the new section using SectionModel
+                sectionModel.addSection(newSection);
+                sectionsList.add(newSection);
+                ToggleButton sectionButton = new ToggleButton(newSection);
+                sectionButton.setToggleGroup(sectionToggleGroup);
+                sectionButton.setOnAction(ev -> {
+                    currentSelectedSection = newSection;
+                    updateGoalsDisplay(newSection);
+                });
+                sectionButtons.getChildren().add(sectionButton);
+            }
+        })
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
+        difficultyComboBox.setValue("Medium"); //default value
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
@@ -170,6 +189,7 @@ public class HomeView extends StackPane implements Subscriber {
             });
             sectionButtons.getChildren().add(sectionButton);
         }
+
         // DatePickers for start and end date
         startDatePicker = new DatePicker(LocalDate.now());
         endDatePicker = new DatePicker(LocalDate.now().plusDays(7));
@@ -303,8 +323,17 @@ public class HomeView extends StackPane implements Subscriber {
             String section = ((ToggleButton) selectedToggle).getText();
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
-            c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate);
-            changePage(HomeViewPage.HOME); // Return to the summary page after submission
+            try {
+                c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate);
+                changePage(HomeViewPage.HOME); // Return to the summary page after submission
+            } catch (InputMismatchException error){
+                // Display error message
+                System.out.println("nooo");
+                Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
+                alert.setTitle("Input Error");
+                alert.setHeaderText(null);
+                alert.setContentText(error.getMessage());
+            }
         });
 
         clearGoalsButton.setOnAction(c::removeButtonPress);
@@ -364,6 +393,13 @@ public class HomeView extends StackPane implements Subscriber {
                 new Label("End Date:"), endDatePicker,
                 submitGoalButton, cancelAddGoalButton
         );
+        //selecting general section toggle
+        Toggle default_toggle = sectionToggleGroup.getToggles().getFirst();
+        for (Toggle t: sectionToggleGroup.getToggles()) {
+            if (default_toggle.equals(t)) t.setSelected(true);
+            else {t.setSelected(false);}
+
+        }
     }
 
     /**
