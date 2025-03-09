@@ -78,4 +78,16 @@ public class MaintainGoalPlan implements IGoalPlan {
         // This goal plan has no changing numbers.
         return;
     }
+
+    @Override
+    public boolean isPlanFinished() {
+        // This goal plan has no end date.
+        return false;
+    }
+
+    @Override
+    public boolean isPlanFinished(LocalDate date) {
+        // This goal plan has no end date.
+        return false;
+    }
 }

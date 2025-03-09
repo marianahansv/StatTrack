@@ -168,6 +168,16 @@ public class IncreaseGoalPlan implements IGoalPlan {
         currentGoalNumber = (int) Math.round(currGoalNumberDouble);
     }
 
+    @Override
+    public boolean isPlanFinished() {
+        return LocalDate.now().isAfter(endDate) || LocalDate.now().equals(endDate);
+    }
+
+    @Override
+    public boolean isPlanFinished(LocalDate date) {
+        return date.isAfter(endDate) || date.equals(endDate);
+    }
+
     /**
      * Unit testing for increase plan increment logic.
      */

@@ -174,6 +174,15 @@ public class GoalPlanModel {
     public void syncGoalPlanToNow() {
         if (goalPlanExists()) {
             IGoalPlan.syncGoalPlanToNow();
+
+            // Turnover Increase Plan to Maintain plan with the target number as the new number to maintain
+            if (IGoalPlan.isPlanFinished()) {
+
+                MaintainGoalPlan replacementPlan = new MaintainGoalPlan(IGoalPlan.getGoalPlanMax(), IGoalPlan.getTimeline());
+
+                setGoalPlan(replacementPlan);
+            }
+
         } else {
             throw new IllegalStateException("Goal plan does not yet exist.");
         }
@@ -187,6 +196,15 @@ public class GoalPlanModel {
     public void syncGoalPlanToDate(LocalDate date) {
         if (goalPlanExists()) {
             IGoalPlan.syncGoalPlanToDate(date);
+
+            // Turnover Increase Plan to Maintain plan with the target number as the new number to maintain
+            if (IGoalPlan.isPlanFinished(date)) {
+
+                MaintainGoalPlan replacementPlan = new MaintainGoalPlan(IGoalPlan.getGoalPlanMax(), IGoalPlan.getTimeline());
+
+                setGoalPlan(replacementPlan);
+            }
+
         } else {
             throw new IllegalStateException("Goal plan does not yet exist.");
         }

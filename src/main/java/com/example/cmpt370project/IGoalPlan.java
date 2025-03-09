@@ -65,4 +65,13 @@ public interface IGoalPlan {
      */
     void syncGoalPlanToDate(LocalDate date);
 
+    /**
+     * Has this plan ended? (i.e. has the user reached their completion date?)
+     */
+    boolean isPlanFinished();
+
+    /**
+     * Has this plan ended by the input target date? (i.e. has the user reached their completion date?)
+     */
+    boolean isPlanFinished(LocalDate date);
 }
