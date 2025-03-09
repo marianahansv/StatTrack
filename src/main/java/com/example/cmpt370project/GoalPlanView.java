@@ -466,6 +466,9 @@ public class GoalPlanView extends StackPane implements Subscriber {
                     goalsPerDayLabel.setText("How many goals would you like to complete every DAY?");
                     startingGoalsLabel.setText("How many goals would you like to start with completing every DAY?");
 
+                    // Set default value of date picker
+                    endDatePicker.setValue(LocalDate.now().plusWeeks(1));
+
                     // Set date picker to limit endDate to one week in advance for daily plan
                     endDatePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
                         @Override
@@ -488,6 +491,9 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 } else if ("WEEKLY Basis".equals(newValue)) {
                     goalsPerDayLabel.setText("How many goals would you like to complete every WEEK?");
                     startingGoalsLabel.setText("How many goals would you like to start with completing every WEEK?");
+
+                    // Set default value of date picker
+                    endDatePicker.setValue(LocalDate.now().plusWeeks(2));
 
                     // Set date picker to limit endDate to two weeks in advance for weekly plan
                     endDatePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {

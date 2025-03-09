@@ -184,7 +184,7 @@ public class GoalPlanModel {
             }
 
         } else {
-            throw new IllegalStateException("Goal plan does not yet exist.");
+            // There is nothing to update.
         }
         notifySubscribers();
         saveDataToFile();
@@ -206,7 +206,7 @@ public class GoalPlanModel {
             }
 
         } else {
-            throw new IllegalStateException("Goal plan does not yet exist.");
+            // There is nothing to update.
         }
         notifySubscribers();
         saveDataToFile();
