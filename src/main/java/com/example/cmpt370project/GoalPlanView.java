@@ -81,7 +81,10 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
         // ********* Wire up page change events non-controller based events *********
         goCreateEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT); });
-        cancelEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.SUMMARY); });
+        cancelEditGoalPlanButton.setOnAction(e-> {
+            changePage(GoalPlanViewPage.SUMMARY);
+            goalPlanModel.syncGoalPlanToNow(); // show most up-to-date goal data
+        });
     }
 
     /**
@@ -112,6 +115,10 @@ public class GoalPlanView extends StackPane implements Subscriber {
      */
     public void setPageToSummaryView() {
         changePage(GoalPlanViewPage.SUMMARY);
+
+        if (goalPlanModel != null) {
+            goalPlanModel.syncGoalPlanToNow(); // show most up-to-date goal data
+        }
     }
 
     /**
@@ -172,12 +179,14 @@ public class GoalPlanView extends StackPane implements Subscriber {
             }
 
             changePage(GoalPlanViewPage.SUMMARY);
+            goalPlanModel.syncGoalPlanToNow(); // show most up-to-date goal data
         });
 
         // GOAL PLAN DELETE
         deletePlanButton.setOnAction(e-> {
             controller.handleDeleteGoalPlan();
             changePage(GoalPlanViewPage.SUMMARY);
+            goalPlanModel.syncGoalPlanToNow(); // show most up-to-date goal data
         });
     }
 
@@ -283,9 +292,6 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 } else {
                     progressMessage = "You have completed " + -progressDiff + " more goals than your target number of goals. Overachiever!";
                 }
-
-                System.out.println(-progressDiff);
-                System.out.println(goalPlanModel.getGoalPlan().getGoalPlanCurrent());
 
                 Label progressFeedback = new Label(progressMessage);
                 progressFeedback.setWrapText(true);

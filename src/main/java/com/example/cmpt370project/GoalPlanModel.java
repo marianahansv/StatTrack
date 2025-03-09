@@ -97,7 +97,6 @@ public class GoalPlanModel {
         } else {
             throw new IllegalStateException("Goal plan does not yet exist.");
         }
-
     }
 
     /**
@@ -167,6 +166,32 @@ public class GoalPlanModel {
         } else {
             throw new IllegalStateException("Goal plan does not yet exist.");
         }
+    }
+
+    /**
+     * Sync the goal plan data to the current date, if it exists.
+     */
+    public void syncGoalPlanToNow() {
+        if (goalPlanExists()) {
+            IGoalPlan.syncGoalPlanToNow();
+        } else {
+            throw new IllegalStateException("Goal plan does not yet exist.");
+        }
+        notifySubscribers();
+        saveDataToFile();
+    }
+
+    /**
+     * Sync the goal plan data to input date, if it exists.
+     */
+    public void syncGoalPlanToDate(LocalDate date) {
+        if (goalPlanExists()) {
+            IGoalPlan.syncGoalPlanToDate(date);
+        } else {
+            throw new IllegalStateException("Goal plan does not yet exist.");
+        }
+        notifySubscribers();
+        saveDataToFile();
     }
 
     /**
