@@ -25,6 +25,9 @@ public class HomeController {
      * @param actionEvent the event that happens when the button is pressed.
      */
     public void handleButtonPress(ActionEvent actionEvent, String title, String difficulty, String section, LocalDate start, LocalDate end) {
+        //validating input
+
+
         gm.addGoal(title,difficulty,section,start,end);
     }
 
