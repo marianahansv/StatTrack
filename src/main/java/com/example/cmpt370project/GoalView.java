@@ -20,6 +20,16 @@ public class GoalView extends StackPane implements Subscriber {
     private GoalModel goalModel;
 
     /**
+     * The goal plan model that this view gets goal data from.
+     */
+    private GoalPlanModel goalPlanModel;
+
+    /**
+     * The user data model that this view gets goals completed data.
+     */
+    private UserHistoryDataModel userHistoryDataModel;
+
+    /**
      * The root of this view.
      */
     private VBox root;
@@ -64,6 +74,30 @@ public class GoalView extends StackPane implements Subscriber {
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
         modelUpdated();
+    }
+
+    /**
+     * Set the goal plan Model for this view.
+     * @param gpModel the goal plan Model for this view.
+     */
+    public void setGoalPlanModel(GoalPlanModel gpModel) {
+        this.goalPlanModel = gpModel;
+
+        if (userHistoryDataModel != null) {
+            modelUpdated();
+        }
+    }
+
+    /**
+     * Set the user data model for this view.
+     * @param userHistoryDataModel the user data model for this view.
+     */
+    public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
+        this.userHistoryDataModel = userHistoryDataModel;
+
+        if (goalPlanModel != null) {
+            modelUpdated();
+        }
     }
 
     @Override

@@ -128,9 +128,11 @@ public class DashboardView extends BorderPane {
 
         // GOAL PLAN MODEL SUBS
         goalPlanModel.addSubscriber(goalPlanPage);
+        goalPlanModel.addSubscriber(goalsPage);
 
         // USER MODEL SUBS
         userHistoryDataModel.addSubscriber(goalPlanPage);
+        userHistoryDataModel.addSubscriber(goalsPage);
 
         // ********* 3. Setup controller with each view *********
 
@@ -156,6 +158,8 @@ public class DashboardView extends BorderPane {
         goalPlanPage.setUserHistoryDataModel(userHistoryDataModel);
 
         goalsPage.setGoalModel(goalModel);
+        goalsPage.setGoalPlanModel(goalPlanModel);
+        goalsPage.setUserHistoryDataModel(userHistoryDataModel);
 
         homePage.setGoalModel(goalModel);
 
