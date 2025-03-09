@@ -1,5 +1,7 @@
 package com.example.cmpt370project;
 
+import java.time.LocalDate;
+
 /**
  * Represents a goal plan where the user's goal is to maintain a consistent number of goals.
  */
@@ -63,5 +65,17 @@ public class MaintainGoalPlan implements IGoalPlan {
     @Override
     public Timeline getTimeline() {
         return timeline;
+    }
+
+    @Override
+    public void syncGoalPlanToNow() {
+        // This goal plan has no changing numbers.
+        return;
+    }
+
+    @Override
+    public void syncGoalPlanToDate(LocalDate date) {
+        // This goal plan has no changing numbers.
+        return;
     }
 }

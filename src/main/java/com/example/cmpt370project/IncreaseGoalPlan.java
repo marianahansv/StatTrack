@@ -140,17 +140,12 @@ public class IncreaseGoalPlan implements IGoalPlan {
         }
     }
 
-    /**
-     * Updates the next increment date and the current goal target for the current date.
-     */
+    @Override
     public void syncGoalPlanToNow() {
         syncGoalPlanToDate(LocalDate.now());
     }
 
-    /**
-     * Updates the next increment date and the current goal target as if it were currently the input date.
-     * @param date the date that the goal plan will now be updated to reflect.
-     */
+    @Override
     public void syncGoalPlanToDate(LocalDate date) {
 
         LocalDate currDate = date;

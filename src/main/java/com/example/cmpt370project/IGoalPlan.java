@@ -1,5 +1,7 @@
 package com.example.cmpt370project;
 
+import java.time.LocalDate;
+
 /**
  * An interface to represent the allowed operations for a goal plan for the system.
  */
@@ -51,5 +53,16 @@ public interface IGoalPlan {
      * Get the timeline for how this goal plan is measured.
      */
     Timeline getTimeline();
+
+    /**
+     * Updates the data of the goal plan according to the current date.
+     */
+    void syncGoalPlanToNow();
+
+    /**
+     * Updates the data of the goal plan according to the input date.
+     * @param date the date for which the goal plan data should be updated to reflect.
+     */
+    void syncGoalPlanToDate(LocalDate date);
 
 }
