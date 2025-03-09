@@ -276,13 +276,13 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
                 if (goalPlanModel.getGoalPlan() instanceof MaintainGoalPlan) {
                     currentPlanTitle.setText("Your current plan is to maintain completing " +
-                            goalPlanModel.getGoalPlan().getGoalPlanCurrent() + " goals each " + planTimelineString + " .");
+                            goalPlanModel.getGoalPlan().getGoalPlanCurrent() + " goals each " + planTimelineString + ".");
                 }
 
                 else if (goalPlanModel.getGoalPlan() instanceof IncreaseGoalPlan) {
                     currentPlanTitle.setText("Your current plan is to increase the number of goals you complete each "
                             + planTimelineString + " until you get to completing " +
-                            goalPlanModel.getGoalPlan().getGoalPlanMax() + " goals each " + planTimelineString + " .");
+                            goalPlanModel.getGoalPlan().getGoalPlanMax() + " goals each " + planTimelineString + ".");
                 }
 
                 goCreateEditGoalPlanButton.setText("Change Your Plan Details");
@@ -309,7 +309,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 String progressMessage = "";
 
                 if (progressDiff > 0) {
-                    progressMessage = "You need to complete " + progressDiff + " more goals today to stay on track with you goal plan. Time to complete some goals!";
+                    progressMessage = "You need to complete " + progressDiff + " more goals today to stay on track with your goal plan. Time to complete some goals!";
                 } else if (progressDiff == 0){
                     progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with you goal plan. Props to you!";
                 } else {

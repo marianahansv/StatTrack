@@ -38,6 +38,8 @@ public class GoalView extends StackPane implements Subscriber {
 
     private ListView<String> goalListView;
 
+    private Label progressFeedback;
+
     /**
      * Create a new goal view page.
      */
@@ -53,6 +55,9 @@ public class GoalView extends StackPane implements Subscriber {
 
         // Add the root UI element to this view
         this.getChildren().add(root);
+
+        // Initialize all other UI elements
+        progressFeedback = new Label();
     }
 
     /**
@@ -65,6 +70,56 @@ public class GoalView extends StackPane implements Subscriber {
         for (Goal goal : goalModel.getGoals()) {
             goalListView.getItems().add(goal.toString());
         }
+
+        root.getChildren().clear();
+
+        // ********* MOTIVATIONAL FEEDBACK MODULE *********
+        VBox goalProgressModule = new VBox(20);
+        goalProgressModule.setAlignment(Pos.CENTER_LEFT);
+        goalProgressModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
+        goalProgressModule.setPadding(new Insets(20));
+
+        if (goalPlanModel.goalPlanExists()) {
+
+            // Get the completed goal values whether it is the week/day
+            String planTimelineString = "";
+            int timelineCompleted = 0;
+
+            switch(goalPlanModel.getGoalPlanTimeline()) {
+                case DAILY -> {
+                    planTimelineString = "DAY";
+                    timelineCompleted = userHistoryDataModel.getDailyCompletedGoals();
+                }
+                case WEEKLY -> {
+                    planTimelineString = "WEEK";
+                    timelineCompleted = userHistoryDataModel.getWeeklyCompletedGoals();
+                }
+            }
+
+            int progressDiff = goalPlanModel.getGoalPlan().getGoalPlanCurrent() - timelineCompleted;
+            String progressMessage = "";
+
+            if (progressDiff > 0) {
+                progressMessage = "You need to complete " + progressDiff + " more goals today to stay on track with your goal plan. Time to complete some goals!";
+            } else if (progressDiff == 0){
+                progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with you goal plan. Props to you!";
+            } else {
+                progressMessage = "You have completed " + -progressDiff + " more goals than your target number of goals for your goal plan. Overachiever!";
+            }
+
+            progressFeedback = new Label(progressMessage);
+
+        } else {
+            progressFeedback.setText("Want to be motivated to complete more goals? Head over to the goal plan tab to set up a goal plan!");
+        }
+
+        progressFeedback.setWrapText(true);
+        goalProgressModule.getChildren().add(progressFeedback);
+        // ********* END OF MOTIVATIONAL FEEDBACK MODULE *********
+
+
+        // Add all UI elements to this UI view
+        root.getChildren().addAll(goalListView, goalProgressModule);
     }
 
     /**
@@ -73,7 +128,10 @@ public class GoalView extends StackPane implements Subscriber {
      */
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
-        modelUpdated();
+
+        if (userHistoryDataModel != null && goalPlanModel != null) {
+            modelUpdated();
+        }
     }
 
     /**
@@ -83,7 +141,7 @@ public class GoalView extends StackPane implements Subscriber {
     public void setGoalPlanModel(GoalPlanModel gpModel) {
         this.goalPlanModel = gpModel;
 
-        if (userHistoryDataModel != null) {
+        if (userHistoryDataModel != null && goalModel != null) {
             modelUpdated();
         }
     }
@@ -95,7 +153,7 @@ public class GoalView extends StackPane implements Subscriber {
     public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
         this.userHistoryDataModel = userHistoryDataModel;
 
-        if (goalPlanModel != null) {
+        if (goalPlanModel != null && goalModel != null) {
             modelUpdated();
         }
     }
