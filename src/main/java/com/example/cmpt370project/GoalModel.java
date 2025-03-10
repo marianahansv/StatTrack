@@ -1,3 +1,4 @@
+
 package com.example.cmpt370project;
 
 import java.io.*;
@@ -27,6 +28,8 @@ public class GoalModel {
      * The subscriber list (i.e. the view), which will update when the view changes.
      */
     private List<Subscriber> subscribers;
+
+    private String currentFilter = "All"; // Stores the currently selected difficulty filter
 
     public GoalModel(){
         goals = new HashMap<>();
@@ -199,7 +202,36 @@ public class GoalModel {
     }
 
     /**
-     * Notify th subscribers of this model that the data has changed.
+     * Sets the difficulty filter and notifies subscribers (View).
+     * The View will update itself based on the new filter.
+     */
+    public void setFilteredDifficulty(String difficulty) {
+        this.currentFilter = difficulty;
+        notifySubscribers();
+    }
+
+    /**
+     * Returns a list of goals filtered by difficulty.
+     * @param difficulty the difficulty level to filter by (e.g., "Easy", "Medium", "Hard").
+     *                   If "All" is passed, it returns all goals.
+     * @return list of goals that match the given difficulty.
+     */
+    public List<Goal> getGoalsByDifficulty(String difficulty) {
+        if ("All".equalsIgnoreCase(difficulty)) {
+            return getGoals();
+        }
+        List<Goal> filteredGoals = new ArrayList<>();
+        for (Goal goal : goals.values()) {
+            if (goal.getDifficulty() != null && goal.getDifficulty().equalsIgnoreCase(difficulty)) {
+                filteredGoals.add(goal);
+            }
+        }
+        return filteredGoals;
+    }
+
+
+    /**
+     * Notify the subscribers of this model that the data has changed.
      */
     public void notifySubscribers() {
         subscribers.forEach(Subscriber::modelUpdated);
@@ -244,3 +276,4 @@ public class GoalModel {
     }
 
 }
+
