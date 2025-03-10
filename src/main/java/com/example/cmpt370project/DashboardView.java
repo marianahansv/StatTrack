@@ -207,6 +207,8 @@ public class DashboardView extends BorderPane {
         VBox sidebar = new VBox();
         sidebar.setSpacing(10);
         sidebar.setAlignment(Pos.CENTER);
+        sidebar.setPrefWidth(100);
+        sidebar.setMaxHeight(400);
         homeButton = new Button("Home");
         goalsButton = new Button("Goals");
         goalPlanButton = new Button("Goal Plan");

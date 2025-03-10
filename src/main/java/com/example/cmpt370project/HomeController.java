@@ -38,7 +38,7 @@ public class HomeController {
             throw new InputMismatchException("End date cannot be before start date.");
         }
         try {
-            gm.addGoal(title, difficulty, section, start, end);
+            gm.addGoal(title, section, difficulty, start, end);
         } catch (InputMismatchException e){
             throw new InputMismatchException(e.getMessage());
         }

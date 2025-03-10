@@ -234,7 +234,12 @@ public class GoalModel {
      * Notify the subscribers of this model that the data has changed.
      */
     public void notifySubscribers() {
-        subscribers.forEach(Subscriber::modelUpdated);
+        // create a copy of the subscribers list before iterating
+        List<Subscriber> subscribersCopy = new ArrayList<>(subscribers);
+
+        for (Subscriber subscriber : subscribersCopy) {
+            subscriber.modelUpdated();  // update each subscriber safely
+        }
     }
 
     // Unit Testing :)
