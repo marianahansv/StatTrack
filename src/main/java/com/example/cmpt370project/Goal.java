@@ -12,6 +12,7 @@ public class Goal {
     private String difficulty = "Medium"; //default difficulty
     private LocalDate startDate = LocalDate.now();
     private LocalDate endDate = LocalDate.now();
+    private boolean completed = false; // defaults to false as why would you make a goal if it is completed already
 
     // Constructors to initialize a new goal
     /**
@@ -81,6 +82,13 @@ public class Goal {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 
     /**
