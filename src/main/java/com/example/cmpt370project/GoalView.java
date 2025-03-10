@@ -126,7 +126,7 @@ public class GoalView extends StackPane implements Subscriber {
         // instantiate and configure the ComboBox for filtering difficulties
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("All", "Easy", "Medium", "Hard");
-        difficultyComboBox.setValue("All"); // default
+        difficultyComboBox.setValue("Filter"); // default
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
 
