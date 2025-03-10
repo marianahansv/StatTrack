@@ -29,6 +29,9 @@ public class HomeController {
         if (title.isBlank()){
             throw new InputMismatchException("Title cannot be empty.");
         }
+        if (title.length() > 40){
+            throw new InputMismatchException("Title cannot be more than 40 characters.");
+        }
         //section has pre-set value
         //difficulty has pre-set value
         if(end.isBefore(start)){

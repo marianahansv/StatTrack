@@ -140,27 +140,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         // Add goal page elements
         submitGoalButton = new Button("Add Goal");
-        // Add goal form
-        submitGoalButton.setOnAction(e -> {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("New Section");
-            dialog.setHeaderText("Create a New Section");
-            dialog.setContentText("Enter section name:");
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent() && !result.get().isBlank()) {
-                String newSection = result.get();
-                // Persist the new section using SectionModel
-                sectionModel.addSection(newSection);
-                sectionsList.add(newSection);
-                ToggleButton sectionButton = new ToggleButton(newSection);
-                sectionButton.setToggleGroup(sectionToggleGroup);
-                sectionButton.setOnAction(ev -> {
-                    currentSelectedSection = newSection;
-                    updateGoalsDisplay(newSection);
-                });
-                sectionButtons.getChildren().add(sectionButton);
-            }
-        })
+
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
         difficultyComboBox = new ComboBox<>();
@@ -227,14 +207,22 @@ public class HomeView extends StackPane implements Subscriber {
             dialog.setContentText("Section:");
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(selectedSection -> {
-                // Delete the section from the model
-                boolean deleted = sectionModel.deleteSection(selectedSection);
-                if (deleted) {
-                    // Remove section from the local list and remove its toggle button from the UI
-                    sectionsList.remove(selectedSection);
-                    sectionButtons.getChildren().removeIf(node ->
-                            node instanceof ToggleButton && ((ToggleButton)node).getText().equals(selectedSection)
-                    );
+                // Delete the section from the model ONLY if there's more than one left
+                if (sectionModel.getSections().size() <= 1) {
+                    Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
+                    alert.setTitle("Warning");
+                    alert.setHeaderText("Can't delete the only section left!");
+                    alert.showAndWait();
+                }
+                else{
+                    boolean deleted = sectionModel.deleteSection(selectedSection);
+                    if (deleted) {
+                        // Remove section from the local list and remove its toggle button from the UI
+                        sectionsList.remove(selectedSection);
+                        sectionButtons.getChildren().removeIf(node ->
+                                node instanceof ToggleButton && ((ToggleButton)node).getText().equals(selectedSection)
+                        );
+                    }
                 }
             });
         });
@@ -323,16 +311,17 @@ public class HomeView extends StackPane implements Subscriber {
             String section = ((ToggleButton) selectedToggle).getText();
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
+            //handle any user input errors if exceptions are thrown by the controller
             try {
                 c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate);
                 changePage(HomeViewPage.HOME); // Return to the summary page after submission
             } catch (InputMismatchException error){
                 // Display error message
-                System.out.println("nooo");
                 Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
                 alert.setTitle("Input Error");
                 alert.setHeaderText(null);
                 alert.setContentText(error.getMessage());
+                alert.showAndWait();
             }
         });
 
