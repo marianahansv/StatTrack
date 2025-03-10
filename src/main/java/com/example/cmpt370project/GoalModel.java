@@ -29,6 +29,8 @@ public class GoalModel {
      */
     private List<Subscriber> subscribers;
 
+    private String currentFilter = "All"; // Stores the currently selected difficulty filter
+
     public GoalModel(){
         goals = new HashMap<>();
         subscribers = new ArrayList<Subscriber>();
@@ -200,13 +202,22 @@ public class GoalModel {
     }
 
     /**
+     * Sets the difficulty filter and notifies subscribers (View).
+     * The View will update itself based on the new filter.
+     */
+    public void setFilteredDifficulty(String difficulty) {
+        this.currentFilter = difficulty;
+        notifySubscribers();
+    }
+
+    /**
      * Returns a list of goals filtered by difficulty.
      * @param difficulty the difficulty level to filter by (e.g., "Easy", "Medium", "Hard").
      *                   If "All" is passed, it returns all goals.
      * @return list of goals that match the given difficulty.
      */
     public List<Goal> getGoalsByDifficulty(String difficulty) {
-        if (difficulty.equalsIgnoreCase("All")) {
+        if ("All".equalsIgnoreCase(difficulty)) {
             return getGoals();
         }
         List<Goal> filteredGoals = new ArrayList<>();

@@ -2,10 +2,12 @@ package com.example.cmpt370project;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import java.util.List;
 
 /**
  * View to handle organization of UI elements and page(s) related to viewing Goals.
@@ -39,6 +41,8 @@ public class GoalView extends StackPane implements Subscriber {
     private ListView<String> goalListView;
 
     private Label progressFeedback;
+
+    private ComboBox<String> difficultyComboBox;
 
     /**
      * Create a new goal view page.
@@ -117,9 +121,17 @@ public class GoalView extends StackPane implements Subscriber {
         goalProgressModule.getChildren().add(progressFeedback);
         // ********* END OF MOTIVATIONAL FEEDBACK MODULE *********
 
+        // 🔥 Goal difficulty filtering button 🔥
+        goalModel.addSubscriber(this);
+        // instantiate and configure the ComboBox for filtering difficulties
+        difficultyComboBox = new ComboBox<>();
+        difficultyComboBox.getItems().addAll("All", "Easy", "Medium", "Hard");
+        difficultyComboBox.setValue("All"); // default
+        // updates the goals list when the selection changes
+        difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
 
         // Add all UI elements to this UI view
-        root.getChildren().addAll(goalListView, goalProgressModule);
+        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
     }
 
     /**
@@ -156,6 +168,31 @@ public class GoalView extends StackPane implements Subscriber {
         if (goalPlanModel != null && goalModel != null) {
             modelUpdated();
         }
+    }
+
+    /**
+     * Updates the goal list based on the currently selected difficulty filter
+     */
+    private void updateFilteredGoals() {
+        if (goalModel == null) return;
+
+        String selectedDifficulty = difficultyComboBox.getValue();
+        List<Goal> filteredGoals = goalModel.getGoalsByDifficulty(selectedDifficulty);
+
+        goalListView.getItems().clear();
+        for (Goal goal : filteredGoals) {
+            goalListView.getItems().add(goal.toString());
+        }
+    }
+
+    /**
+     * Set up interaction with a controller for this view.
+     * @param controller the controller that will handle changing model data for user interactions on this page.
+     */
+    public void setFilterChangeListener(GoalController controller) {
+        difficultyComboBox.setOnAction(event -> {
+            controller.filterGoals(difficultyComboBox.getValue());
+        });
     }
 
     @Override
