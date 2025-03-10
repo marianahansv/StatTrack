@@ -6,6 +6,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,12 +21,15 @@ public class GoalPlanModel {
     /**
      * The file where the json goal plan data will be stored.
      */
-    private static final String fileName = System.getProperty("user.home") + "/GoalApplication/IGoalPlan.json";
+    private static final String fileName = System.getProperty("user.home") + "/GoalApplication/goalPlan.json";
 
     /**
      * Handles JSON serialization and deserialization.
      */
-    private static final Gson gson = new GsonBuilder().create();
+    private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
+            context.serialize(src.format(format))).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
+            LocalDate.parse(json.getAsJsonPrimitive().getAsString(), format)).create();
 
     /**
      * The current IGoalPlan the user has set up
@@ -92,7 +97,6 @@ public class GoalPlanModel {
         } else {
             throw new IllegalStateException("Goal plan does not yet exist.");
         }
-
     }
 
     /**
@@ -150,6 +154,62 @@ public class GoalPlanModel {
         } else {
             throw new IllegalStateException("Goal plan does not yet exist.");
         }
+    }
+
+    /**
+     * Get the timeline for the goal plan, if it exists.
+     * @return the timeline (DAILY or WEEKLY) for the goal plan, if it exists.
+     */
+    public com.example.cmpt370project.IGoalPlan.Timeline getGoalPlanTimeline() {
+        if (goalPlanExists()) {
+            return this.IGoalPlan.getTimeline();
+        } else {
+            throw new IllegalStateException("Goal plan does not yet exist.");
+        }
+    }
+
+    /**
+     * Sync the goal plan data to the current date, if it exists.
+     */
+    public void syncGoalPlanToNow() {
+        if (goalPlanExists()) {
+            IGoalPlan.syncGoalPlanToNow();
+
+            // Turnover Increase Plan to Maintain plan with the target number as the new number to maintain
+            if (IGoalPlan.isPlanFinished()) {
+
+                MaintainGoalPlan replacementPlan = new MaintainGoalPlan(IGoalPlan.getGoalPlanMax(), IGoalPlan.getTimeline());
+
+                setGoalPlan(replacementPlan);
+            }
+
+        } else {
+            // There is nothing to update.
+        }
+        notifySubscribers();
+        saveDataToFile();
+    }
+
+    /**
+     * Sync the goal plan data to input date, if it exists.
+     */
+    public void syncGoalPlanToDate(LocalDate date) {
+        if (goalPlanExists()) {
+            IGoalPlan.syncGoalPlanToDate(date);
+
+            // Turnover Increase Plan to Maintain plan with the target number as the new number to maintain
+            if (IGoalPlan.isPlanFinished(date)) {
+
+                MaintainGoalPlan replacementPlan = new MaintainGoalPlan(IGoalPlan.getGoalPlanMax(), IGoalPlan.getTimeline());
+
+                setGoalPlan(replacementPlan);
+            }
+
+        } else {
+            // There is nothing to update.
+        }
+        notifySubscribers();
+        saveDataToFile();
     }
 
     /**
@@ -279,7 +339,7 @@ public class GoalPlanModel {
 
 
     /**
-     * Unit and Regression Testing for this class's and the Goal Plan features and JSON methods.
+     * Unit and Regression Testing for this class's Goal Plan features and JSON methods.
      */
     public static void main(String[] args) {
 
@@ -339,7 +399,7 @@ public class GoalPlanModel {
         }
 
         // Test 7: Set goal plan
-        IGoalPlan mgp = new MaintainGoalPlan(10);
+        IGoalPlan mgp = new MaintainGoalPlan(10, com.example.cmpt370project.IGoalPlan.Timeline.DAILY);
         goalPlanModel.setGoalPlan(mgp);
 
         if (!goalPlanModel.goalPlanExists()) {
@@ -356,7 +416,7 @@ public class GoalPlanModel {
         }
 
         // Test 9: Test save of maintain goal plan (write and read)
-        IGoalPlan igp = new IncreaseGoalPlan(3, 8);
+        IGoalPlan igp = new IncreaseGoalPlan(3, 8, com.example.cmpt370project.IGoalPlan.Timeline.DAILY, LocalDate.now());
         emptyGoalPlanModel.setGoalPlan(igp);
 
         emptyGoalPlanModel = new GoalPlanModel();
