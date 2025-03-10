@@ -4,6 +4,7 @@ package com.example.cmpt370project;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -37,7 +38,13 @@ public class GoalVisView extends StackPane implements Subscriber {
         goalChartView = new GoalProgress(goalModel);
         root.getChildren().add(goalChartView);
 
-        this.getChildren().add(root);
+        // SCROLL BAR because too much content not enough space 🔥🔥🔥
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        this.getChildren().add(scrollPane);
     }
 
     /**
