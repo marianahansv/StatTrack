@@ -160,6 +160,7 @@ public class GoalProgress extends VBox {
  * Each goal gets a separate series with its own start and end data points.
  */
 private void updateLineChart() {
+    goalModel.notifySubscribers();
     // Clear any existing data from the LineChart
     lineChart.getData().clear();
     // Makes the X Axis consistent
