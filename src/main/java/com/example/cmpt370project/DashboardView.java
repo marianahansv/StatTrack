@@ -57,9 +57,15 @@ public class DashboardView extends BorderPane {
     private GoalPlanView goalPlanPage;
 
     /**
-     * The goal plan page of the application.
+     * The goal individual visualization page of the application.
      */
     private GoalVisView goalVisPage;
+
+
+    /**
+     *  The user progress historical visualization page of the application
+     */
+    private UserProgressHistoryVisView userprogresshistoryVisPage;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
