@@ -102,6 +102,7 @@ public class Goal {
                 ", difficulty='" + difficulty + '\'' +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", completed=" + completed +
                 '}';
     }
 

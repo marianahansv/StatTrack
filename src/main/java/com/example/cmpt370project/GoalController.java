@@ -21,4 +21,11 @@ public class GoalController {
     public void filterGoals(String difficulty) {
         goalModel.setFilteredDifficulty(difficulty); // updates the model
     }
+    /**
+     * Compeletes goal.
+     */
+    public void completeGoal(Goal goal) {
+        goalModel.completeGoal(goal);
+    }
+    
 }

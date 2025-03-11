@@ -2,6 +2,7 @@ package com.example.cmpt370project;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -20,6 +21,8 @@ public class GoalView extends StackPane implements Subscriber {
      * The goal model that this view gets goal data from.
      */
     private GoalModel goalModel;
+    
+    private GoalController goalController; // Controller need to display button
 
     /**
      * The goal plan model that this view gets goal data from.
@@ -40,9 +43,13 @@ public class GoalView extends StackPane implements Subscriber {
 
     private ListView<String> goalListView;
 
+    private ListView<Goal> goalListViewGoal;
+
     private Label progressFeedback;
 
     private ComboBox<String> difficultyComboBox;
+
+    private Button completeGoalButton;
 
     /**
      * Create a new goal view page.
@@ -63,6 +70,14 @@ public class GoalView extends StackPane implements Subscriber {
         // Initialize all other UI elements
         progressFeedback = new Label();
     }
+
+    
+
+    public void setGoalController(GoalController controller) {
+    this.goalController = controller;
+    }
+    
+
 
     /**
      * Update the UI elements of this page when the model changes.
@@ -129,10 +144,23 @@ public class GoalView extends StackPane implements Subscriber {
         difficultyComboBox.setValue("Filter"); // default
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
+        
+        completeGoalButton = new Button("Complete");
 
         // Add all UI elements to this UI view
-        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
+        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton);
+    
+        
+        completeGoalButton.setOnAction(e -> {
+             Goal selectedGoal = goalListViewGoal.getSelectionModel().getSelectedItem();
+             if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
+                goalController.completeGoal(selectedGoal);
+            } 
+        });
     }
+
+
+
 
     /**
      * Set the goal model of this view.

@@ -90,6 +90,17 @@ public class GoalModel {
         notifySubscribers();
     }
 
+
+        /**
+     * Complete a goa;
+     * @param goal The goal to update.
+     */
+    public void completeGoal(Goal goal) {
+        goal.setCompleted(true);
+        notifySubscribers(); // Make sure the view refreshes
+    }
+    
+
     /**
      * Update an existing goal by replacing the goal with the same title.
      * @param title The title of the goal to update.
