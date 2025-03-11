@@ -41,7 +41,7 @@ public class GoalView extends StackPane implements Subscriber {
 
     // ********* Add other ui elements as attributes here if needed (i.e. if they need to change in drawView()) *********
 
-    private ListView<String> goalListView;
+    private ListView<Goal> goalListView;
 
     private ListView<Goal> goalListViewGoal;
 
@@ -62,7 +62,8 @@ public class GoalView extends StackPane implements Subscriber {
 
         Label goalsLabel = new Label("My Goals:");
         goalListView = new ListView<>();
-        root.getChildren().addAll(goalsLabel, goalListView);
+        goalListViewGoal = new ListView<>();
+        root.getChildren().addAll(goalsLabel, goalListView, goalListViewGoal);
 
         // Add the root UI element to this view
         this.getChildren().add(root);
@@ -86,9 +87,16 @@ public class GoalView extends StackPane implements Subscriber {
         if (goalModel == null) return;
 
         goalListView.getItems().clear();
-        for (Goal goal : goalModel.getGoals()) {
+        //goalListViewGoal.getItems().clear();
+        /*for (Goal goal : goalModel.getGoals()) {
             goalListView.getItems().add(goal.toString());
+        }*/
+
+        for (Goal goal : goalModel.getGoals()) {
+            goalListView.getItems().add(goal);
         }
+
+        
 
         root.getChildren().clear();
 
@@ -152,7 +160,7 @@ public class GoalView extends StackPane implements Subscriber {
     
         
         completeGoalButton.setOnAction(e -> {
-             Goal selectedGoal = goalListViewGoal.getSelectionModel().getSelectedItem();
+             Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
              if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
                 goalController.completeGoal(selectedGoal);
             } 
@@ -209,7 +217,7 @@ public class GoalView extends StackPane implements Subscriber {
 
         goalListView.getItems().clear();
         for (Goal goal : filteredGoals) {
-            goalListView.getItems().add(goal.toString());
+            goalListView.getItems().add(goal); //toString()
         }
     }
 
