@@ -43,7 +43,7 @@ public class GoalView extends StackPane implements Subscriber {
 
     private ListView<Goal> goalListView;
 
-    private ListView<Goal> goalListViewGoal;
+    // private ListView<Goal> goalListViewGoal;
 
     private Label progressFeedback;
 
@@ -62,8 +62,8 @@ public class GoalView extends StackPane implements Subscriber {
 
         Label goalsLabel = new Label("My Goals:");
         goalListView = new ListView<>();
-        goalListViewGoal = new ListView<>();
-        root.getChildren().addAll(goalsLabel, goalListView, goalListViewGoal);
+        //goalListViewGoal = new ListView<>();goalListViewGoal
+        root.getChildren().addAll(goalsLabel, goalListView );
 
         // Add the root UI element to this view
         this.getChildren().add(root);
@@ -77,13 +77,14 @@ public class GoalView extends StackPane implements Subscriber {
     public void setGoalController(GoalController controller) {
     this.goalController = controller;
     }
-    
 
 
     /**
      * Update the UI elements of this page when the model changes.
      */
     private void drawView() {
+        //setGoalController(goalController);
+        
         if (goalModel == null) return;
 
         goalListView.getItems().clear();
@@ -160,10 +161,15 @@ public class GoalView extends StackPane implements Subscriber {
     
         
         completeGoalButton.setOnAction(e -> {
+            
              Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
-             if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
-                goalController.completeGoal(selectedGoal);
-            } 
+             // System.out.println(selectedGoal);
+             selectedGoal.setCompleted(true);
+             goalModel.notifySubscribers();
+
+             /**if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
+                goalController.completeGoal(selectedGoal); // Controller not needed
+            } **/
         });
     }
 
