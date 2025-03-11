@@ -99,7 +99,7 @@ public class GoalModel {
         goal.setCompleted(true);
         deleteGoal(goal.getTitle());
         notifySubscribers(); // Make sure the view refreshes
-        System.out.println(1111111);
+        //System.out.println(1111111);
     }
     
 

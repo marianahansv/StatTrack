@@ -51,6 +51,9 @@ public class GoalView extends StackPane implements Subscriber {
 
     private Button completeGoalButton;
 
+    private Button editGoalButton;
+    
+
     /**
      * Create a new goal view page.
      */
@@ -156,8 +159,10 @@ public class GoalView extends StackPane implements Subscriber {
         
         completeGoalButton = new Button("Complete");
 
+        editGoalButton = new Button("Increase Deadline");
+
         // Add all UI elements to this UI view
-        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton);
+        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
     
         
         completeGoalButton.setOnAction(e -> {
@@ -171,6 +176,16 @@ public class GoalView extends StackPane implements Subscriber {
                 goalController.completeGoal(selectedGoal); // Controller not needed
             } **/
         });
+
+
+        editGoalButton.setOnAction(e -> {
+            
+            Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
+            // System.out.println(selectedGoal);
+            selectedGoal.setEndDate(selectedGoal.getEndDate().plusDays(1));;
+            goalModel.notifySubscribers();
+            System.out.println(4);
+       });
     }
 
 
