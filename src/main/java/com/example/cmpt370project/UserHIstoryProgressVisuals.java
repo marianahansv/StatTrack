@@ -8,6 +8,7 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -49,10 +50,28 @@ public class UserHIstoryProgressVisuals extends VBox {
     private RadioButton notincludeDescriptiveStatistics;
 
     /**
-     * Radio Button to select to allow the user to choose the color of their
-     * graphs.
+     * Radio Button to select to allow the user to choose the red color as main
+     * for the graphs.
      */
-    private RadioButton colorPreference;
+    private RadioButton redcolorPreference;
+
+    /**
+     * Radio Button to select to allow the user to choose the purple color as main
+     * for the graphs.
+     */
+    private RadioButton purplecolorPreference;
+
+    /**
+     * Radio Button to select to allow the user to choose the blue color as main
+     * for the graphs.
+     */
+    private RadioButton bluecolorPreference;
+
+    /**
+     * Radio Button to select to allow the user to choose the orange color as main
+     * for the graphs.
+     */
+    private RadioButton orangecolorPreference;
 
     /**
      * Piechart for the visualization purposes.
@@ -82,8 +101,13 @@ public class UserHIstoryProgressVisuals extends VBox {
         /*Select, backend prepare and update the descriptive statistics */
         setDescriptiveStatistics();
         /*Select, backend prepare and update the color preferences */
+        setColorPreferences();
     }
 
+    /**
+     * The method supports in allowing the user to select the chart that they are willing to pick. It is the
+     * front-end part of the View page.
+     */
     private void setChartType(){
         Label label = new Label("Graph Preferences: ");
         checkboxPieChart= new CheckBox("Pie Chart");
@@ -106,6 +130,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         getChildren().addAll(horizontalbox);
     }
 
+    /**
+     * The method supports in allowing the user to select if they would like some descriptive statistics alongside it.
+     * It is the front-end part of the View page.
+     */
     private void setDescriptiveStatistics(){
         Label label = new Label("Descriptive Statistics Included?: ");
         includeDescriptiveStatistics = new RadioButton("Included");
@@ -113,12 +141,10 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Setting each of the radio buttons to be unchecked */
         /* Will ensure that only one is being selected at one time */
-        includeDescriptiveStatistics.setSelected(false);
-        notincludeDescriptiveStatistics.setSelected(true);
+        ToggleGroup chooseDescriptiveStatistics = new ToggleGroup();
+        chooseDescriptiveStatistics.getToggles().add(includeDescriptiveStatistics);
+        chooseDescriptiveStatistics.getToggles().add(notincludeDescriptiveStatistics);
 
-        if (includeDescriptiveStatistics.isSelected()){
-            notincludeDescriptiveStatistics.setSelected(false);
-        }
         /* Setting up listeners for the buttons */
         includeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
         notincludeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
@@ -127,6 +153,35 @@ public class UserHIstoryProgressVisuals extends VBox {
         horizontalBox_DS.getChildren().addAll(label, includeDescriptiveStatistics, notincludeDescriptiveStatistics);
         horizontalBox_DS.setAlignment(Pos.CENTER);
         getChildren().addAll(horizontalBox_DS);
+    }
+
+    /**
+     * The method supports in allowing the user to select if they would like to pick a main specific color alongside it.
+     * It is the front-end part of the View page.
+     */
+    private void setColorPreferences(){
+        Label colorchoice = new Label("Color Preference: ");
+        redcolorPreference = new RadioButton("Red");
+        purplecolorPreference = new RadioButton("Purple");
+        bluecolorPreference = new RadioButton("Blue");
+        orangecolorPreference = new RadioButton("Orange");
+
+        /* Put them all into a toggle group so only one can be selected at once */
+        ToggleGroup chooseColorPreferences = new ToggleGroup();
+        chooseColorPreferences.getToggles().add(redcolorPreference);
+        chooseColorPreferences.getToggles().add(purplecolorPreference);
+        chooseColorPreferences.getToggles().add(bluecolorPreference);
+        chooseColorPreferences.getToggles().add(orangecolorPreference);
+
+        redcolorPreference.setOnAction(e -> updateColorPreferences());
+        bluecolorPreference.setOnAction(e -> updateColorPreferences());
+        orangecolorPreference.setOnAction(e -> updateColorPreferences());
+        purplecolorPreference.setOnAction(e -> updateColorPreferences());
+
+        HBox horizontalBox_CP = new HBox(30);
+        horizontalBox_CP.getChildren().addAll(colorchoice, redcolorPreference, purplecolorPreference, orangecolorPreference, bluecolorPreference);
+        horizontalBox_CP.setAlignment(Pos.CENTER);
+        getChildren().addAll(horizontalBox_CP);
     }
     private void drawPieCharts(){}
 
@@ -143,6 +198,8 @@ public class UserHIstoryProgressVisuals extends VBox {
     void updateScatterCharts(){}
 
     private void updateDescriptiveStatistics(){}
+
+    private void updateColorPreferences(){}
 
     @Override
     public Node getStyleableNode() {
