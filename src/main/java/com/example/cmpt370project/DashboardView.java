@@ -8,6 +8,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.time.LocalDate;
+
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
  */
@@ -32,6 +34,11 @@ public class DashboardView extends BorderPane {
      */
     private UserProgressHIstoryVisModel historicalChartModel;
 
+    /**
+     * The model that holds the user's name and current/past goal trend/behaviour data of the application.
+     */
+    private UserHistoryDataModel userHistoryDataModel;
+
     // ************************* APPLICATION CONTROLLERS *************************
 
     /**
@@ -43,6 +50,9 @@ public class DashboardView extends BorderPane {
      * The goalPlanController of this application (goes with the goal plan page).
      */
     private GoalPlanController goalPlanController;
+
+    // Consider removing this later since it is not really doing anything now
+    //private GoalChartController chartController;
 
     // ************************* APPLICATION VIEWS *************************
 
@@ -62,9 +72,11 @@ public class DashboardView extends BorderPane {
     private GoalPlanView goalPlanPage;
 
     /**
-     * The goal individual visualization page of the application.
+     * The goal plan page of the application.
      */
     private GoalVisView goalVisPage;
+
+    //private GoalProgress goalChartView;
 
 
     /**
@@ -104,16 +116,7 @@ public class DashboardView extends BorderPane {
     /**
      * Construct the dashboard view and MVC structure of the application.
      */
-    public DashboardView(GoalModel goalModel) {
-
-
-
-        this.goalModel = goalModel;
-
-
-
-
-
+    public DashboardView() {
 
         // ************************* MVC CONFIGURATION *************************
 
@@ -123,6 +126,7 @@ public class DashboardView extends BorderPane {
         goalModel = new GoalModel();
         goalPlanModel = new GoalPlanModel();
         historicalChartModel = new UserProgressHIstoryVisModel();
+        userHistoryDataModel = new UserHistoryDataModel();
 
         // CONTROLLERS
         homeController = new HomeController();
@@ -146,6 +150,12 @@ public class DashboardView extends BorderPane {
 
         // GOAL PLAN MODEL SUBS
         goalPlanModel.addSubscriber(goalPlanPage);
+        goalPlanModel.addSubscriber(goalsPage);
+
+        // USER MODEL SUBS
+        userHistoryDataModel.addSubscriber(goalPlanPage);
+        userHistoryDataModel.addSubscriber(goalsPage);
+        userHistoryDataModel.addSubscriber(homePage);
         historicalChartModel.addSubscriber(historicalChartView);
 
         // ********* 3. Setup controller with each view *********
@@ -167,9 +177,17 @@ public class DashboardView extends BorderPane {
         goalPlanController.setModel(goalPlanModel);
 
         // ********* 5. Set the required models of each view *********
+
         goalPlanPage.setGoalPlanModel(goalPlanModel);
+        goalPlanPage.setUserHistoryDataModel(userHistoryDataModel);
+
         goalsPage.setGoalModel(goalModel);
+        goalsPage.setGoalPlanModel(goalPlanModel);
+        goalsPage.setUserHistoryDataModel(userHistoryDataModel);
+
         homePage.setGoalModel(goalModel);
+        homePage.setUserHistoryDataModel(userHistoryDataModel);
+
         goalVisPage.setGoalPlanModel(goalPlanModel);
         historicalChartView.setGoalPlanModel(historicalChartModel);
 
@@ -186,6 +204,17 @@ public class DashboardView extends BorderPane {
             this.setCenter(goalPlanPage);
         });
         goalVisButton.setOnAction(e -> this.setCenter(goalVisPage));
+
+
+        // ************************* POPULATE DUMMY DATA *************************
+        // Here is where we can manually set data to show for testing/demo purposes!!
+
+        // Set completed goals to test on GoalPlan page
+        userHistoryDataModel.setDailyCompletedGoals(12);
+        userHistoryDataModel.setWeeklyCompletedGoals(2);
+
+        // Set username to test on the HomeView page
+        userHistoryDataModel.setUserName("HasAPlanFran");
         historicalChartButton.setOnAction(e -> this.setCenter(historicalChartView));
     }
 
@@ -203,9 +232,19 @@ public class DashboardView extends BorderPane {
         VBox sidebar = new VBox();
         sidebar.setSpacing(10);
         sidebar.setAlignment(Pos.CENTER);
+        sidebar.setPrefWidth(100);
         homeButton = new Button("Home");
-        goalsButton = new Button("Goals");
+        goalsButton = new Button("My Goals");
         goalPlanButton = new Button("Goal Plan");
+        goalVisButton = new Button("Goal Visuals");
+
+        // Set the same preferred width for each button
+        homeButton.setMaxWidth(Double.MAX_VALUE);
+        goalsButton.setMaxWidth(Double.MAX_VALUE);
+        goalPlanButton.setMaxWidth(Double.MAX_VALUE);
+        goalVisButton.setMaxWidth(Double.MAX_VALUE);
+
+        sidebar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;");
         goalVisButton = new Button("Goal Vis");
         historicalChartButton = new Button("Goal His");
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
