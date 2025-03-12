@@ -1,6 +1,9 @@
 package com.example.cmpt370project;
 
 import javafx.scene.Node;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.ScatterChart;
 
 /**
  * This class focuses on creating the pie charts, line charts and scatter charts everytime the user picks either one or
@@ -8,6 +11,11 @@ import javafx.scene.Node;
  */
 public class UserHIstoryProgressVisuals extends Node {
     private UserProgressHIstoryVisModel historicalChartModel;
+
+    private String GraphChoices[] = {"Line Graph", "Scatter Graph", "Pie Chart"};
+    private PieChart pieChart;
+    private LineChart<String, Integer> lineChart;
+    private ScatterChart<String, Integer> scatterChart;
 
     public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
