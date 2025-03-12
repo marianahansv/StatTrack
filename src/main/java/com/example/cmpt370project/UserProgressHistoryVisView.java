@@ -29,7 +29,7 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
         root.setSpacing(10);
         root.setPadding(new Insets(10));
         Label enterlabel = new Label("Visualizing YOUR historical footprint!");
-        enterlabel.setStyle("-fx-font-weight: bold; -fx-font-size: 24px; -fx-alignment: left ");
+        enterlabel.setStyle("-fx-font-weight: bold; -fx-font-size: 24px");
 
         root.getChildren().add(enterlabel);
         root.setAlignment(Pos.TOP_LEFT);

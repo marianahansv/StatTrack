@@ -38,9 +38,15 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     /**
      * Radio Button to select if the user wants descriptive statistics to be
-     * created alongside the graphs or not.
+     * created alongside the graphs.
      */
     private RadioButton includeDescriptiveStatistics;
+
+    /**
+     * Radio Button to select if the user doesn't want descriptive statistics to be
+     * created alongside the graphs.
+     */
+    private RadioButton notincludeDescriptiveStatistics;
 
     /**
      * Radio Button to select to allow the user to choose the color of their
@@ -74,7 +80,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         // we will need to have an update function as well
 
         /*Select, backend prepare and update the descriptive statistics */
-
+        setDescriptiveStatistics();
         /*Select, backend prepare and update the color preferences */
     }
 
@@ -89,7 +95,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         checkboxLineChart.setSelected(false);
         checkboxScatterGraph.setSelected(false);
 
-        /* Settinng up listeners for each of my buttons */
+        /* Setting up listeners for each of my buttons */
         checkboxPieChart.setOnAction(e -> updatePieCharts());
         checkboxLineChart.setOnAction(e -> updateLineCharts());
         checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
@@ -101,7 +107,26 @@ public class UserHIstoryProgressVisuals extends VBox {
     }
 
     private void setDescriptiveStatistics(){
+        Label label = new Label("Descriptive Statistics Included?: ");
+        includeDescriptiveStatistics = new RadioButton("Included");
+        notincludeDescriptiveStatistics = new RadioButton("Not Included");
 
+        /* Setting each of the radio buttons to be unchecked */
+        /* Will ensure that only one is being selected at one time */
+        includeDescriptiveStatistics.setSelected(false);
+        notincludeDescriptiveStatistics.setSelected(true);
+
+        if (includeDescriptiveStatistics.isSelected()){
+            notincludeDescriptiveStatistics.setSelected(false);
+        }
+        /* Setting up listeners for the buttons */
+        includeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
+        notincludeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
+
+        HBox horizontalBox_DS = new HBox(10);
+        horizontalBox_DS.getChildren().addAll(label, includeDescriptiveStatistics, notincludeDescriptiveStatistics);
+        horizontalBox_DS.setAlignment(Pos.CENTER);
+        getChildren().addAll(horizontalBox_DS);
     }
     private void drawPieCharts(){}
 
