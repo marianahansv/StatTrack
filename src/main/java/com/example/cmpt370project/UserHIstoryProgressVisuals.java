@@ -117,10 +117,10 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
-        /* Select, backend prepare and update the charts */
-        setChartType(); //need update function to be called
         /* Select, backend prepare and update the month grid panes */
         setmonthGridPane();
+        /* Select, backend prepare and update the charts */
+        setChartType(); //need update function to be called
         /* Select, backend prepare and update the descriptive statistics */
         setDescriptiveStatistics();
         /* Select, backend prepare and update the color preferences */
@@ -138,8 +138,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         leftmonth_grid_selector.setValue("January");
         rightmonth_grid_selector.setValue("January");
 
-        leftmonth_grid_selector.setOnAction(e -> updateGridPane());
-        rightmonth_grid_selector.setOnAction(e -> updateGridPane());
+        leftmonth_grid_selector.setOnAction(e -> updateGridPane(leftmonth_grid, leftmonth_grid_selector.getValue()));
+        rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid, rightmonth_grid_selector.getValue()));
 
         /* Dealing with the yearly selectors now */
         yearSelector = new ComboBox<>();
@@ -157,7 +157,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector, rightmonth_grid);
         HBox month_container = new HBox(50);
         month_container.setAlignment(Pos.CENTER);
-        month_container.getChildren().addAll(leftmonth_grid, rightmonth_grid);
+        month_container.getChildren().addAll(left_side, right_side);
         getChildren().addAll(month_container);
     }
 
