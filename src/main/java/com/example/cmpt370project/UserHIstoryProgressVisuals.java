@@ -115,6 +115,7 @@ public class UserHIstoryProgressVisuals extends VBox {
      * The year selector for the right grid.
      */
     private ComboBox<String> yearSelector_right;
+
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
@@ -131,6 +132,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         setColorPreferences();
     }
 
+    /**
+     * The method that organizes both the left and the right grid pane. Focuses on putting the elements all together
+     * in one big piece.
+     */
     private void setmonthGridPane(){
         /* Dealing with the month selectors first */
         leftmonth_grid_selector = new ComboBox<>();
@@ -169,6 +174,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         getChildren().addAll(month_container);
     }
 
+    /**
+     * It is a helper function to support the setmonthGridPane and it adds the dates on the calendar (grid panes).
+     * @return A grid pane with the dates added to it depending on the month
+     */
     private GridPane grid_with_dates(){
         GridPane grid = new GridPane();
         grid.setHgap(5); // for between the elements in the grid
@@ -176,6 +185,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         updateGridPane(grid, "January");
         return grid;
     }
+
     /**
      * The method supports in allowing the user to select the chart that they are willing to pick. It is the
      * front-end part of the View page.
@@ -273,6 +283,12 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private void updateColorPreferences(){}
 
+    /**
+     * The method is used to generate the accurate number of dates depending on the month that we are interested in.
+     * For each of the dates, it helps to add the required buttons inside the grid pane.
+     * @param grid: A grid pane where the dates and the months will be stored
+     * @param currentmonth: The month selected by the user
+     */
     private void updateGridPane(GridPane grid, String currentmonth){
         /* Make the entire grid clear first */
         grid.getChildren().clear();
@@ -299,11 +315,6 @@ public class UserHIstoryProgressVisuals extends VBox {
                 row ++;
             }
         }
-    }
-
-    @Override
-    public Node getStyleableNode() {
-        return super.getStyleableNode();
     }
 
 }
