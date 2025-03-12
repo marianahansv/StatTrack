@@ -6,12 +6,13 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
+import javafx.scene.layout.VBox;
 
 /**
  * This class focuses on creating the pie charts, line charts and scatter charts everytime the user picks either one or
  * two of those or decides to see all of them together.
  */
-public class UserHIstoryProgressVisuals extends Node {
+public class UserHIstoryProgressVisuals extends VBox {
     /**
      * The UserProgressHIstoryVisModel is the model that consists of the pieces of data that we need for this view.
      */
@@ -50,10 +51,32 @@ public class UserHIstoryProgressVisuals extends Node {
      */
     private ScatterChart<String, Integer> scatterChart;
 
+    /**
+     * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
+     * @param historicalChartModel: The model that helps to function with this view
+     */
     public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
         // we will have to create a way to choose the type of chart that we are interested in
         // we will need to have an update function as well
+    }
+
+    private void setChartType(){
+        CheckBox PieChart = new CheckBox("Pie Chart");
+        CheckBox LineChart = new CheckBox("Line Chart");
+        CheckBox ScatterChart = new CheckBox("Scatter Chart");
+
+        /* Setting each of the graphs to be unchecked */
+        PieChart.setSelected(false);
+        LineChart.setSelected(false);
+        ScatterChart.setSelected(false);
+
+        /* Settinng up listeners for each of my buttons */
+        PieChart.setOnAction(e -> updatePieCharts());
+        LineChart.setOnAction(e -> updateLineCharts());
+        ScatterChart.setOnAction(e -> updateScatterCharts());
+
+        getChildren().addAll(PieChart, LineChart, ScatterChart);
     }
 
     private void drawPieCharts(){}
@@ -63,8 +86,6 @@ public class UserHIstoryProgressVisuals extends Node {
     private void drawScatterCharts(){}
 
     private void generateDescriptiveStatistics(){}
-    
-    void updateRequiredCharts(){}
 
     private void updatePieCharts(){}
 
