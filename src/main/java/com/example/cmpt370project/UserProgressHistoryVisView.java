@@ -29,7 +29,10 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
         root.setSpacing(10);
         root.setPadding(new Insets(10));
         Label enterlabel = new Label("Visualizing YOUR historical footprint!");
+        enterlabel.setStyle("-fx-font-weight: bold; -fx-font-size: 24px; -fx-alignment: left ");
+
         root.getChildren().add(enterlabel);
+        root.setAlignment(Pos.TOP_LEFT);
         historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartModel);
         root.getChildren().add(historicalChartProgress);
         this.getChildren().add(root);
@@ -48,7 +51,9 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
      * Helps to update the view whenever there are any changes made to the model
      */
     private void drawView(){
-        historicalChartProgress.updateRequiredCharts();
+        historicalChartProgress.updatePieCharts();
+        historicalChartProgress.updateScatterCharts();
+        historicalChartProgress.updateLineCharts();
     }
 
     /**

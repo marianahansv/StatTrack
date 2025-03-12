@@ -1,11 +1,14 @@
 package com.example.cmpt370project;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
@@ -19,10 +22,19 @@ public class UserHIstoryProgressVisuals extends VBox {
     private UserProgressHIstoryVisModel historicalChartModel;
 
     /**
-     * CheckBox to select which graphs do the user want to view.
-     * This could be one, two or more than two graphs.
+     * CheckBox to select if the Pie Chart should be selected or not.
      */
-    private CheckBox chartSelector; //no parameters needed
+    private CheckBox checkboxPieChart;
+
+    /**
+     * CheckBox to select if the Line Chart should be selected or not.
+     */
+    private CheckBox checkboxLineChart;
+
+    /**
+     * CheckBox to select if the Scatter Chart should be selected or not.
+     */
+    private CheckBox checkboxScatterGraph;
 
     /**
      * Radio Button to select if the user wants descriptive statistics to be
@@ -57,28 +69,40 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
-        // we will have to create a way to choose the type of chart that we are interested in
+        /* Select, backend prepare and update the charts */
+        setChartType();
         // we will need to have an update function as well
+
+        /*Select, backend prepare and update the descriptive statistics */
+
+        /*Select, backend prepare and update the color preferences */
     }
 
     private void setChartType(){
-        CheckBox PieChart = new CheckBox("Pie Chart");
-        CheckBox LineChart = new CheckBox("Line Chart");
-        CheckBox ScatterChart = new CheckBox("Scatter Chart");
+        Label label = new Label("Graph Preferences: ");
+        checkboxPieChart= new CheckBox("Pie Chart");
+        checkboxLineChart = new CheckBox("Line Chart");
+        checkboxScatterGraph = new CheckBox("Scatter Chart");
 
         /* Setting each of the graphs to be unchecked */
-        PieChart.setSelected(false);
-        LineChart.setSelected(false);
-        ScatterChart.setSelected(false);
+        checkboxPieChart.setSelected(false);
+        checkboxLineChart.setSelected(false);
+        checkboxScatterGraph.setSelected(false);
 
         /* Settinng up listeners for each of my buttons */
-        PieChart.setOnAction(e -> updatePieCharts());
-        LineChart.setOnAction(e -> updateLineCharts());
-        ScatterChart.setOnAction(e -> updateScatterCharts());
+        checkboxPieChart.setOnAction(e -> updatePieCharts());
+        checkboxLineChart.setOnAction(e -> updateLineCharts());
+        checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
 
-        getChildren().addAll(PieChart, LineChart, ScatterChart);
+        HBox horizontalbox = new HBox(10);
+        horizontalbox.getChildren().addAll(label, checkboxPieChart, checkboxLineChart, checkboxScatterGraph);
+        horizontalbox.setAlignment(Pos.CENTER);
+        getChildren().addAll(horizontalbox);
     }
 
+    private void setDescriptiveStatistics(){
+
+    }
     private void drawPieCharts(){}
 
     private void drawLineCharts(){}
@@ -87,11 +111,11 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private void generateDescriptiveStatistics(){}
 
-    private void updatePieCharts(){}
+    void updatePieCharts(){}
 
-    private void updateLineCharts(){}
+    void updateLineCharts(){}
 
-    private void updateScatterCharts(){}
+    void updateScatterCharts(){}
 
     private void updateDescriptiveStatistics(){}
 
@@ -99,4 +123,5 @@ public class UserHIstoryProgressVisuals extends VBox {
     public Node getStyleableNode() {
         return super.getStyleableNode();
     }
+
 }
