@@ -103,12 +103,25 @@ public class Goal {
      */
     @Override
     public String toString() {
-        return "Title: " + title + "\n" +
-                "Section: " + section + "\n" +
-                "Difficulty: " + difficulty + "\n" +
-                "Start Date: " + startDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + "\n" +
+        return "Title: " + title + " | " +
+                "Section: " + section + " | " +
+                "Difficulty: " + difficulty + " | " +
+                "Start Date: " + startDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + " | " +
                 "End Date: " + endDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy"));
     }
+
+    // Would love to use this string representation, but means we need to fix the sections UI.
+//    /**
+//     * Returns a string representation of the Goal
+//     */
+//    @Override
+//    public String toString() {
+//        return "Title: " + title + "\n" +
+//                "Section: " + section + "\n" +
+//                "Difficulty: " + difficulty + "\n" +
+//                "Start Date: " + startDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + "\n" +
+//                "End Date: " + endDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy"));
+//    }
 
     /**
      * Unit Testing (basically for understanding how this works but it's pretty simple tbt to 270 :) )

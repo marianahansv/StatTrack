@@ -347,7 +347,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
             }
 
             Label titleLabel = new Label("Let's " + titleString + " Your Personalized Goal Plan:");
-            titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+            titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
             root.getChildren().add(titleLabel);
 
