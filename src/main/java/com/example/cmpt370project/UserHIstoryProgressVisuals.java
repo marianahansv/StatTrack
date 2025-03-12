@@ -118,6 +118,11 @@ public class UserHIstoryProgressVisuals extends VBox {
     private ComboBox<String> yearSelector_right;
 
     /**
+     * This is a button to generate the visualization based on the preferences set by the users.
+     */
+    private Button generate_visualizaton;
+
+    /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
      */
