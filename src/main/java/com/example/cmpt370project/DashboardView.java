@@ -207,7 +207,7 @@ public class DashboardView extends BorderPane {
         goalsButton = new Button("Goals");
         goalPlanButton = new Button("Goal Plan");
         goalVisButton = new Button("Goal Vis");
-        historicalChartButton = new Button("His Chart");
+        historicalChartButton = new Button("Goal His");
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
         sidebar.setStyle("-fx-background-color: lightblue; -fx-padding: 10px;");
         this.setLeft(sidebar);

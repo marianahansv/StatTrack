@@ -12,7 +12,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * This class focuses on creating the pie charts, line charts and scatter charts everytime the user picks either one or
- * two of those or decides to see all of them together.
+ * two of those or decides to see all of them together. It also helps to create the buttons for selection and the grid
+ * panes for the month selections.
  */
 public class UserHIstoryProgressVisuals extends VBox {
     /**
@@ -123,13 +124,18 @@ public class UserHIstoryProgressVisuals extends VBox {
     public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
         /* Select, backend prepare and update the month grid panes */
-        setmonthGridPane();
+        setmonthGridPane();//need update function to be called
+
         /* Select, backend prepare and update the charts */
         setChartType(); //need update function to be called
+
         /* Select, backend prepare and update the descriptive statistics */
-        setDescriptiveStatistics();
+        setDescriptiveStatistics(); //need update function to be called
+
         /* Select, backend prepare and update the color preferences */
-        setColorPreferences();
+        setColorPreferences(); //need update function to be called
+
+        allPreferencesarrangement();
     }
 
     /**
@@ -191,7 +197,7 @@ public class UserHIstoryProgressVisuals extends VBox {
      * front-end part of the View page.
      */
     private void setChartType(){
-        Label label = new Label("Graph Preferences: ");
+        //Label label = new Label("Graph Preferences: ");
         checkboxPieChart= new CheckBox("Pie Chart");
         checkboxLineChart = new CheckBox("Line Chart");
         checkboxScatterGraph = new CheckBox("Scatter Chart");
@@ -206,10 +212,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         checkboxLineChart.setOnAction(e -> updateLineCharts());
         checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
 
-        HBox horizontalbox = new HBox(10);
-        horizontalbox.getChildren().addAll(label, checkboxPieChart, checkboxLineChart, checkboxScatterGraph);
-        horizontalbox.setAlignment(Pos.CENTER);
-        getChildren().addAll(horizontalbox);
+        //HBox horizontalbox = new HBox(10);
+        //horizontalbox.getChildren().addAll(label, checkboxPieChart, checkboxLineChart, checkboxScatterGraph);
+        //horizontalbox.setAlignment(Pos.CENTER);
+        //getChildren().addAll(horizontalbox);
     }
 
     /**
@@ -242,7 +248,7 @@ public class UserHIstoryProgressVisuals extends VBox {
      * It is the front-end part of the View page.
      */
     private void setColorPreferences(){
-        Label colorchoice = new Label("Color Preference: ");
+        // Label colorchoice = new Label("Color Preference: ");
         redcolorPreference = new RadioButton("Red");
         purplecolorPreference = new RadioButton("Purple");
         bluecolorPreference = new RadioButton("Blue");
@@ -260,10 +266,33 @@ public class UserHIstoryProgressVisuals extends VBox {
         orangecolorPreference.setOnAction(e -> updateColorPreferences());
         purplecolorPreference.setOnAction(e -> updateColorPreferences());
 
-        HBox horizontalBox_CP = new HBox(30);
-        horizontalBox_CP.getChildren().addAll(colorchoice, redcolorPreference, purplecolorPreference, orangecolorPreference, bluecolorPreference);
-        horizontalBox_CP.setAlignment(Pos.CENTER);
-        getChildren().addAll(horizontalBox_CP);
+        // HBox horizontalBox_CP = new HBox(30);
+        // horizontalBox_CP.getChildren().addAll(colorchoice, redcolorPreference, purplecolorPreference, orangecolorPreference, bluecolorPreference);
+        // horizontalBox_CP.setAlignment(Pos.CENTER);
+        // getChildren().addAll(horizontalBox_CP);
+    }
+
+    /**
+     * This is to take all the three user preferences and put them neatly into one container. Only this will be
+     * displayed to the user to ensure that there is sufficient spacing between the preferences for the user.
+     */
+    private void allPreferencesarrangement(){
+        VBox bigcontainer = new VBox(30);
+
+        /* Container for the chart type */
+        HBox horizontalbox_CT = new HBox(30);
+        horizontalbox_CT.getChildren().addAll(new Label("Graph Preferences"), checkboxPieChart, checkboxLineChart,
+                checkboxScatterGraph);
+        horizontalbox_CT.setAlignment(Pos.CENTER);
+        getChildren().addAll(horizontalbox_CT);
+
+        /* Container for the color preferences */
+        HBox horizontalbox_CP = new HBox(30);
+        horizontalbox_CP.getChildren().addAll(new Label("Color Preferences: "), redcolorPreference,
+                purplecolorPreference, orangecolorPreference, bluecolorPreference);
+        horizontalbox_CP.setAlignment(Pos.CENTER);
+        getChildren().addAll(horizontalbox_CP);
+
     }
     private void drawPieCharts(){}
 
