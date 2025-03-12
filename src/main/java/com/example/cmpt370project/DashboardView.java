@@ -185,6 +185,7 @@ public class DashboardView extends BorderPane {
             this.setCenter(goalPlanPage);
         });
         goalVisButton.setOnAction(e -> this.setCenter(goalVisPage));
+        historicalChartButton.setOnAction(e -> this.setCenter(historicalChartView));
     }
 
     /**
@@ -205,7 +206,8 @@ public class DashboardView extends BorderPane {
         goalsButton = new Button("Goals");
         goalPlanButton = new Button("Goal Plan");
         goalVisButton = new Button("Goal Vis");
-        sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton);
+        historicalChartButton = new Button("His Chart");
+        sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
         sidebar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;");
         this.setLeft(sidebar);
 
