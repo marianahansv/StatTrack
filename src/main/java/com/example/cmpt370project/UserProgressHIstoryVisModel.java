@@ -16,4 +16,9 @@ public class UserProgressHIstoryVisModel {
         goalsCompletedforDay = 0; //default
     }
 
+    public void addSubscriber(Subscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
+
 }

@@ -146,6 +146,7 @@ public class DashboardView extends BorderPane {
 
         // GOAL PLAN MODEL SUBS
         goalPlanModel.addSubscriber(goalPlanPage);
+        historicalChartModel.addSubscriber(historicalChartView);
 
         // ********* 3. Setup controller with each view *********
 
