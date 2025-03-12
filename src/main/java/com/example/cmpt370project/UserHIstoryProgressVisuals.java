@@ -5,10 +5,8 @@ import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.ScatterChart;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -88,6 +86,15 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     private ScatterChart<String, Integer> scatterChart;
 
+    private GridPane leftmonth_grid;
+
+    private GridPane rightmonth_grid;
+
+    private ComboBox<String> leftmonth_grid_selector;
+
+    private ComboBox<String> rightmonth_grid_selector;
+
+    private ComboBox<String> yearSelector;
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
