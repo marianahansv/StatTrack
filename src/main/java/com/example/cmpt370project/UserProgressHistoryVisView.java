@@ -13,7 +13,7 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
     /**
      * The model where the data is being retrieved from.
      */
-    private GoalModel goalModel;
+    private UserProgressHIstoryVisModel historicalChartModel;
 
     /**
      * The view where the pie charts, line charts, scatter plots visualization.
@@ -23,10 +23,21 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
     /**
      * Create a historical visualization representation page
      */
-    public UserProgressHistoryVisView(GoalModel goalModel){
-
+    public UserProgressHistoryVisView(UserProgressHIstoryVisModel historicalChartModel){
+        VBox root = new VBox();
+        root.setAlignment(Pos.CENTER);
+        root.setSpacing(10);
+        root.setPadding(new Insets(10));
+        Label enterlabel = new Label("Visualizing YOUR historical footprint!");
+        root.getChildren().add(enterlabel);
+        historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartModel);
+        root.getChildren().add(historicalChartProgress);
+        this.getChildren().add(root);
     }
 
+    public void setGoalPlanModel(UserProgressHIstoryVisModel historicalChartModel){
+        this.historicalChartModel = historicalChartModel;
+    }
     /**
      * This will update the view everytime the model is updated.
      */

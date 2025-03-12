@@ -27,6 +27,11 @@ public class DashboardView extends BorderPane {
      */
     private GoalPlanModel goalPlanModel;
 
+    /**
+     * The model that holds the historical data of each user and their goals
+     */
+    private UserProgressHIstoryVisModel historicalChartModel;
+
     // ************************* APPLICATION CONTROLLERS *************************
 
     /**
@@ -65,7 +70,7 @@ public class DashboardView extends BorderPane {
     /**
      *  The user progress historical visualization page of the application
      */
-    private UserProgressHistoryVisView userprogresshistoryVisPage;
+    private UserProgressHistoryVisView historicalChartView;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
@@ -92,6 +97,11 @@ public class DashboardView extends BorderPane {
     private Button goalVisButton;
 
     /**
+     * The button to go the historical data visualization page.
+     */
+    private Button historicalChartButton;
+
+    /**
      * Construct the dashboard view and MVC structure of the application.
      */
     public DashboardView(GoalModel goalModel) {
@@ -112,6 +122,7 @@ public class DashboardView extends BorderPane {
         // MODElS
         goalModel = new GoalModel();
         goalPlanModel = new GoalPlanModel();
+        historicalChartModel = new UserProgressHIstoryVisModel();
 
         // CONTROLLERS
         homeController = new HomeController();
@@ -123,6 +134,8 @@ public class DashboardView extends BorderPane {
         this.goalsPage = new GoalView();
         this.goalPlanPage = new GoalPlanView();
         this.goalVisPage = new GoalVisView(goalModel);
+        this.historicalChartView = new UserProgressHistoryVisView(historicalChartModel);
+
         //goalChartView = new GoalProgress(goalModel);
 
         // ********* 2. Add subscribers to models *********
@@ -157,6 +170,7 @@ public class DashboardView extends BorderPane {
         goalsPage.setGoalModel(goalModel);
         homePage.setGoalModel(goalModel);
         goalVisPage.setGoalPlanModel(goalPlanModel);
+        historicalChartView.setGoalPlanModel(historicalChartModel);
 
         // ************************* END MVC CONFIGURATION *************************
 
