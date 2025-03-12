@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import java.util.List;
@@ -41,6 +42,7 @@ public class GoalView extends StackPane implements Subscriber {
     private ListView<String> goalListView;
 
     private Label progressFeedback;
+    private Label welcomeLabel;
 
     private ComboBox<String> difficultyComboBox;
 
@@ -49,9 +51,8 @@ public class GoalView extends StackPane implements Subscriber {
      */
     public GoalView() {
         root = new VBox();
-        root.setAlignment(Pos.TOP_CENTER);
-        root.setSpacing(5);
-        root.setPadding(new Insets(10));
+        root.setSpacing(20);
+        root.setPadding(new Insets(20));
 
         Label goalsLabel = new Label("My Goals:");
         goalListView = new ListView<>();
@@ -76,6 +77,9 @@ public class GoalView extends StackPane implements Subscriber {
         }
 
         root.getChildren().clear();
+
+        welcomeLabel = new Label("Here's Your Current Goals:");
+        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
         // ********* MOTIVATIONAL FEEDBACK MODULE *********
         VBox goalProgressModule = new VBox(20);
@@ -130,8 +134,14 @@ public class GoalView extends StackPane implements Subscriber {
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
 
+        VBox dashboardControls = new VBox();
+        dashboardControls.setAlignment(Pos.TOP_CENTER);
+        dashboardControls.setSpacing(5);
+
+        dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
+
         // Add all UI elements to this UI view
-        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
+        root.getChildren().addAll(welcomeLabel, dashboardControls);
     }
 
     /**

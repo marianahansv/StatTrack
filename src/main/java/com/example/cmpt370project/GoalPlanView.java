@@ -227,7 +227,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
         if (goalPlanModel != null) {
             // Add page title
             Label titleLabel = new Label("Here's Your Personalized Goal Plan:");
-            titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+            titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
             root.getChildren().add(titleLabel);
 
             // ********* GOAL PLAN NOT EXIST VIEW *********

@@ -113,7 +113,9 @@ public class HomeView extends StackPane implements Subscriber {
         root = new VBox();
         // Home page element
         addGoalButton = new Button("Add Goal");
-        welcomeLabel = new Label("Welcome to the Home Page!");
+        welcomeLabel = new Label("Welcome to Your Personal Goal Tracker!");
+        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+
         clearGoalsButton = new Button("Clear Goals");
 
         // Motivational Message module

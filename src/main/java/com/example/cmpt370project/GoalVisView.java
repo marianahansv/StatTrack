@@ -28,15 +28,19 @@ public class GoalVisView extends StackPane implements Subscriber {
      */
     public GoalVisView(GoalModel goalModel) {
         VBox root = new VBox();
-        root.setAlignment(Pos.CENTER);
-        root.setSpacing(10);
-        root.setPadding(new Insets(10));
+        root.setSpacing(20);
+        root.setPadding(new Insets(20));
 
-        Label welcomeLabel = new Label("Welcome to the Data Visssssss Page!");
+        Label welcomeLabel = new Label("Let's Visualize Your Goal Progress:");
+        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
         root.getChildren().add(welcomeLabel);
 
+        VBox goalVisualizations = new VBox();
+        goalVisualizations.setAlignment(Pos.CENTER);
+
         goalChartView = new GoalProgress(goalModel);
-        root.getChildren().add(goalChartView);
+        goalVisualizations.getChildren().add(goalChartView);
+        root.getChildren().add(goalVisualizations);
 
         // SCROLL BAR because too much content not enough space 🔥🔥🔥
         ScrollPane scrollPane = new ScrollPane(root);
