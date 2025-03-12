@@ -107,10 +107,14 @@ public class UserHIstoryProgressVisuals extends VBox {
     private ComboBox<String> rightmonth_grid_selector;
 
     /**
-     * The year selector for the grids.
+     * The year selector for the left grid.
      */
-    private ComboBox<String> yearSelector;
+    private ComboBox<String> yearSelector_left;
 
+    /**
+     * The year selector for the right grid.
+     */
+    private ComboBox<String> yearSelector_right;
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
@@ -142,19 +146,23 @@ public class UserHIstoryProgressVisuals extends VBox {
         rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid, rightmonth_grid_selector.getValue()));
 
         /* Dealing with the yearly selectors now */
-        yearSelector = new ComboBox<>();
-        yearSelector.getItems().addAll("1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988",
-                "1989", "1990", "1991", "1992", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000",
-                "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013",
-                "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025");
-        yearSelector.setValue("2025");
+        yearSelector_left = new ComboBox<>();
+        for (int year = 1920; year <= 2025; year++){
+            yearSelector_left.getItems().add(String.valueOf(year));
+        }
+        yearSelector_left.setValue("2025");
+        yearSelector_right = new ComboBox<>();
+        yearSelector_right.getItems().addAll(yearSelector_left.getItems());
+        yearSelector_right.setValue("2025");
 
         /* Dealing with the grid panes - both left and right at the same time */
         leftmonth_grid = grid_with_dates();
         rightmonth_grid = grid_with_dates();
 
-        VBox left_side = new VBox(5, new Label("Select Starting Month"),leftmonth_grid_selector, leftmonth_grid);
-        VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector, rightmonth_grid);
+        VBox left_side = new VBox(5, new Label("Select Starting Month"),leftmonth_grid_selector,
+                new Label("Select Starting Year"), yearSelector_left, leftmonth_grid);
+        VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector,
+                new Label("Select Ending Year"), yearSelector_right, rightmonth_grid);
         HBox month_container = new HBox(50);
         month_container.setAlignment(Pos.CENTER);
         month_container.getChildren().addAll(left_side, right_side);
