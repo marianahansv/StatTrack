@@ -155,9 +155,19 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         VBox left_side = new VBox(5, new Label("Select Starting Month"),leftmonth_grid_selector, leftmonth_grid);
         VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector, rightmonth_grid);
+        HBox month_container = new HBox(50);
+        month_container.setAlignment(Pos.CENTER);
+        month_container.getChildren().addAll(leftmonth_grid, rightmonth_grid);
+        getChildren().addAll(month_container);
     }
 
-    private GridPane grid_with_dates(){}
+    private GridPane grid_with_dates(){
+        GridPane grid = new GridPane();
+        grid.setHgap(5); // for between the elements in the grid
+        grid.setVgap(5);
+        updateGridPane(grid, "January");
+        return grid;
+    }
     /**
      * The method supports in allowing the user to select the chart that they are willing to pick. It is the
      * front-end part of the View page.
@@ -255,7 +265,25 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private void updateColorPreferences(){}
 
-    private void updateGridPane(){}
+    private void updateGridPane(GridPane grid, String currentmonth){
+        /* Make the entire grid clear first */
+        grid.getChildren().clear();
+
+        /* Figure out how many days there will be in the grid depending on the month */
+        int days = switch(currentmonth){
+            case "February" -> 28;
+            case "April", "November", "September", "June" -> 30;
+            default -> 31;
+        };
+
+        int row = 0; // current row position
+        int col = 0; // current column position
+
+        for (int day = 1; day <= days; day++){
+
+
+        }
+    }
 
     @Override
     public Node getStyleableNode() {
