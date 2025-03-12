@@ -279,9 +279,17 @@ public class UserHIstoryProgressVisuals extends VBox {
         int row = 0; // current row position
         int col = 0; // current column position
 
+        /* Adding the dates to the month calendar */
         for (int day = 1; day <= days; day++){
-
-
+            Button dateButton = new Button(String.valueOf(day));
+            int finalDay = day;
+            dateButton.setOnAction(e -> System.out.println("The selected is: " + currentmonth + " on " + finalDay));
+            grid.add(dateButton, col, row);
+            col ++;
+            if (col == 7){
+                col = 0;
+                row ++;
+            }
         }
     }
 
