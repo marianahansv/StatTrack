@@ -86,15 +86,31 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     private ScatterChart<String, Integer> scatterChart;
 
+    /**
+     * The month grid on the left-hand side of the page.
+     */
     private GridPane leftmonth_grid;
 
+    /**
+     * The month grid on the right-hand side of the page.
+     */
     private GridPane rightmonth_grid;
 
+    /**
+     * The selector for the month on the left grid box.
+     */
     private ComboBox<String> leftmonth_grid_selector;
 
+    /**
+     * The selector for the month on the right grid box.
+     */
     private ComboBox<String> rightmonth_grid_selector;
 
+    /**
+     * The year selector for the grids.
+     */
     private ComboBox<String> yearSelector;
+
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
