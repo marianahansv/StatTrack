@@ -118,15 +118,46 @@ public class UserHIstoryProgressVisuals extends VBox {
     public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
         /* Select, backend prepare and update the charts */
-        setChartType();
-        // we will need to have an update function as well
-
-        /*Select, backend prepare and update the descriptive statistics */
+        setChartType(); //need update function to be called
+        /* Select, backend prepare and update the month grid panes */
+        setmonthGridPane();
+        /* Select, backend prepare and update the descriptive statistics */
         setDescriptiveStatistics();
-        /*Select, backend prepare and update the color preferences */
+        /* Select, backend prepare and update the color preferences */
         setColorPreferences();
     }
 
+    private void setmonthGridPane(){
+        /* Dealing with the month selectors first */
+        leftmonth_grid_selector = new ComboBox<>();
+        rightmonth_grid_selector = new ComboBox<>();
+        leftmonth_grid_selector.getItems().addAll("January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December");
+        rightmonth_grid_selector.getItems().addAll(leftmonth_grid_selector.getItems());
+
+        leftmonth_grid_selector.setValue("January");
+        rightmonth_grid_selector.setValue("January");
+
+        leftmonth_grid_selector.setOnAction(e -> updateGridPane());
+        rightmonth_grid_selector.setOnAction(e -> updateGridPane());
+
+        /* Dealing with the yearly selectors now */
+        yearSelector = new ComboBox<>();
+        yearSelector.getItems().addAll("1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988",
+                "1989", "1990", "1991", "1992", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000",
+                "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013",
+                "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025");
+        yearSelector.setValue("2025");
+
+        /* Dealing with the grid panes - both left and right at the same time */
+        leftmonth_grid = grid_with_dates();
+        rightmonth_grid = grid_with_dates();
+
+        VBox left_side = new VBox(5, new Label("Select Starting Month"),leftmonth_grid_selector, leftmonth_grid);
+        VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector, rightmonth_grid);
+    }
+
+    private GridPane grid_with_dates(){}
     /**
      * The method supports in allowing the user to select the chart that they are willing to pick. It is the
      * front-end part of the View page.
@@ -223,6 +254,8 @@ public class UserHIstoryProgressVisuals extends VBox {
     private void updateDescriptiveStatistics(){}
 
     private void updateColorPreferences(){}
+
+    private void updateGridPane(){}
 
     @Override
     public Node getStyleableNode() {
