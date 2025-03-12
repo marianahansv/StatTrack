@@ -35,9 +35,22 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
         this.getChildren().add(root);
     }
 
+    /**
+     * Helps to set the accurate model that goes with this view. In this case, it would be
+     * UserProgressHistoryVisModel
+     * @param historicalChartModel: The model that contains the data for this view
+     */
     public void setGoalPlanModel(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
     }
+
+    /**
+     * Helps to update the view whenever there are any changes made to the model
+     */
+    private void drawView(){
+        historicalChartProgress.updateRequiredCharts();
+    }
+
     /**
      * This will update the view everytime the model is updated.
      */

@@ -22,6 +22,8 @@ public class UserHIstoryProgressVisuals extends Node {
     private void drawScatterCharts(){}
 
     private void generateDescriptiveStatistics(){}
+    
+    void updateRequiredCharts(){}
 
     private void updatePieCharts(){}
 
