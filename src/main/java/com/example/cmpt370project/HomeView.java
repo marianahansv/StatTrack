@@ -315,6 +315,7 @@ public class HomeView extends StackPane implements Subscriber {
             try {
                 c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate);
                 changePage(HomeViewPage.HOME); // Return to the summary page after submission
+                resetAddGoalPage();
             } catch (InputMismatchException error){
                 // Display error message
                 Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
@@ -326,6 +327,12 @@ public class HomeView extends StackPane implements Subscriber {
         });
 
         clearGoalsButton.setOnAction(c::removeButtonPress);
+    }
+
+    private void resetAddGoalPage(){
+        titleInput.clear();
+        difficultyComboBox.setValue("Medium");
+        sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().getFirst());
     }
     /**
      * Draws the UI of the Home page.
