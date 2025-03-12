@@ -208,11 +208,17 @@ public class DashboardView extends BorderPane {
         sidebar.setSpacing(10);
         sidebar.setAlignment(Pos.CENTER);
         sidebar.setPrefWidth(100);
-        sidebar.setMaxHeight(400);
         homeButton = new Button("Home");
-        goalsButton = new Button("Goals");
+        goalsButton = new Button("My Goals");
         goalPlanButton = new Button("Goal Plan");
-        goalVisButton = new Button("Goal Vis");
+        goalVisButton = new Button("Goal Visuals");
+
+        // Set the same preferred width for each button
+        homeButton.setMaxWidth(Double.MAX_VALUE);
+        goalsButton.setMaxWidth(Double.MAX_VALUE);
+        goalPlanButton.setMaxWidth(Double.MAX_VALUE);
+        goalVisButton.setMaxWidth(Double.MAX_VALUE);
+
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton);
         sidebar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;");
         this.setLeft(sidebar);
