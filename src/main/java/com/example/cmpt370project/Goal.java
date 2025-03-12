@@ -1,6 +1,7 @@
 package com.example.cmpt370project;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * The Goal class represents an individual goal with various attributes to track its details and progress.
@@ -83,18 +84,30 @@ public class Goal {
         this.endDate = endDate;
     }
 
+//    /**
+//     * Returns a string representation of the Goal
+//     */
+//    @Override
+//    public String toString() {
+//        return "Goal{" +
+//                "title='" + title + '\'' +
+//                ", section='" + section + '\'' +
+//                ", difficulty='" + difficulty + '\'' +
+//                ", startDate=" + startDate +
+//                ", endDate=" + endDate +
+//                '}';
+//    }
+
     /**
      * Returns a string representation of the Goal
      */
     @Override
     public String toString() {
-        return "Goal{" +
-                "title='" + title + '\'' +
-                ", section='" + section + '\'' +
-                ", difficulty='" + difficulty + '\'' +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                '}';
+        return "Title: " + title + "\n" +
+                "Section: " + section + "\n" +
+                "Difficulty: " + difficulty + "\n" +
+                "Start Date: " + startDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + "\n" +
+                "End Date: " + endDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy"));
     }
 
     /**
