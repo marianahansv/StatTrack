@@ -113,7 +113,9 @@ public class HomeView extends StackPane implements Subscriber {
         root = new VBox();
         // Home page element
         addGoalButton = new Button("Add Goal");
-        welcomeLabel = new Label("Welcome to the Home Page!");
+        welcomeLabel = new Label("Welcome to Your Personal Goal Tracker!");
+        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+
         clearGoalsButton = new Button("Clear Goals");
 
         // Motivational Message module
@@ -315,6 +317,7 @@ public class HomeView extends StackPane implements Subscriber {
             try {
                 c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate);
                 changePage(HomeViewPage.HOME); // Return to the summary page after submission
+                resetAddGoalPage();
             } catch (InputMismatchException error){
                 // Display error message
                 Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
@@ -326,6 +329,12 @@ public class HomeView extends StackPane implements Subscriber {
         });
 
         clearGoalsButton.setOnAction(c::removeButtonPress);
+    }
+
+    private void resetAddGoalPage(){
+        titleInput.clear();
+        difficultyComboBox.setValue("Medium");
+        sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().getFirst());
     }
     /**
      * Draws the UI of the Home page.
