@@ -115,7 +115,8 @@ public class Goal {
                 "Section: " + section + " | " +
                 "Difficulty: " + difficulty + " | " +
                 "Start Date: " + startDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + " | " +
-                "End Date: " + endDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy"));
+                "End Date: " + endDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy"))+ " | " +
+                "Completed: " + isCompleted();
     }
 
     // Would love to use this string representation, but means we need to fix the sections UI.
