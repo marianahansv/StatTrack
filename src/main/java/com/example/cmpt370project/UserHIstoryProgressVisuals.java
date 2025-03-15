@@ -136,9 +136,9 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     AtomicReference<Button> currentButton = new AtomicReference<>(null); // had to make this atomic
 
-    private AtomicReference<Button> leftgrid_dates = new AtomicReference<>(null);
+    AtomicReference<Button> leftgrid_dates = new AtomicReference<>(null);
 
-    private AtomicReference<Button> rightgrid_dates = new AtomicReference<>(null);
+    AtomicReference<Button> rightgrid_dates = new AtomicReference<>(null);
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
@@ -440,6 +440,8 @@ public class UserHIstoryProgressVisuals extends VBox {
     private void updateResetView(){
         yearSelector_left.setValue("2025");
         yearSelector_right.setValue("2025");
+        setButtonOutlook(leftgrid_dates.get(), false);
+        setButtonOutlook(rightgrid_dates.get(), false);
         leftmonth_grid_selector.setValue("January");
         rightmonth_grid_selector.setValue("January");
         checkboxPieChart.setSelected(false);
