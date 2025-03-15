@@ -175,14 +175,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         leftmonth_grid = grid_with_dates();
         rightmonth_grid = grid_with_dates();
 
-        VBox left_side = new VBox(5, new Label("Select Starting Month"),leftmonth_grid_selector,
-                new Label("Select Starting Year"), yearSelector_left, leftmonth_grid);
-        VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector,
-                new Label("Select Ending Year"), yearSelector_right, rightmonth_grid);
-        HBox month_container = new HBox(50);
-        month_container.setAlignment(Pos.CENTER);
-        month_container.getChildren().addAll(left_side, right_side);
-        getChildren().addAll(month_container);
     }
 
     /**
@@ -202,7 +194,6 @@ public class UserHIstoryProgressVisuals extends VBox {
      * front-end part of the View page.
      */
     private void setChartType(){
-        //Label label = new Label("Graph Preferences: ");
         checkboxPieChart= new CheckBox("Pie Chart");
         checkboxLineChart = new CheckBox("Line Chart");
         checkboxScatterGraph = new CheckBox("Scatter Chart");
@@ -217,10 +208,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         checkboxLineChart.setOnAction(e -> updateLineCharts());
         checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
 
-        //HBox horizontalbox = new HBox(10);
-        //horizontalbox.getChildren().addAll(label, checkboxPieChart, checkboxLineChart, checkboxScatterGraph);
-        //horizontalbox.setAlignment(Pos.CENTER);
-        //getChildren().addAll(horizontalbox);
     }
 
     /**
@@ -228,7 +215,6 @@ public class UserHIstoryProgressVisuals extends VBox {
      * It is the front-end part of the View page.
      */
     private void setDescriptiveStatistics(){
-        Label label = new Label("Descriptive Statistics Included?: ");
         includeDescriptiveStatistics = new RadioButton("Included");
         notincludeDescriptiveStatistics = new RadioButton("Not Included");
 
@@ -242,10 +228,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         includeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
         notincludeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
 
-        HBox horizontalBox_DS = new HBox(10);
-        horizontalBox_DS.getChildren().addAll(label, includeDescriptiveStatistics, notincludeDescriptiveStatistics);
-        horizontalBox_DS.setAlignment(Pos.CENTER);
-        getChildren().addAll(horizontalBox_DS);
     }
 
     /**
@@ -253,7 +235,6 @@ public class UserHIstoryProgressVisuals extends VBox {
      * It is the front-end part of the View page.
      */
     private void setColorPreferences(){
-        // Label colorchoice = new Label("Color Preference: ");
         redcolorPreference = new RadioButton("Red");
         purplecolorPreference = new RadioButton("Purple");
         bluecolorPreference = new RadioButton("Blue");
@@ -270,19 +251,25 @@ public class UserHIstoryProgressVisuals extends VBox {
         bluecolorPreference.setOnAction(e -> updateColorPreferences());
         orangecolorPreference.setOnAction(e -> updateColorPreferences());
         purplecolorPreference.setOnAction(e -> updateColorPreferences());
-
-        // HBox horizontalBox_CP = new HBox(30);
-        // horizontalBox_CP.getChildren().addAll(colorchoice, redcolorPreference, purplecolorPreference, orangecolorPreference, bluecolorPreference);
-        // horizontalBox_CP.setAlignment(Pos.CENTER);
-        // getChildren().addAll(horizontalBox_CP);
     }
 
     /**
-     * This is to take all the three user preferences and put them neatly into one container. Only this will be
-     * displayed to the user to ensure that there is sufficient spacing between the preferences for the user.
+     * The function is creating a huge container element to store all the grid boxes as well as the three user
+     * preferences into one big box. This is done to ensure good spacing between all of the elements on the page and
+     * to create a visually pleasing experience for the user.
      */
     private void allPreferencesarrangement(){
         VBox bigcontainer = new VBox(30);
+
+        /* Two grid boxes for the calendar month and dates */
+        VBox left_side = new VBox(5, new Label("Select Starting Month"),leftmonth_grid_selector,
+                new Label("Select Starting Year"), yearSelector_left, leftmonth_grid);
+        VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector,
+                new Label("Select Ending Year"), yearSelector_right, rightmonth_grid);
+        HBox month_container = new HBox(50);
+        month_container.setAlignment(Pos.CENTER);
+        month_container.getChildren().addAll(left_side, right_side);
+        getChildren().addAll(month_container);
 
         /* Container for the chart type */
         HBox horizontalbox_CT = new HBox(30);
@@ -298,6 +285,16 @@ public class UserHIstoryProgressVisuals extends VBox {
         horizontalbox_CP.setAlignment(Pos.CENTER);
         getChildren().addAll(horizontalbox_CP);
 
+        /* Container for descriptive statistics */
+        HBox horizontalbox_DS = new HBox(30);
+        horizontalbox_DS.getChildren().addAll(new Label("Include Descriptive Statistics?: "), includeDescriptiveStatistics, notincludeDescriptiveStatistics);
+        horizontalbox_DS.setAlignment(Pos.CENTER);
+        getChildren().addAll(horizontalbox_DS);
+
+        /* Add all the horizontal boxes into one bigcontainer */
+        bigcontainer.getChildren().addAll(month_container, horizontalbox_CT, horizontalbox_CP, horizontalbox_DS);
+        bigcontainer.setAlignment(Pos.CENTER);
+        getChildren().add(bigcontainer);
     }
     private void drawPieCharts(){}
 
