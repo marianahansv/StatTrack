@@ -122,6 +122,12 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     private Button generate_visualizaton;
 
+
+    /**
+     * This is a button to reset the visualization based on the preferences set by the users.
+     */
+    private Button reset_visualization;
+
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
@@ -139,6 +145,9 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Select, backend prepare and update the color preferences */
         setColorPreferences(); //need update function to be called
+
+        /* Select, backend prepare and update the "Generate" button */
+        set_visualization();
 
         allPreferencesarrangement();
     }
@@ -207,7 +216,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         checkboxPieChart.setOnAction(e -> updatePieCharts());
         checkboxLineChart.setOnAction(e -> updateLineCharts());
         checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
-
     }
 
     /**
@@ -227,7 +235,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* Setting up listeners for the buttons */
         includeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
         notincludeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
-
     }
 
     /**
@@ -251,6 +258,17 @@ public class UserHIstoryProgressVisuals extends VBox {
         bluecolorPreference.setOnAction(e -> updateColorPreferences());
         orangecolorPreference.setOnAction(e -> updateColorPreferences());
         purplecolorPreference.setOnAction(e -> updateColorPreferences());
+    }
+
+    /**
+     * This method is used to generate and reset the visualization preferences by the user.
+     */
+    private void set_visualization(){
+        generate_visualizaton = new Button("Generate");
+        generate_visualizaton.setOnAction(e -> updateGenerateView());
+
+        reset_visualization = new Button("Reset");
+        reset_visualization.setOnAction(e -> updateResetView());
     }
 
     /**
@@ -287,15 +305,24 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Container for descriptive statistics */
         HBox horizontalbox_DS = new HBox(30);
-        horizontalbox_DS.getChildren().addAll(new Label("Include Descriptive Statistics?: "), includeDescriptiveStatistics, notincludeDescriptiveStatistics);
+        horizontalbox_DS.getChildren().addAll(new Label("Include Descriptive Statistics?: "),
+                includeDescriptiveStatistics, notincludeDescriptiveStatistics);
         horizontalbox_DS.setAlignment(Pos.CENTER);
         getChildren().addAll(horizontalbox_DS);
 
+        /* Container for the generate button */
+        HBox horizontalbox_G = new HBox(30);
+        horizontalbox_G.getChildren().addAll(generate_visualizaton, reset_visualization);
+        horizontalbox_G.setAlignment(Pos.CENTER);
+        getChildren().addAll(horizontalbox_G);
+
+
         /* Add all the horizontal boxes into one bigcontainer */
-        bigcontainer.getChildren().addAll(month_container, horizontalbox_CT, horizontalbox_CP, horizontalbox_DS);
+        bigcontainer.getChildren().addAll(month_container, horizontalbox_CT, horizontalbox_CP, horizontalbox_DS, horizontalbox_G);
         bigcontainer.setAlignment(Pos.CENTER);
         getChildren().add(bigcontainer);
     }
+
     private void drawPieCharts(){}
 
     private void drawLineCharts(){}
@@ -313,6 +340,10 @@ public class UserHIstoryProgressVisuals extends VBox {
     private void updateDescriptiveStatistics(){}
 
     private void updateColorPreferences(){}
+
+    private void updateGenerateView(){}
+
+    private void updateResetView(){}
 
     /**
      * The method is used to generate the accurate number of dates depending on the month that we are interested in.
@@ -338,6 +369,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         for (int day = 1; day <= days; day++){
             Button dateButton = new Button(String.valueOf(day));
             int finalDay = day;
+            /* Everytime the user clicks, it will print out the following on the terminal. */
             dateButton.setOnAction(e -> System.out.println("The selected is: " + currentmonth + " on " + finalDay));
             grid.add(dateButton, col, row);
             col ++;
@@ -347,5 +379,4 @@ public class UserHIstoryProgressVisuals extends VBox {
             }
         }
     }
-
 }
