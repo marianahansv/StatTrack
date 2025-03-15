@@ -281,16 +281,34 @@ public class UserHIstoryProgressVisuals extends VBox {
         VBox bigcontainer = new VBox(30);
 
         /* Two grid boxes for the calendar month and dates */
-        VBox left_side = new VBox(4, new Label("Select Starting Month"),leftmonth_grid_selector,
-                new Label("Select Starting Year"), yearSelector_left, leftmonth_grid);
-        VBox right_side = new VBox(4, new Label("Select Ending Month"),rightmonth_grid_selector,
-                new Label("Select Ending Year"), yearSelector_right, rightmonth_grid);
+        /* Create distinct separation between the buttons to add styling on each respectively */
+        HBox left_month_selector = new HBox(10);
+        left_month_selector.getChildren().addAll(leftmonth_grid_selector);
+        left_month_selector.setAlignment(Pos.CENTER);
+        HBox right_month_selector = new HBox(10);
+        right_month_selector.getChildren().addAll(rightmonth_grid_selector);
+        right_month_selector.setAlignment(Pos.CENTER);
+        HBox left_year_selector = new HBox(10);
+        left_year_selector.getChildren().addAll(yearSelector_left);
+        left_year_selector.setAlignment(Pos.CENTER);
+        HBox right_year_selector = new HBox(10);
+        right_year_selector.getChildren().addAll(yearSelector_right);
+        right_year_selector.setAlignment(Pos.CENTER);
+
+        HBox left_label = new HBox(10);
+        left_label.getChildren().addAll(new Label("Select Starting Month and Year: "));
+        HBox right_label = new HBox(10);
+        right_label.getChildren().addAll(new Label("Select Ending Month and Year: "));
+        VBox left_side = new VBox(4, left_month_selector, left_year_selector, leftmonth_grid);
+        VBox right_side = new VBox(4, right_month_selector, right_year_selector, rightmonth_grid);
         left_side.setStyle("-fx-background-color: lightblue;" + "-fx-padding: 10px;" + "-fx-background-radius: 10px;");
         right_side.setStyle("-fx-background-color: lightblue;" + "-fx-padding: 10px;" + "-fx-background-radius: 10px;");
+        VBox left_container = new VBox(6, left_label, left_side);
+        VBox right_container = new VBox(6, right_label, right_side);
 
         HBox month_container = new HBox(50);
         month_container.setAlignment(Pos.CENTER);
-        month_container.getChildren().addAll(left_side, right_side);
+        month_container.getChildren().addAll(left_container, right_container);
         getChildren().addAll(month_container);
 
         /* Container for the chart type */
