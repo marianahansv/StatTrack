@@ -438,6 +438,14 @@ public class UserHIstoryProgressVisuals extends VBox {
      * includes all the default options including the checkboxes and radio options as well.
      */
     private void updateResetView(){
+        if (isNoneSelected()){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Already in DEFAULT mode!");
+            alert.setHeaderText(null);
+            alert.setContentText("You are already in DEFAULT mode! There is nothing that can be reset! ");
+            alert.showAndWait();
+            return;
+        }
         yearSelector_left.setValue("2025");
         yearSelector_right.setValue("2025");
         setButtonOutlook(leftgrid_dates.get(), false);
@@ -453,6 +461,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         bluecolorPreference.setSelected(false);
         includeDescriptiveStatistics.setSelected(false);
         notincludeDescriptiveStatistics.setSelected(false);
+
     }
 
     /**
@@ -553,5 +562,14 @@ public class UserHIstoryProgressVisuals extends VBox {
         else{
             setButtonOutlook(newButton, true);
         }
+    }
+
+    private boolean isNoneSelected(){
+        return ((yearSelector_left.getValue().equals("2025")) && (yearSelector_right.getValue().equals("2025")) &&
+                ((rightmonth_grid_selector.getValue().equals("January"))) && ((leftmonth_grid_selector.getValue().equals("January")))
+                && (leftgrid_dates.get() == null) && (rightgrid_dates.get() == null) && !checkboxPieChart.isSelected()
+                && !checkboxScatterGraph.isSelected() && !checkboxLineChart.isSelected() && !redcolorPreference.isSelected()
+                && !orangecolorPreference.isSelected() && !bluecolorPreference.isSelected() && !purplecolorPreference.isSelected()
+                && !includeDescriptiveStatistics.isSelected() && !notincludeDescriptiveStatistics.isSelected());
     }
 }
