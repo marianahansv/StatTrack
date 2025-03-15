@@ -167,19 +167,28 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         leftmonth_grid_selector.setValue("January");
         rightmonth_grid_selector.setValue("January");
+        leftmonth_grid_selector.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
+                        "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
+        rightmonth_grid_selector.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
+                "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
 
         leftmonth_grid_selector.setOnAction(e -> updateGridPane(leftmonth_grid, leftmonth_grid_selector.getValue()));
         rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid, rightmonth_grid_selector.getValue()));
 
         /* Dealing with the yearly selectors now */
         yearSelector_left = new ComboBox<>();
+        yearSelector_right = new ComboBox<>();
+
         for (int year = 1920; year <= 2025; year++){
             yearSelector_left.getItems().add(String.valueOf(year));
         }
         yearSelector_left.setValue("2025");
-        yearSelector_right = new ComboBox<>();
+        yearSelector_left.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
+                "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
         yearSelector_right.getItems().addAll(yearSelector_left.getItems());
         yearSelector_right.setValue("2025");
+        yearSelector_right.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
+                "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
 
         /* Dealing with the grid panes - both left and right at the same time */
         leftmonth_grid = grid_with_dates();
