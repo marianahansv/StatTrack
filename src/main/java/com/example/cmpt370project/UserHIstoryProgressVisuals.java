@@ -146,9 +146,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* Select, backend prepare and update the color preferences */
         setColorPreferences(); //need update function to be called
 
-        /* Select, backend prepare and update the "Generate" button */
+        /* Select, backend prepare and update the "Generate" and "Reset" button */
         set_visualization();
 
+        /* Puts all elements neatly in one container */
         allPreferencesarrangement();
     }
 
@@ -280,10 +281,13 @@ public class UserHIstoryProgressVisuals extends VBox {
         VBox bigcontainer = new VBox(30);
 
         /* Two grid boxes for the calendar month and dates */
-        VBox left_side = new VBox(5, new Label("Select Starting Month"),leftmonth_grid_selector,
+        VBox left_side = new VBox(4, new Label("Select Starting Month"),leftmonth_grid_selector,
                 new Label("Select Starting Year"), yearSelector_left, leftmonth_grid);
-        VBox right_side = new VBox(5, new Label("Select Ending Month"),rightmonth_grid_selector,
+        VBox right_side = new VBox(4, new Label("Select Ending Month"),rightmonth_grid_selector,
                 new Label("Select Ending Year"), yearSelector_right, rightmonth_grid);
+        left_side.setStyle("-fx-background-color: lightblue;" + "-fx-padding: 10px;" + "-fx-background-radius: 10px;");
+        right_side.setStyle("-fx-background-color: lightblue;" + "-fx-padding: 10px;" + "-fx-background-radius: 10px;");
+
         HBox month_container = new HBox(50);
         month_container.setAlignment(Pos.CENTER);
         month_container.getChildren().addAll(left_side, right_side);
@@ -368,6 +372,9 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* Adding the dates to the month calendar */
         for (int day = 1; day <= days; day++){
             Button dateButton = new Button(String.valueOf(day));
+            dateButton.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" + "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
+            dateButton.setOnMouseEntered(e -> dateButton.setStyle("-fx-background-color: white;" + "-fx-background-radius: 10px;" + "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;"));
+            dateButton.setOnMouseExited(e -> dateButton.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" + "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;"));
             int finalDay = day;
             /* Everytime the user clicks, it will print out the following on the terminal. */
             dateButton.setOnAction(e -> System.out.println("The selected is: " + currentmonth + " on " + finalDay));
