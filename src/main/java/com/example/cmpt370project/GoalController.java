@@ -26,6 +26,7 @@ public class GoalController {
      */
     public void completeGoal(Goal goal) {
         goalModel.completeGoal(goal);
+        //System.out.println(55555);
     }
     
 }

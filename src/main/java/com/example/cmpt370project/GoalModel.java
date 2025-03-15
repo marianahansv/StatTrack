@@ -61,8 +61,8 @@ public class GoalModel {
      * @param startDate start date of goal
      * @param endDate end date of goal
      */
-    public void addGoal(String title, String section, String difficulty, LocalDate startDate, LocalDate endDate){
-        Goal newGoal = new Goal(title,section,difficulty,startDate,endDate);
+    public void addGoal(String title, String section, String difficulty, LocalDate startDate, LocalDate endDate, boolean completed){
+        Goal newGoal = new Goal(title,section,difficulty,startDate,endDate,completed);
         goals.put(newGoal.getTitle(),newGoal);
         save_goals_to_file();
         notifySubscribers();
@@ -91,16 +91,7 @@ public class GoalModel {
     }
 
 
-        /**
-     * Complete a goa;
-     * @param goal The goal to update.
-     */
-    public void completeGoal(Goal goal) {
-        goal.setCompleted(true);
-        deleteGoal(goal.getTitle());
-        notifySubscribers(); // Make sure the view refreshes
-        //System.out.println(1111111);
-    }
+  
     
 
     /**
@@ -111,12 +102,15 @@ public class GoalModel {
      */
     public boolean updateGoal(String title, Goal updatedGoal) {
         if (goals.containsKey(title)) {
+            System.out.println("Updating goal: " + title);
             goals.put(title, updatedGoal);
             save_goals_to_file();
             return true;
         }
+        System.out.println("Goal not found for update: " + title);
         return false;
     }
+    
     /**
      * Delete a goal by its title. (I'm just thinking of what would be easier but we can always change it as we need)
      * @param title of goal to delete.
@@ -144,7 +138,19 @@ public class GoalModel {
     public int getGoalCount() {
         return goals.size();
     }
-
+      /**
+     * Complete a goal;
+     * @param goal The goal to complete.
+     */
+    public void completeGoal(Goal goal) {
+        goal.setCompleted(true);
+        System.out.println(1111111);
+        notifySubscribers(); // Make sure the view refreshes
+        updateGoal(goal.getTitle(), goal);
+        //save_goals_to_file();
+        //deleteGoal(goal.getTitle());
+        
+    }
     /**
      * Checks if file exists before reading or writing to it.
      * If it doesn't, it creates an empty file
@@ -260,8 +266,8 @@ public class GoalModel {
         GoalModel model = new GoalModel();
         // Create some goals
         Goal goal1 = new Goal("Run a marathon", "Fitness", "Hard",
-                LocalDate.of(2025, 2, 1), LocalDate.of(2025, 6, 1));
-        Goal goal2 = new Goal("Read 10 books","Personal", "Medium", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 7, 31));
+                LocalDate.of(2025, 2, 1), LocalDate.of(2025, 6, 1), false);
+        Goal goal2 = new Goal("Read 10 books","Personal", "Medium", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 7, 31), false);
 
         //test addGoal
         model.addGoal(goal1);

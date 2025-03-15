@@ -1,15 +1,15 @@
 package com.example.cmpt370project;
 
+import java.util.List;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import java.util.List;
 
 /**
  * View to handle organization of UI elements and page(s) related to viewing Goals.
@@ -180,8 +180,9 @@ public class GoalView extends StackPane implements Subscriber {
             
              Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
              // System.out.println(selectedGoal);
-             selectedGoal.setCompleted(true);
-             goalModel.notifySubscribers();
+             goalModel.completeGoal(selectedGoal);
+             // selectedGoal.setCompleted(true);
+             // goalModel.notifySubscribers();
 
              /**if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
                 goalController.completeGoal(selectedGoal); // Controller not needed

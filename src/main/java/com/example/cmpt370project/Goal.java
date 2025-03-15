@@ -34,13 +34,15 @@ public class Goal {
      * @param difficulty The difficulty of the goal (e.g., "easy", "hard")
      * @param startDate The date when the goal starts
      * @param endDate The target date to complete the goal
+     * @param completed Is the goal completed or not
      */
-    public Goal(String title, String section, String difficulty, LocalDate startDate, LocalDate endDate) {
+    public Goal(String title, String section, String difficulty, LocalDate startDate, LocalDate endDate, boolean completed) {
         this.title = title;
         this.section = section;
         this.difficulty = difficulty;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.completed = completed;
     }
 
     // Getters and setters :)
@@ -142,7 +144,8 @@ public class Goal {
                 "Personal",
                 "Medium",
                 LocalDate.of(2025, 2, 1),
-                LocalDate.of(2025, 3, 1)
+                LocalDate.of(2025, 3, 1),
+                false
         );
 
         // Display goal information

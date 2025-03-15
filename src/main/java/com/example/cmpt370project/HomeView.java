@@ -313,9 +313,10 @@ public class HomeView extends StackPane implements Subscriber {
             String section = ((ToggleButton) selectedToggle).getText();
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
+            boolean completed = false; // Why would you add a goal you completed?
             //handle any user input errors if exceptions are thrown by the controller
             try {
-                c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate);
+                c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate, completed);
                 changePage(HomeViewPage.HOME); // Return to the summary page after submission
                 resetAddGoalPage();
             } catch (InputMismatchException error){
