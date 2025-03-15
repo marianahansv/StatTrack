@@ -136,12 +136,17 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     AtomicReference<Button> currentButton = new AtomicReference<>(null); // had to make this atomic
 
+    private AtomicReference<Button> leftgrid_dates = new AtomicReference<>(null);
+
+    private AtomicReference<Button> rightgrid_dates = new AtomicReference<>(null);
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
      */
     public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
         this.historicalChartModel = historicalChartModel;
+        leftmonth_grid = new GridPane();
+        rightmonth_grid = new GridPane();
         /* Select, backend prepare and update the month grid panes */
         setmonthGridPane();//need update function to be called
 
@@ -184,8 +189,8 @@ public class UserHIstoryProgressVisuals extends VBox {
                                           "-fx-background-radius: 10px;" +
                                           "-fx-padding: 1px;");
 
-        leftmonth_grid_selector.setOnAction(e -> updateGridPane(leftmonth_grid, leftmonth_grid_selector.getValue()));
-        rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid, rightmonth_grid_selector.getValue()));
+        leftmonth_grid_selector.setOnAction(e -> updateGridPane(leftmonth_grid, leftmonth_grid_selector.getValue(),true));
+        rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid, rightmonth_grid_selector.getValue(),false));
 
         /* Dealing with the yearly selectors now */
         yearSelector_left = new ComboBox<>();
@@ -207,8 +212,8 @@ public class UserHIstoryProgressVisuals extends VBox {
                                     "-fx-padding: 1px;");
 
         /* Dealing with the grid panes - both left and right at the same time */
-        leftmonth_grid = grid_with_dates();
-        rightmonth_grid = grid_with_dates();
+        leftmonth_grid = grid_with_dates(true);
+        rightmonth_grid = grid_with_dates(false);
 
     }
 
@@ -216,11 +221,17 @@ public class UserHIstoryProgressVisuals extends VBox {
      * It is a helper function to support the setmonthGridPane and it adds the dates on the calendar (grid panes).
      * @return A grid pane with the dates added to it depending on the month
      */
-    private GridPane grid_with_dates(){
-        GridPane grid = new GridPane();
+    private GridPane grid_with_dates(boolean is_left_grid){
+        GridPane grid;
+        if (is_left_grid){
+            grid = leftmonth_grid;
+        }
+        else{
+            grid = rightmonth_grid;
+        }
         grid.setHgap(5); // for between the elements in the grid
         grid.setVgap(5);
-        updateGridPane(grid, "January");
+        updateGridPane(grid, "January", is_left_grid);
         return grid;
     }
 
@@ -447,8 +458,9 @@ public class UserHIstoryProgressVisuals extends VBox {
      * For each of the dates, it helps to add the required buttons inside the grid pane.
      * @param grid: A grid pane where the dates and the months will be stored
      * @param currentmonth: The month selected by the user
+     * @param is_left_grid: It is to classify if the dateButtons that we are creating is for the left or the right grid
      */
-    private void updateGridPane(GridPane grid, String currentmonth){
+    private void updateGridPane(GridPane grid, String currentmonth, boolean is_left_grid){
         /* Make the entire grid clear first */
         grid.getChildren().clear();
 
@@ -464,30 +476,47 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Adding the dates to the month calendar */
         for (int day = 1; day <= days; day++){
+            /* By default, we assume that the dateButton is for the right grid pane. */
             Button dateButton = new Button(String.valueOf(day));
+
+            dateButton.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" +
+                        "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
+
             /* Default of the dateButton */
             dateButton.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" +
                     "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
 
             /* Working with the colors of the button and how they react with each other */
-            dateButton.setOnMouseEntered(e -> {if(currentButton.get() != dateButton){
+            dateButton.setOnMouseEntered(e -> {if((is_left_grid && leftgrid_dates.get() != dateButton) ||
+                                                  (!is_left_grid && rightgrid_dates.get() != dateButton)){
                                                             dateButton.setStyle("-fx-background-color: white;" +
                                                             "-fx-background-radius: 10px;" +
                                                             "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
                                                 }});
-            dateButton.setOnMouseExited(e -> {if(currentButton.get() != dateButton){
+            dateButton.setOnMouseExited(e -> {if((is_left_grid && leftgrid_dates.get() != dateButton) ||
+                                                 (!is_left_grid && rightgrid_dates.get() != dateButton)){
                                                             dateButton.setStyle("-fx-background-color: #ebebeb;" +
                                                             "-fx-background-radius: 10px;" +
                                                             "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
                                                 }});
-            dateButton.setOnMousePressed(e -> {changeChosenButton(currentButton, dateButton);});
-
+            dateButton.setOnMousePressed(e -> {if (is_left_grid) {
+                                                    changeChosenButton(leftgrid_dates, dateButton);
+                                               } else {
+                                                    changeChosenButton(rightgrid_dates, dateButton);
+                                               }});
             dateButton.setOnMouseReleased(e -> {});
 
             int finalDay = day;
             /* Everytime the user clicks, it will print out the following on the terminal. */
-            dateButton.setOnAction(e -> System.out.println("The selected is: " + currentmonth + " on " + finalDay));
-            grid.add(dateButton, col, row);
+
+            if (is_left_grid){
+                dateButton.setOnAction(e -> System.out.println("The selected is: " + currentmonth + " on " + finalDay));
+                leftmonth_grid.add(dateButton, col, row);
+            }
+            else{
+                dateButton.setOnAction(e -> System.out.println("The selected is: " + currentmonth + " on " + finalDay));
+                rightmonth_grid.add(dateButton, col, row);
+            }
             col ++;
             if (col == 7){
                 col = 0;
