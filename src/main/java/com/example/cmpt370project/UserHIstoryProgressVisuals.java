@@ -10,6 +10,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * This class focuses on creating the pie charts, line charts and scatter charts everytime the user picks either one or
  * two of those or decides to see all of them together. It also helps to create the buttons for selection and the grid
@@ -127,6 +129,12 @@ public class UserHIstoryProgressVisuals extends VBox {
      * This is a button to reset the visualization based on the preferences set by the users.
      */
     private Button reset_visualization;
+
+    /**
+     * Global variable currentButton to store to keep track of each date button the user clicks. This allows
+     * only one date in the calendar to be selected at a time.
+     */
+    AtomicReference<Button> currentButton = new AtomicReference<>(null); // had to make this atomic
 
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
@@ -414,6 +422,10 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     }
 
+    /**
+     * Once the "Reset" button is clicked, we need to make sure that everything goes back into its default mode. This
+     * includes all the default options including the checkboxes and radio options as well.
+     */
     private void updateResetView(){
         yearSelector_left.setValue("2025");
         yearSelector_right.setValue("2025");
@@ -458,21 +470,17 @@ public class UserHIstoryProgressVisuals extends VBox {
                     "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
 
             /* Working with the colors of the button and how they react with each other */
-            dateButton.setOnMouseEntered(e -> {if(!HasButtonPressed(dateButton)){
+            dateButton.setOnMouseEntered(e -> {if(currentButton.get() != dateButton){
                                                             dateButton.setStyle("-fx-background-color: white;" +
                                                             "-fx-background-radius: 10px;" +
                                                             "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
-                                                }
-                                            });
-            dateButton.setOnMouseExited(e -> {if(!HasButtonPressed(dateButton)){
+                                                }});
+            dateButton.setOnMouseExited(e -> {if(currentButton.get() != dateButton){
                                                             dateButton.setStyle("-fx-background-color: #ebebeb;" +
                                                             "-fx-background-radius: 10px;" +
                                                             "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
-                                                }
-                                            });
-            dateButton.setOnMousePressed(e -> {dateButton.setStyle("-fx-background-color: #222243;" +
-                                        "-fx-background-radius: 10px;" + "-fx-text-fill: white;" +
-                                        "-fx-font-weight: bold;"); setButtonOutlook(dateButton, true);});
+                                                }});
+            dateButton.setOnMousePressed(e -> {changeChosenButton(currentButton, dateButton);});
 
             dateButton.setOnMouseReleased(e -> {});
 
@@ -500,6 +508,19 @@ public class UserHIstoryProgressVisuals extends VBox {
         else{
             button.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" +
                     "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
+        }
+    }
+
+    private void changeChosenButton(AtomicReference<Button> currentButton, Button newButton){
+        if (currentButton.get() != newButton){
+            if (currentButton.get() != null){
+                setButtonOutlook(currentButton.get(), false);
+            }
+            setButtonOutlook(newButton, true);
+            currentButton.set(newButton);
+        }
+        else{
+            setButtonOutlook(newButton, true);
         }
     }
 }
