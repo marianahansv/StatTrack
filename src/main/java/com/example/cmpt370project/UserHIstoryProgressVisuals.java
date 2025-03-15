@@ -226,6 +226,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         checkboxPieChart.setOnAction(e -> updatePieCharts());
         checkboxLineChart.setOnAction(e -> updateLineCharts());
         checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
+
+        /* Designing the checkboxes */
     }
 
     /**
@@ -274,11 +276,18 @@ public class UserHIstoryProgressVisuals extends VBox {
      * This method is used to generate and reset the visualization preferences by the user.
      */
     private void set_visualization(){
-        generate_visualizaton = new Button("Generate");
+        generate_visualizaton = new Button("GENERATE");
         generate_visualizaton.setOnAction(e -> updateGenerateView());
-
-        reset_visualization = new Button("Reset");
+        generate_visualizaton.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px");
+        generate_visualizaton.setOnMouseEntered(e-> generate_visualizaton.setStyle("-fx-background-color: white;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
+        generate_visualizaton.setOnMouseExited(e-> generate_visualizaton.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
+        reset_visualization = new Button("RESET");
         reset_visualization.setOnAction(e -> updateResetView());
+        reset_visualization.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px");
+        reset_visualization.setOnMouseEntered(e-> reset_visualization.setStyle("-fx-background-color: white;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
+        reset_visualization.setOnMouseExited(e-> reset_visualization.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
+
+
     }
 
     /**
@@ -322,23 +331,34 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Container for the chart type */
         HBox horizontalbox_CT = new HBox(30);
-        horizontalbox_CT.getChildren().addAll(new Label("Graph Preferences"), checkboxPieChart, checkboxLineChart,
+        HBox horizontalbox_CT_label = new HBox(10);
+        horizontalbox_CT_label.getChildren().addAll(new Label("Graph Preferences: "));
+        horizontalbox_CT_label.setAlignment(Pos.BASELINE_LEFT);
+        horizontalbox_CT_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" + "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
+        horizontalbox_CT.getChildren().addAll(horizontalbox_CT_label, checkboxPieChart, checkboxLineChart,
                 checkboxScatterGraph);
-        horizontalbox_CT.setAlignment(Pos.CENTER);
+        horizontalbox_CT.setAlignment(Pos.BASELINE_CENTER);
         getChildren().addAll(horizontalbox_CT);
 
         /* Container for the color preferences */
         HBox horizontalbox_CP = new HBox(30);
-        horizontalbox_CP.getChildren().addAll(new Label("Color Preferences: "), redcolorPreference,
+        HBox horizontalbox_CP_label = new HBox(10);
+        horizontalbox_CP_label.getChildren().addAll(new Label("Color Preferences: "));
+        horizontalbox_CP_label.setAlignment(Pos.BASELINE_LEFT);
+        horizontalbox_CP_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" + "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
+        horizontalbox_CP.getChildren().addAll(horizontalbox_CP_label, redcolorPreference,
                 purplecolorPreference, orangecolorPreference, bluecolorPreference);
-        horizontalbox_CP.setAlignment(Pos.CENTER);
+        horizontalbox_CP.setAlignment(Pos.BASELINE_CENTER);
         getChildren().addAll(horizontalbox_CP);
 
         /* Container for descriptive statistics */
         HBox horizontalbox_DS = new HBox(30);
-        horizontalbox_DS.getChildren().addAll(new Label("Include Descriptive Statistics?: "),
-                includeDescriptiveStatistics, notincludeDescriptiveStatistics);
-        horizontalbox_DS.setAlignment(Pos.CENTER);
+        HBox horizontalbox_DS_label = new HBox(10);
+        horizontalbox_DS_label.getChildren().addAll(new Label("Include Descriptive Statistics: "));
+        horizontalbox_DS_label.setAlignment(Pos.BASELINE_LEFT);
+        horizontalbox_DS_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" + "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
+        horizontalbox_DS.getChildren().addAll(horizontalbox_DS_label, includeDescriptiveStatistics, notincludeDescriptiveStatistics);
+        horizontalbox_DS.setAlignment(Pos.BASELINE_CENTER);
         getChildren().addAll(horizontalbox_DS);
 
         /* Container for the generate button */
