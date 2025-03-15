@@ -167,10 +167,14 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         leftmonth_grid_selector.setValue("January");
         rightmonth_grid_selector.setValue("January");
-        leftmonth_grid_selector.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
-                        "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
-        rightmonth_grid_selector.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
-                "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
+        leftmonth_grid_selector.setStyle("-fx-background-color: #ebebeb;" +
+                                         "-fx-alignment: center;" +
+                                         "-fx-background-radius: 10px;" +
+                                         "-fx-padding: 1px;");
+        rightmonth_grid_selector.setStyle("-fx-background-color: #ebebeb;" +
+                                          "-fx-alignment: center;" +
+                                          "-fx-background-radius: 10px;" +
+                                          "-fx-padding: 1px;");
 
         leftmonth_grid_selector.setOnAction(e -> updateGridPane(leftmonth_grid, leftmonth_grid_selector.getValue()));
         rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid, rightmonth_grid_selector.getValue()));
@@ -183,12 +187,16 @@ public class UserHIstoryProgressVisuals extends VBox {
             yearSelector_left.getItems().add(String.valueOf(year));
         }
         yearSelector_left.setValue("2025");
-        yearSelector_left.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
-                "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
+        yearSelector_left.setStyle("-fx-background-color: #ebebeb;" +
+                                   "-fx-alignment: center;" +
+                                   "-fx-background-radius: 10px;" +
+                                   "-fx-padding: 1px;");
         yearSelector_right.getItems().addAll(yearSelector_left.getItems());
         yearSelector_right.setValue("2025");
-        yearSelector_right.setStyle("-fx-background-color: #ebebeb;" + "-fx-alignment: center;" +
-                "-fx-background-radius: 10px;" + "-fx-padding: 1px;");
+        yearSelector_right.setStyle("-fx-background-color: #ebebeb;" +
+                                    "-fx-alignment: center;" +
+                                    "-fx-background-radius: 10px;" +
+                                    "-fx-padding: 1px;");
 
         /* Dealing with the grid panes - both left and right at the same time */
         leftmonth_grid = grid_with_dates();
@@ -226,8 +234,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         checkboxPieChart.setOnAction(e -> updatePieCharts());
         checkboxLineChart.setOnAction(e -> updateLineCharts());
         checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
-
-        /* Designing the checkboxes */
     }
 
     /**
@@ -278,15 +284,22 @@ public class UserHIstoryProgressVisuals extends VBox {
     private void set_visualization(){
         generate_visualizaton = new Button("GENERATE");
         generate_visualizaton.setOnAction(e -> updateGenerateView());
-        generate_visualizaton.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px");
-        generate_visualizaton.setOnMouseEntered(e-> generate_visualizaton.setStyle("-fx-background-color: white;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
-        generate_visualizaton.setOnMouseExited(e-> generate_visualizaton.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
+        generate_visualizaton.setStyle("-fx-background-color: lightblue;" +
+                                        "-fx-font-weight: bold;" +
+                                        "-fx-background-radius: 10px");
+        generate_visualizaton.setOnMouseEntered(e-> generate_visualizaton.setStyle("-fx-background-color: white;" +
+                                                            "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
+        generate_visualizaton.setOnMouseExited(e-> generate_visualizaton.setStyle("-fx-background-color: lightblue;" +
+                                                            "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
         reset_visualization = new Button("RESET");
         reset_visualization.setOnAction(e -> updateResetView());
-        reset_visualization.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px");
-        reset_visualization.setOnMouseEntered(e-> reset_visualization.setStyle("-fx-background-color: white;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
-        reset_visualization.setOnMouseExited(e-> reset_visualization.setStyle("-fx-background-color: lightblue;" + "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
-
+        reset_visualization.setStyle("-fx-background-color: lightblue;" +
+                                     "-fx-font-weight: bold;" +
+                                     "-fx-background-radius: 10px");
+        reset_visualization.setOnMouseEntered(e-> reset_visualization.setStyle("-fx-background-color: white;" +
+                                                            "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
+        reset_visualization.setOnMouseExited(e-> reset_visualization.setStyle("-fx-background-color: lightblue;" +
+                                                            "-fx-font-weight: bold;" + "-fx-background-radius: 10px"));
 
     }
 
@@ -334,7 +347,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         HBox horizontalbox_CT_label = new HBox(10);
         horizontalbox_CT_label.getChildren().addAll(new Label("Graph Preferences: "));
         horizontalbox_CT_label.setAlignment(Pos.BASELINE_LEFT);
-        horizontalbox_CT_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" + "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
+        horizontalbox_CT_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" +
+                                                                    "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
         horizontalbox_CT.getChildren().addAll(horizontalbox_CT_label, checkboxPieChart, checkboxLineChart,
                 checkboxScatterGraph);
         horizontalbox_CT.setAlignment(Pos.BASELINE_CENTER);
@@ -345,7 +359,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         HBox horizontalbox_CP_label = new HBox(10);
         horizontalbox_CP_label.getChildren().addAll(new Label("Color Preferences: "));
         horizontalbox_CP_label.setAlignment(Pos.BASELINE_LEFT);
-        horizontalbox_CP_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" + "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
+        horizontalbox_CP_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" +
+                                                                    "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
         horizontalbox_CP.getChildren().addAll(horizontalbox_CP_label, redcolorPreference,
                 purplecolorPreference, orangecolorPreference, bluecolorPreference);
         horizontalbox_CP.setAlignment(Pos.BASELINE_CENTER);
@@ -356,8 +371,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         HBox horizontalbox_DS_label = new HBox(10);
         horizontalbox_DS_label.getChildren().addAll(new Label("Include Descriptive Statistics: "));
         horizontalbox_DS_label.setAlignment(Pos.BASELINE_LEFT);
-        horizontalbox_DS_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" + "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
-        horizontalbox_DS.getChildren().addAll(horizontalbox_DS_label, includeDescriptiveStatistics, notincludeDescriptiveStatistics);
+        horizontalbox_DS_label.setStyle("-fx-font-weight:bold;" + "-fx-background-color: lightblue;" +
+                                                                    "-fx-background-radius: 5px;" + "-fx-padding: 2px;");
+        horizontalbox_DS.getChildren().addAll(horizontalbox_DS_label, includeDescriptiveStatistics,
+                                              notincludeDescriptiveStatistics);
         horizontalbox_DS.setAlignment(Pos.BASELINE_CENTER);
         getChildren().addAll(horizontalbox_DS);
 
@@ -369,7 +386,8 @@ public class UserHIstoryProgressVisuals extends VBox {
 
 
         /* Add all the horizontal boxes into one bigcontainer */
-        bigcontainer.getChildren().addAll(month_container, horizontalbox_CT, horizontalbox_CP, horizontalbox_DS, horizontalbox_G);
+        bigcontainer.getChildren().addAll(month_container, horizontalbox_CT, horizontalbox_CP,
+                                          horizontalbox_DS, horizontalbox_G);
         bigcontainer.setAlignment(Pos.CENTER);
         getChildren().add(bigcontainer);
     }
@@ -392,9 +410,25 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private void updateColorPreferences(){}
 
-    private void updateGenerateView(){}
+    private void updateGenerateView(){
 
-    private void updateResetView(){}
+    }
+
+    private void updateResetView(){
+        yearSelector_left.setValue("2025");
+        yearSelector_right.setValue("2025");
+        leftmonth_grid_selector.setValue("January");
+        rightmonth_grid_selector.setValue("January");
+        checkboxPieChart.setSelected(false);
+        checkboxLineChart.setSelected(false);
+        checkboxScatterGraph.setSelected(false);
+        redcolorPreference.setSelected(false);
+        purplecolorPreference.setSelected(false);
+        orangecolorPreference.setSelected(false);
+        bluecolorPreference.setSelected(false);
+        includeDescriptiveStatistics.setSelected(false);
+        notincludeDescriptiveStatistics.setSelected(false);
+    }
 
     /**
      * The method is used to generate the accurate number of dates depending on the month that we are interested in.
@@ -419,9 +453,29 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* Adding the dates to the month calendar */
         for (int day = 1; day <= days; day++){
             Button dateButton = new Button(String.valueOf(day));
-            dateButton.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" + "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
-            dateButton.setOnMouseEntered(e -> dateButton.setStyle("-fx-background-color: white;" + "-fx-background-radius: 10px;" + "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;"));
-            dateButton.setOnMouseExited(e -> dateButton.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" + "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;"));
+            /* Default of the dateButton */
+            dateButton.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" +
+                    "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
+
+            /* Working with the colors of the button and how they react with each other */
+            dateButton.setOnMouseEntered(e -> {if(!HasButtonPressed(dateButton)){
+                                                            dateButton.setStyle("-fx-background-color: white;" +
+                                                            "-fx-background-radius: 10px;" +
+                                                            "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
+                                                }
+                                            });
+            dateButton.setOnMouseExited(e -> {if(!HasButtonPressed(dateButton)){
+                                                            dateButton.setStyle("-fx-background-color: #ebebeb;" +
+                                                            "-fx-background-radius: 10px;" +
+                                                            "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
+                                                }
+                                            });
+            dateButton.setOnMousePressed(e -> {dateButton.setStyle("-fx-background-color: #222243;" +
+                                        "-fx-background-radius: 10px;" + "-fx-text-fill: white;" +
+                                        "-fx-font-weight: bold;"); setButtonOutlook(dateButton, true);});
+
+            dateButton.setOnMouseReleased(e -> {});
+
             int finalDay = day;
             /* Everytime the user clicks, it will print out the following on the terminal. */
             dateButton.setOnAction(e -> System.out.println("The selected is: " + currentmonth + " on " + finalDay));
@@ -431,6 +485,21 @@ public class UserHIstoryProgressVisuals extends VBox {
                 col = 0;
                 row ++;
             }
+        }
+    }
+
+    private boolean HasButtonPressed(Button button){
+        return button.getStyle().contains("#222243");
+    }
+
+    private void setButtonOutlook(Button button, boolean pressed){
+        if (pressed){
+            button.setStyle("-fx-background-color: #222243;" +
+                    "-fx-background-radius: 10px;" + "-fx-text-fill: white;" + "-fx-font-weight: bold;");
+        }
+        else{
+            button.setStyle("-fx-background-color: #ebebeb;" + "-fx-background-radius: 10px;" +
+                    "-fx-text-fill: #4A4A4A;" + "-fx-font-weight: bold;");
         }
     }
 }
