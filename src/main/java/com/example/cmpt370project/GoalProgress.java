@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.Chart;
@@ -194,6 +195,7 @@ private void updateLineChart() {
     lineChart.getData().clear();
     // Makes the X Axis consistent
     CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
+    Axis<Number> yAxis = (Axis<Number>) lineChart.getYAxis();
     // List to hold dates as categories (so they can overlap and not connect)
     ObservableList<String> categories = FXCollections.observableArrayList();
 
@@ -244,6 +246,8 @@ private void updateLineChart() {
     }
     // Set the sorted categories on the X axis
     xAxis.setCategories(categories);
+    //xAxis.setLabel("Days");
+    yAxis.setLabel("Days Left");
     
     
     // Loop through each goal in the model
