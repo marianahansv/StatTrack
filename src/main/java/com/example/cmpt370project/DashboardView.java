@@ -8,8 +8,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.time.LocalDate;
-
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
  */
@@ -203,7 +201,10 @@ public class DashboardView extends BorderPane {
             goalPlanPage.setPageToSummaryView();
             this.setCenter(goalPlanPage);
         });
-        goalVisButton.setOnAction(e -> this.setCenter(goalVisPage));
+        goalVisButton.setOnAction(e -> {
+            //goalModel.notifySubscribers();
+            this.setCenter(goalVisPage);
+        });
 
 
         // ************************* POPULATE DUMMY DATA *************************

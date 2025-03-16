@@ -21,7 +21,7 @@ import javafx.scene.layout.VBox;
  * View class for visualizing the progress of goals.
  * This view displays each goal's progress using separate charts.
  */
-public class GoalProgress extends VBox {
+public class GoalProgress extends VBox implements Subscriber {
  /**
      * The goal model that provides goal data.
      */
@@ -53,9 +53,17 @@ public class GoalProgress extends VBox {
      */ 
     public GoalProgress(GoalModel goalModel) {
         this.goalModel = goalModel;
+        //this.goalModel.notifySubscribers();
+        goalModel.addSubscriber(this);
         setupChartSelector();
         setupChart();
         updateChart();  // Initialize with data
+    }
+
+    @Override
+    public void modelUpdated() {
+        // When the model changes, update the chart automatically.
+        updateChart();
     }
 
     /**
@@ -127,6 +135,7 @@ public class GoalProgress extends VBox {
      * @return a PieChart representing the goal's progress.
      */    
     private PieChart createPieChartForGoal(Goal goal) {
+        
         PieChart pieChart = new PieChart();
         pieChart.setTitle(goal.getTitle());
         // Calculate total days, days left, and days completed.
@@ -190,7 +199,6 @@ public class GoalProgress extends VBox {
  * Each goal gets a separate series with its own start and end data points.
  */
 private void updateLineChart() {
-    goalModel.notifySubscribers();
     // Clear any existing data from the LineChart
     lineChart.getData().clear();
     // Makes the X Axis consistent
