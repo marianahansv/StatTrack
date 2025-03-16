@@ -28,6 +28,12 @@ public class UserHIstoryProgressVisuals extends VBox {
     private UserProgressHIstoryVisModel historicalChartModel;
 
     /**
+     * The UserProgressHistoryController is the controller that will store some functions which will be used by the
+     * view and the model. It acts as a communication linkage between the model and the view respectively.
+     */
+    private UserProgressHistoryController historicalChartController;
+
+    /**
      * CheckBox to select if the Pie Chart should be selected or not.
      */
     private CheckBox checkboxPieChart;
@@ -106,22 +112,22 @@ public class UserHIstoryProgressVisuals extends VBox {
     /**
      * The selector for the month on the left grid box.
      */
-    private ComboBox<String> leftmonth_grid_selector;
+    ComboBox<String> leftmonth_grid_selector;
 
     /**
      * The selector for the month on the right grid box.
      */
-    private ComboBox<String> rightmonth_grid_selector;
+    ComboBox<String> rightmonth_grid_selector;
 
     /**
      * The year selector for the left grid.
      */
-    private ComboBox<String> yearSelector_left;
+    ComboBox<String> yearSelector_left;
 
     /**
      * The year selector for the right grid.
      */
-    private ComboBox<String> yearSelector_right;
+    ComboBox<String> yearSelector_right;
 
     /**
      * This is a button to generate the visualization based on the preferences set by the users.
@@ -140,15 +146,25 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     AtomicReference<Button> currentButton = new AtomicReference<>(null); // had to make this atomic
 
+    /**
+     * Global variable to store the date button for the starting month.
+     */
     AtomicReference<Button> leftgrid_dates = new AtomicReference<>();
 
+    /**
+     * Global variable to store the date button for the ending month.
+     */
     AtomicReference<Button> rightgrid_dates = new AtomicReference<>();
+
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
      */
-    public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel){
+    public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel, UserProgressHistoryController historicalChartController) {
         this.historicalChartModel = historicalChartModel;
+        this.historicalChartController = historicalChartController;
+        this.historicalChartController.setupViewClass(this); /* Required to set up the view classes correctly */
+
         leftmonth_grid = new GridPane();
         rightmonth_grid = new GridPane();
         /* Select, backend prepare and update the month grid panes */
@@ -428,16 +444,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         pieChart.setTitle("Pie Chart by Categories");
         pieChart.setPrefWidth(400);
         pieChart.setPrefHeight(400);
-        String startDate = (leftgrid_dates.get() != null) ? leftgrid_dates.get().getText() : "0";
-        String startMonth = leftmonth_grid_selector.getValue();
-        String startYear = yearSelector_left.getValue();
-        String endDate = (rightgrid_dates.get() != null) ? rightgrid_dates.get().getText() : "0";
-        String endMonth = rightmonth_grid_selector.getValue();
-        String endYear = yearSelector_right.getValue();
 
         /* Deriving all calculations used for the charts */
-        LocalDate startFormatDate = dateFormatting(startYear, startMonth, startDate);
-        LocalDate endFormatDate = dateFormatting(endYear, endMonth, endDate);
+        LocalDate startFormatDate = dateFormatting(historicalChartController.getStartYear(), historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate = dateFormatting(historicalChartController.getEndYear(), historicalChartController.getEndMonth(), historicalChartController.getEndDate());
         List<Goal> easyGoals = filteredGoalList(historicalChartModel.easyGoals(), startFormatDate, endFormatDate);
         List<Goal> mediumGoals = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate, endFormatDate);
         List<Goal> hardGoals = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate, endFormatDate);
@@ -588,6 +598,18 @@ public class UserHIstoryProgressVisuals extends VBox {
             return;
         }
 
+        /* If the user picked a timeframe that had no goals inside the timeframe */
+        LocalDate beginDate = dateFormatting(historicalChartController.getStartYear(), historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endingDate = dateFormatting(historicalChartController.getEndYear(), historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        if (filteredGoalList(historicalChartModel.getGoals(), beginDate , endingDate).isEmpty()){
+            Alert alert_four = new Alert(Alert.AlertType.WARNING);
+            alert_four.setTitle("You were AWAY!");
+            alert_four.setHeaderText(null);
+            alert_four.setContentText("No goals were set during this time period so no statistical analysis can be " +
+                                      "performed.");
+            alert_four.showAndWait();
+            return;
+        }
         /* Creating a visual page for all the charts and descriptive statistics */
         resultsPageView();
     }
