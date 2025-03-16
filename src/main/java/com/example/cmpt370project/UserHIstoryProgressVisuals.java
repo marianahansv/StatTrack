@@ -411,7 +411,26 @@ public class UserHIstoryProgressVisuals extends VBox {
         getChildren().add(bigcontainer);
     }
 
-    private void drawPieCharts(){}
+    private VBox drawPieCharts() {
+        VBox pieChart_display = new VBox(30);
+
+        /* Storing all useful information in the respective variables */
+        pieChart = new PieChart();
+        String startDate = leftgrid_dates.get().toString();
+        String startMonth = leftmonth_grid_selector.toString();
+        String startYear = yearSelector_left.toString();
+        String endDate = rightgrid_dates.get().toString();
+        String endMonth = rightmonth_grid_selector.toString();
+        String endYear = yearSelector_right.toString();
+
+        /* Creating the piecharts */
+        /* Adding all the elements into the HBox*/
+        pieChart_display.getChildren().add(pieChart);
+        pieChart_display.setAlignment(Pos.BASELINE_LEFT);
+        getChildren().add(pieChart_display);
+
+        return pieChart_display;
+    }
 
     private void drawLineCharts(){}
 
@@ -429,7 +448,27 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private void updateColorPreferences(){}
 
+    private void resultsPageView(){
+        /* Adds all the charts on the top of the page - Pie Chart, Line Chart and Scatter Graph */
+        HBox allCharts = new HBox(30);
+        allCharts.getChildren().addAll(drawPieCharts());
+        allCharts.setAlignment(Pos.TOP_CENTER);
+
+
+    }
     private void updateGenerateView(){
+        /* If user doesn't select anything, nothing can be generated as well. */
+        if (isNoneSelected()){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("NOTHING has been selected! ");
+            alert.setHeaderText(null);
+            alert.setContentText("Since you haven't selected anything yet, nothing can be generated!");
+            alert.showAndWait();
+            return;
+        }
+
+        /* Creating a visual page for all the charts and descriptive statistics */
+        resultsPageView();
 
     }
 

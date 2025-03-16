@@ -16,9 +16,13 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
     private UserProgressHIstoryVisModel historicalChartModel;
 
     /**
-     * The view where the pie charts, line charts, scatter plots visualization.
+     * The view where the selection buttons for the charts and the descriptive statistics are placed.
      */
     private UserHIstoryProgressVisuals historicalChartProgress;
+
+    /**
+     * The view where the charts and the descriptive statistics will be generated.
+     */
 
     /**
      * Create a historical visualization representation page
