@@ -4,9 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -142,9 +140,9 @@ public class UserHIstoryProgressVisuals extends VBox {
      */
     AtomicReference<Button> currentButton = new AtomicReference<>(null); // had to make this atomic
 
-    AtomicReference<Button> leftgrid_dates = new AtomicReference<>(null);
+    AtomicReference<Button> leftgrid_dates = new AtomicReference<>();
 
-    AtomicReference<Button> rightgrid_dates = new AtomicReference<>(null);
+    AtomicReference<Button> rightgrid_dates = new AtomicReference<>();
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
      * @param historicalChartModel: The model that helps to function with this view
@@ -467,17 +465,30 @@ public class UserHIstoryProgressVisuals extends VBox {
     }
 
     private VBox drawLineCharts() {
+        VBox lineChart_display = new VBox(10);
 
-        /* Storing all useful information in the respective variables */
-        return new VBox(30);
+        /* Adding all the basics elements of the line chart together */
+        CategoryAxis x_axis = new CategoryAxis();
+        NumberAxis y_axis = new NumberAxis();
+        x_axis.setLabel("Date");
+        y_axis.setLabel("Goals Completed Per Day");
+        LineChart<String, Number> lineChart = new LineChart<>(x_axis, y_axis);
+
+        /* Adding all the elements into hte VBox */
+        lineChart_display.getChildren().add(lineChart);
+        lineChart_display.setAlignment(Pos.CENTER);
+        getChildren().add(lineChart_display);
+        return lineChart_display;
     }
 
     private VBox drawScatterCharts(){
-        return new VBox(30);
+        VBox scatterChart_display = new VBox(10);
+        return scatterChart_display;
     }
 
     private HBox generateDescriptiveStatistics(){
-        return new HBox(30);
+        HBox descriptiveStatistics_display = new HBox(10);
+        return descriptiveStatistics_display;
     }
 
     void updatePieCharts(){}
@@ -528,22 +539,36 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* If user doesn't select anything, nothing can be generated as well. */
         if (isNoneSelected()){
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("NOTHING has been selected! ");
+            alert.setTitle("No parameters have been selected! ");
             alert.setHeaderText(null);
-            alert.setContentText("Since you haven't selected anything yet, nothing can be generated!");
+            alert.setContentText("Since you haven't selected any parameters yet, nothing can be generated!");
             alert.showAndWait();
             return;
         }
+
         LocalDate startDate = dateFormatting(yearSelector_left.getValue(), leftmonth_grid_selector.getValue(), leftgrid_dates.get().getText());
         LocalDate endDate = dateFormatting(yearSelector_right.getValue(), rightmonth_grid_selector.getValue(), rightgrid_dates.get().getText());
+        /* If user doesn't pick the accurate startDate or endDate*/
+        if ((rightgrid_dates.get() == null) || (leftgrid_dates.get() == null)){
+            Alert alert_three= new Alert(Alert.AlertType.WARNING);
+            alert_three.setTitle("No dates have been selected! ");
+            alert_three.setHeaderText(null);
+            alert_three.setContentText("You might have missed selecting either one of the dates! ");
+            alert_three.showAndWait();
+            return;
+        }
+
+        /* If the range of the dates chosen by the users are out of bound */
         if (endDate.isBefore(startDate) || startDate.isAfter(endDate)){
             Alert alert_two = new Alert(Alert.AlertType.WARNING);
             alert_two.setTitle("Date ranges are inaccurate! ");
             alert_two.setHeaderText(null);
-            alert_two.setContentText("The date ranges you have selected are inaccurate. Please pick a start date prior to the end date. ");
+            alert_two.setContentText("The date ranges you have selected are inaccurate. Please pick a start date prior " +
+                                     "to the end date. ");
             alert_two.showAndWait();
             return;
         }
+
         /* Creating a visual page for all the charts and descriptive statistics */
         resultsPageView();
     }
