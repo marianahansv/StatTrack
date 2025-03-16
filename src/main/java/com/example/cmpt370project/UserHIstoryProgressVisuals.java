@@ -426,8 +426,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* Storing all useful information in the respective variables */
         pieChart = new PieChart();
         pieChart.setTitle("Pie Chart by Categories");
-        pieChart.setPrefWidth(600);
-        pieChart.setPrefHeight(600);
+        pieChart.setPrefWidth(400);
+        pieChart.setPrefHeight(400);
         String startDate = (leftgrid_dates.get() != null) ? leftgrid_dates.get().getText() : "0";
         String startMonth = leftmonth_grid_selector.getValue();
         String startYear = yearSelector_left.getValue();
@@ -515,10 +515,28 @@ public class UserHIstoryProgressVisuals extends VBox {
         return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) && !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
     }
 
+    /**
+     * This function focuses on
+     */
     private void resultsPageView(){
         /* Adds all the charts on the top of the page - Pie Chart, Line Chart and Scatter Graph */
         HBox allCharts = new HBox(30);
-        allCharts.getChildren().addAll(drawPieCharts(), drawLineCharts(), drawScatterCharts());
+        VBox noLineChart = new VBox(new Label("No Line Chart was selected by the user! "));
+        VBox noScatterChart = new VBox(new Label("No Scatter Chart was selected by the user! "));
+        VBox noPieChart = new VBox(new Label("No Pie Chart was selected by the user! "));
+        if (checkboxPieChart.isSelected()){
+            allCharts.getChildren().addAll(drawPieCharts(), noLineChart, noScatterChart);
+        }
+        else if (checkboxLineChart.isSelected()){
+            allCharts.getChildren().addAll(noPieChart, drawLineCharts(), noScatterChart);
+        }
+        else if (checkboxScatterGraph.isSelected()){
+            allCharts.getChildren().addAll(noPieChart, noLineChart, drawScatterCharts());
+        }
+        else if (checkboxPieChart.isSelected() && checkboxLineChart.isSelected()){
+            allCharts.getChildren().addAll(drawPieCharts(), drawLineCharts(), noScatterChart);
+        }
+
         allCharts.setAlignment(Pos.TOP_CENTER);
         getChildren().add(allCharts);
 
