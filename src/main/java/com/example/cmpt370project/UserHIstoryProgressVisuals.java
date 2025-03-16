@@ -611,6 +611,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         noPieChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: #a3a2a2;" +
                             "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;" );
         noPieChart.setAlignment(Pos.CENTER);
+        HBox noDescriptiveStatistics = new HBox(new Label("No Descriptive Statistics was selected by the user! "));
+        noDescriptiveStatistics.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: #a3a2a2;" +
+                                         "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
+        noDescriptiveStatistics.setAlignment(Pos.CENTER);
 
         /* Assessing cases to figure out what can be displayed to the user based on the parameters selected */
         if (checkboxPieChart.isSelected() && !checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()){
@@ -640,7 +644,12 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* The VBox containing the wholeDisplay will have everything we need which includes the three graphs
         * as well as the descriptive statistics at the bottom. */
         VBox wholeDisplay = new VBox(30);
-        wholeDisplay.getChildren().addAll(allCharts, generateDescriptiveStatistics());
+        if (notincludeDescriptiveStatistics.isSelected()){
+            wholeDisplay.getChildren().addAll(allCharts, noDescriptiveStatistics);
+        }
+        else {
+            wholeDisplay.getChildren().addAll(allCharts, generateDescriptiveStatistics());
+        }
         wholeDisplay.setAlignment(Pos.CENTER);
         getChildren().add(wholeDisplay);
 
