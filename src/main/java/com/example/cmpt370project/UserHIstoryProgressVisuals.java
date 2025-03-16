@@ -9,6 +9,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -469,7 +472,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         pieChart.setData(data_PC);
 
         /* Adding all the elements into the HBox*/
-        pieChart_display.getChildren().add(pieChart);
+        pieChart_display.getChildren().addAll(pieChart, curatedLegendPieChart());
         pieChart_display.setAlignment(Pos.CENTER);
         getChildren().add(pieChart_display);
 
@@ -489,11 +492,25 @@ public class UserHIstoryProgressVisuals extends VBox {
             data.getNode().setStyle("-fx-pie-color: " + colorObserved + ";");
             current_index++;
         }
+    }
+
+    private HBox curatedLegendPieChart(){
+        String colorChosen = colorChosen();
+        String[] shadesofColor = colorpreferenceShades(colorChosen);
         /* Working on the legend box of pie chart to make sure that the color alignment matches well */
         /* Working with the default one is tricky - we will hide the default one and only show our created */
         /* legend box instead to the user. */
-
-
+        HBox curatedLegend = new HBox(10);
+        int current_index_again = 0;
+        for (PieChart.Data data: pieChart.getData()){
+            Rectangle colorbox = new Rectangle(20, 20); // Square to store the color
+            colorbox.setFill(Color.web(shadesofColor[current_index_again % shadesofColor.length]));
+            Text label_info = new Text(data.getName());
+            curatedLegend.getChildren().addAll(colorbox, label_info);
+            current_index_again++;
+        }
+        curatedLegend.setAlignment(Pos.CENTER);
+        return curatedLegend;
     }
 
     private VBox drawLineCharts() {
