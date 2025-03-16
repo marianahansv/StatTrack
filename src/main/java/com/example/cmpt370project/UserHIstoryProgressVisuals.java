@@ -534,19 +534,29 @@ public class UserHIstoryProgressVisuals extends VBox {
         VBox noLineChart = new VBox(new Label("No Line Chart was selected by the user! "));
         VBox noScatterChart = new VBox(new Label("No Scatter Chart was selected by the user! "));
         VBox noPieChart = new VBox(new Label("No Pie Chart was selected by the user! "));
-        if (checkboxPieChart.isSelected()){
+
+        /* Assessing cases to figure out what can be displayed to the user based on the parameters selected */
+        if (checkboxPieChart.isSelected() && !checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()) {
             allCharts.getChildren().addAll(drawPieCharts(), noLineChart, noScatterChart);
         }
-        else if (checkboxLineChart.isSelected()){
+        else if (checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected() && !checkboxPieChart.isSelected()) {
             allCharts.getChildren().addAll(noPieChart, drawLineCharts(), noScatterChart);
         }
-        else if (checkboxScatterGraph.isSelected()){
+        else if (checkboxScatterGraph.isSelected() && !checkboxPieChart.isSelected() && !checkboxLineChart.isSelected()) {
             allCharts.getChildren().addAll(noPieChart, noLineChart, drawScatterCharts());
         }
-        else if (checkboxPieChart.isSelected() && checkboxLineChart.isSelected()){
+        else if (checkboxPieChart.isSelected() && checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()){
             allCharts.getChildren().addAll(drawPieCharts(), drawLineCharts(), noScatterChart);
         }
-
+        else if (checkboxPieChart.isSelected() && checkboxScatterGraph.isSelected() && !checkboxLineChart.isSelected()){
+            allCharts.getChildren().addAll(drawPieCharts(), noLineChart, drawScatterCharts());
+        }
+        else if (checkboxLineChart.isSelected() && checkboxScatterGraph.isSelected() && !checkboxPieChart.isSelected()){
+            allCharts.getChildren().addAll(noPieChart, drawLineCharts(), drawScatterCharts());
+        }
+        else if (checkboxLineChart.isSelected() && checkboxScatterGraph.isSelected() && checkboxPieChart.isSelected()){
+            allCharts.getChildren().addAll(drawPieCharts(), drawLineCharts(), drawScatterCharts());
+        }
         allCharts.setAlignment(Pos.TOP_CENTER);
         getChildren().add(allCharts);
 
@@ -603,7 +613,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         LocalDate endingDate = dateFormatting(historicalChartController.getEndYear(), historicalChartController.getEndMonth(), historicalChartController.getEndDate());
         if (filteredGoalList(historicalChartModel.getGoals(), beginDate , endingDate).isEmpty()){
             Alert alert_four = new Alert(Alert.AlertType.WARNING);
-            alert_four.setTitle("You were AWAY!");
+            alert_four.setTitle("No treasures found for you.");
             alert_four.setHeaderText(null);
             alert_four.setContentText("No goals were set during this time period so no statistical analysis can be " +
                                       "performed.");
