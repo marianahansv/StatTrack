@@ -1,5 +1,7 @@
 package com.example.cmpt370project;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
@@ -10,7 +12,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * This class focuses on creating the pie charts, line charts and scatter charts everytime the user picks either one or
@@ -411,20 +417,40 @@ public class UserHIstoryProgressVisuals extends VBox {
         getChildren().add(bigcontainer);
     }
 
+    /**
+     * The pie chart created will display the information about the goals in categories of difficulty which
+     * ranges from Small, Medium and Large.
+     * @return: A VBox containing the Pie Chart inside it.
+     */
     private VBox drawPieCharts() {
         VBox pieChart_display = new VBox(30);
 
         /* Storing all useful information in the respective variables */
         pieChart = new PieChart();
-        String startDate = leftgrid_dates.get().toString();
-        String startMonth = leftmonth_grid_selector.toString();
-        String startYear = yearSelector_left.toString();
-        String endDate = rightgrid_dates.get().toString();
-        String endMonth = rightmonth_grid_selector.toString();
-        String endYear = yearSelector_right.toString();
+        pieChart.setTitle("Setting goals by categories");
+        String startDate = (leftgrid_dates.get() != null) ? leftgrid_dates.get().getText() : "0";
+        String startMonth = leftmonth_grid_selector.getValue();
+        String startYear = yearSelector_left.getValue();
+        String endDate = (rightgrid_dates.get() != null) ? rightgrid_dates.get().getText() : "0";
+        String endMonth = rightmonth_grid_selector.getValue();
+        String endYear = yearSelector_right.getValue();
 
-        /* Creating the piecharts */
+        /* Deriving all calculations used for the charts */
+        LocalDate startFormatDate = dateFormatting(startYear, startMonth, startDate);
+        LocalDate endFormatDate = dateFormatting(endYear, endMonth, endDate);
+        List<Goal> easyGoals = filteredGoalList(historicalChartModel.easyGoals(), startFormatDate, endFormatDate);
+        List<Goal> mediumGoals = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate, endFormatDate);
+        List<Goal> hardGoals = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate, endFormatDate);
+        int easyCount = (easyGoals != null) ? easyGoals.size() : 0;
+        int mediumCount = (mediumGoals != null) ? mediumGoals.size() : 0;
+        int hardCount = (hardGoals != null) ? hardGoals.size() : 0;
 
+        /* Use the Pie Chart data to create the pie chart required */
+        ObservableList<PieChart.Data> data_PC  = FXCollections.observableArrayList(
+                new PieChart.Data("Easy", easyCount),
+                new PieChart.Data("Medium", mediumCount),
+                new PieChart.Data("Hard", hardCount));
+        pieChart.setData(data_PC);
 
         /* Adding all the elements into the HBox*/
         pieChart_display.getChildren().add(pieChart);
@@ -434,9 +460,15 @@ public class UserHIstoryProgressVisuals extends VBox {
         return pieChart_display;
     }
 
-    private void drawLineCharts(){}
+    private VBox drawLineCharts() {
 
-    private void drawScatterCharts(){}
+        /* Storing all useful information in the respective variables */
+        return new VBox(30);
+    }
+
+    private VBox drawScatterCharts(){
+        return new VBox(30);
+    }
 
     private void generateDescriptiveStatistics(){}
 
@@ -450,14 +482,33 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private void updateColorPreferences(){}
 
+    private LocalDate dateFormatting(String year, String month, String day) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (Integer.parseInt(day) > 0 && Integer.parseInt(day) <= 9) {
+            return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + historicalChartModel.numericalDay(day), format);
+        }
+        return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + day, format);
+    }
+
+
+    private List<Goal> filteredGoalList(List<Goal> goals, LocalDate startDate, LocalDate endDate){
+        return goals.stream().filter(goal -> !goal.getStartDate().isAfter(startDate) && !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
+    }
+
     private void resultsPageView(){
         /* Adds all the charts on the top of the page - Pie Chart, Line Chart and Scatter Graph */
         HBox allCharts = new HBox(30);
-        allCharts.getChildren().addAll(drawPieCharts());
+        allCharts.getChildren().addAll(drawPieCharts(), drawLineCharts());
         allCharts.setAlignment(Pos.TOP_CENTER);
+        getChildren().add(allCharts);
 
-
+        Dialog<Void> popupDialog = new Dialog<>();
+        popupDialog.setTitle("Your Charts and Descriptive Statistics!");
+        popupDialog.getDialogPane().setContent(allCharts);
+        popupDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+        popupDialog.showAndWait();
     }
+
     private void updateGenerateView(){
         /* If user doesn't select anything, nothing can be generated as well. */
         if (isNoneSelected()){
@@ -468,10 +519,18 @@ public class UserHIstoryProgressVisuals extends VBox {
             alert.showAndWait();
             return;
         }
-
+        LocalDate startDate = dateFormatting(yearSelector_left.getValue(), leftmonth_grid_selector.getValue(), leftgrid_dates.get().getText());
+        LocalDate endDate = dateFormatting(yearSelector_right.getValue(), rightmonth_grid_selector.getValue(), rightgrid_dates.get().getText());
+        if (endDate.isBefore(startDate) || startDate.isAfter(endDate)){
+            Alert alert_two = new Alert(Alert.AlertType.WARNING);
+            alert_two.setTitle("Date ranges are inaccurate! ");
+            alert_two.setHeaderText(null);
+            alert_two.setContentText("The date ranges you have selected are inaccurate. Please pick a start date prior to the end date. ");
+            alert_two.showAndWait();
+            return;
+        }
         /* Creating a visual page for all the charts and descriptive statistics */
         resultsPageView();
-
     }
 
     /**
