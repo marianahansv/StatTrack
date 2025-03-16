@@ -425,7 +425,7 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Storing all useful information in the respective variables */
         pieChart = new PieChart();
-        pieChart.setTitle("Setting goals by categories");
+        pieChart.setTitle("Pie Chart by Categories");
         pieChart.setPrefWidth(600);
         pieChart.setPrefHeight(600);
         String startDate = (leftgrid_dates.get() != null) ? leftgrid_dates.get().getText() : "0";
@@ -473,6 +473,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         x_axis.setLabel("Date");
         y_axis.setLabel("Goals Completed Per Day");
         LineChart<String, Number> lineChart = new LineChart<>(x_axis, y_axis);
+        lineChart.setTitle("Goals Completed Per Day");
 
         /* Adding all the elements into hte VBox */
         lineChart_display.getChildren().add(lineChart);
