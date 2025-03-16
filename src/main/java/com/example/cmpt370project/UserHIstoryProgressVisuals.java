@@ -538,16 +538,16 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* Adds all the charts on the top of the page - Pie Chart, Line Chart and Scatter Graph */
         HBox allCharts = new HBox(20);
         VBox noLineChart = new VBox(new Label("No Line Chart was selected by the user! "));
-        noLineChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: gray;" +
-                             "-fx-padding: 5px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
+        noLineChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: #a3a2a2;" +
+                             "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
         noLineChart.setAlignment(Pos.CENTER);
         VBox noScatterChart = new VBox(new Label("No Scatter Chart was selected by the user! "));
-        noScatterChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: gray;" +
-                                "-fx-padding: 5px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
+        noScatterChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: #a3a2a2;" +
+                                "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
         noScatterChart.setAlignment(Pos.CENTER);
         VBox noPieChart = new VBox(new Label("No Pie Chart was selected by the user! "));
-        noPieChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: gray;" +
-                            "-fx-padding: 5px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;" );
+        noPieChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: #a3a2a2;" +
+                            "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;" );
         noPieChart.setAlignment(Pos.CENTER);
 
         /* Assessing cases to figure out what can be displayed to the user based on the parameters selected */
