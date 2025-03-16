@@ -344,7 +344,7 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     /**
      * The function is creating a huge container element to store all the grid boxes as well as the three user
-     * preferences into one big box. This is done to ensure good spacing between all of the elements on the page and
+     * preferences into one big box. This is done to ensure good spacing between all the elements on the page and
      * to create a visually pleasing experience for the user.
      */
     private void allPreferencesarrangement(){
@@ -473,7 +473,19 @@ public class UserHIstoryProgressVisuals extends VBox {
         pieChart_display.setAlignment(Pos.CENTER);
         getChildren().add(pieChart_display);
 
+        colorPieChart(pieChart); // To color our pie chart with the accurate shade color
+
         return pieChart_display;
+    }
+
+    private void colorPieChart(PieChart pieChart) {
+        String colorChosen = colorChosen();
+        String[] shadesofColor = colorpreferenceShades(colorChosen);
+        int current_index = 0;
+        for (PieChart.Data data: pieChart.getData()){
+            data.getNode().setStyle("-fx-pie-color: " + shadesofColor[current_index % shadesofColor.length] + ";");
+            current_index++;
+        }
     }
 
     private VBox drawLineCharts() {
@@ -513,6 +525,31 @@ public class UserHIstoryProgressVisuals extends VBox {
     private void updateDescriptiveStatistics(){}
 
     private void updateColorPreferences(){}
+
+    private String colorChosen(){
+        if (redcolorPreference.isSelected()) return "Red";
+        if (purplecolorPreference.isSelected()) return "Purple";
+        if (orangecolorPreference.isSelected()) return "Orange";
+        else return "Blue";
+    }
+
+    private String[] colorpreferenceShades(String colorChosen){
+        if (colorChosen.equals("Red")){
+            return new String[]{"#FF6961", "#FF7F7F", "#FF9999", "#FFB3B3", "#FFCCCC", "#FFA0A0", "#F4C1C1", "#FDAAAA",
+                                "#EE6969", "#F97C7C"};
+        }
+        else if (colorChosen.equals("Purple")){
+            return new String[]{"#9F2B68", "#800020", "#702963", "#483248", "#CBC3E3", "#AA98A9", "#915F6D", "#770737",
+                                "#673147", "#A95C68", "#800080"};
+        }
+        else if (colorChosen.equals("Orange")){
+            return new String[]{"#FDC883", "#FFE5B4", "#FAD9C4", "#FFD68A", "#FFB52E", "#FF6C8B", "#FFC55C", "#FF9138",
+                                "#FF681F", "#FF681F"};
+        }
+        // Otherwise, it will be Blue
+        return new String[]{"#A7C7E7", "#CCCCFF", "#B6D0E2", "#96DED1", "#87CEEB", "#89CFF0", "#ADD8E6", "#9ACEEB",
+                            "#B3CEE5", "#6699CC"};
+    }
 
     private LocalDate dateFormatting(String year, String month, String day) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
