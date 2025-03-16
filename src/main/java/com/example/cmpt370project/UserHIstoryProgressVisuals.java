@@ -446,8 +446,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         pieChart.setPrefHeight(400);
 
         /* Deriving all calculations used for the charts */
-        LocalDate startFormatDate = dateFormatting(historicalChartController.getStartYear(), historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate = dateFormatting(historicalChartController.getEndYear(), historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        LocalDate startFormatDate = dateFormatting(historicalChartController.getStartYear(),
+                                    historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate = dateFormatting(historicalChartController.getEndYear(),
+                                        historicalChartController.getEndMonth(), historicalChartController.getEndDate());
         List<Goal> easyGoals = filteredGoalList(historicalChartModel.easyGoals(), startFormatDate, endFormatDate);
         List<Goal> mediumGoals = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate, endFormatDate);
         List<Goal> hardGoals = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate, endFormatDate);
@@ -515,34 +517,44 @@ public class UserHIstoryProgressVisuals extends VBox {
     private LocalDate dateFormatting(String year, String month, String day) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         if (Integer.parseInt(day) > 0 && Integer.parseInt(day) <= 9) {
-            return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + historicalChartModel.numericalDay(day), format);
+            return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" +
+                                                                        historicalChartModel.numericalDay(day), format);
         }
         return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + day, format);
     }
 
 
     private List<Goal> filteredGoalList(List<Goal> goals, LocalDate startDate, LocalDate endDate){
-        return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) && !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
+        return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) &&
+                                                        !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
     }
 
     /**
-     * This function focuses on
+     * This function focuses on the arrangement and the display of the graphs. If a specific option of the graphs is
+     * selected by the user, only those graphs will be displayed by the user. ALl the other graphs will not be displayed
+     * and will be marked as a No-Show.
      */
     private void resultsPageView(){
         /* Adds all the charts on the top of the page - Pie Chart, Line Chart and Scatter Graph */
         HBox allCharts = new HBox(30);
         VBox noLineChart = new VBox(new Label("No Line Chart was selected by the user! "));
+        noLineChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;");
+        noLineChart.setAlignment(Pos.CENTER);
         VBox noScatterChart = new VBox(new Label("No Scatter Chart was selected by the user! "));
+        noScatterChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;");
+        noScatterChart.setAlignment(Pos.CENTER);
         VBox noPieChart = new VBox(new Label("No Pie Chart was selected by the user! "));
+        noPieChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;");
+        noPieChart.setAlignment(Pos.CENTER);
 
         /* Assessing cases to figure out what can be displayed to the user based on the parameters selected */
-        if (checkboxPieChart.isSelected() && !checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()) {
+        if (checkboxPieChart.isSelected() && !checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()){
             allCharts.getChildren().addAll(drawPieCharts(), noLineChart, noScatterChart);
         }
-        else if (checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected() && !checkboxPieChart.isSelected()) {
+        else if (checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected() && !checkboxPieChart.isSelected()){
             allCharts.getChildren().addAll(noPieChart, drawLineCharts(), noScatterChart);
         }
-        else if (checkboxScatterGraph.isSelected() && !checkboxPieChart.isSelected() && !checkboxLineChart.isSelected()) {
+        else if (checkboxScatterGraph.isSelected() && !checkboxPieChart.isSelected() && !checkboxLineChart.isSelected()){
             allCharts.getChildren().addAll(noPieChart, noLineChart, drawScatterCharts());
         }
         else if (checkboxPieChart.isSelected() && checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()){
@@ -585,8 +597,10 @@ public class UserHIstoryProgressVisuals extends VBox {
             return;
         }
 
-        LocalDate startDate = dateFormatting(yearSelector_left.getValue(), leftmonth_grid_selector.getValue(), leftgrid_dates.get().getText());
-        LocalDate endDate = dateFormatting(yearSelector_right.getValue(), rightmonth_grid_selector.getValue(), rightgrid_dates.get().getText());
+        LocalDate startDate = dateFormatting(yearSelector_left.getValue(), leftmonth_grid_selector.getValue(),
+                                                                                        leftgrid_dates.get().getText());
+        LocalDate endDate = dateFormatting(yearSelector_right.getValue(), rightmonth_grid_selector.getValue(),
+                                                                                        rightgrid_dates.get().getText());
         /* If user doesn't pick the accurate startDate or endDate*/
         if ((rightgrid_dates.get() == null) || (leftgrid_dates.get() == null)){
             Alert alert_three= new Alert(Alert.AlertType.WARNING);
@@ -609,8 +623,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         }
 
         /* If the user picked a timeframe that had no goals inside the timeframe */
-        LocalDate beginDate = dateFormatting(historicalChartController.getStartYear(), historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endingDate = dateFormatting(historicalChartController.getEndYear(), historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        LocalDate beginDate = dateFormatting(historicalChartController.getStartYear(),
+                                    historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endingDate = dateFormatting(historicalChartController.getEndYear(),
+                                        historicalChartController.getEndMonth(), historicalChartController.getEndDate());
         if (filteredGoalList(historicalChartModel.getGoals(), beginDate , endingDate).isEmpty()){
             Alert alert_four = new Alert(Alert.AlertType.WARNING);
             alert_four.setTitle("No treasures found for you.");
@@ -618,6 +634,19 @@ public class UserHIstoryProgressVisuals extends VBox {
             alert_four.setContentText("No goals were set during this time period so no statistical analysis can be " +
                                       "performed.");
             alert_four.showAndWait();
+            return;
+        }
+
+        /* If the user forgets to pick a graph choice, color preference or inclusion of descriptive statistics, they
+        * will be asked to select either one. */
+        if ((!checkboxPieChart.isSelected() || !checkboxLineChart.isSelected() || !checkboxScatterGraph.isSelected()) ||
+                (!redcolorPreference.isSelected() || !purplecolorPreference.isSelected() || orangecolorPreference.isSelected() || bluecolorPreference.isSelected()) ||
+                (!includeDescriptiveStatistics.isSelected() || !notincludeDescriptiveStatistics.isSelected())) {
+            Alert alert_five = new Alert(Alert.AlertType.WARNING);
+            alert_five.setTitle("Missed either of the parameters! ");
+            alert_five.setHeaderText(null);
+            alert_five.setContentText("Please set all of the parameters carefully to allow the generation of the graph accurately! ");
+            alert_five.showAndWait();
             return;
         }
         /* Creating a visual page for all the charts and descriptive statistics */
