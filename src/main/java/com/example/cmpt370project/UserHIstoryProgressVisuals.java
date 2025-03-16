@@ -639,9 +639,9 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* If the user forgets to pick a graph choice, color preference or inclusion of descriptive statistics, they
         * will be asked to select either one. */
-        if ((!checkboxPieChart.isSelected() || !checkboxLineChart.isSelected() || !checkboxScatterGraph.isSelected()) ||
-                (!redcolorPreference.isSelected() || !purplecolorPreference.isSelected() || orangecolorPreference.isSelected() || bluecolorPreference.isSelected()) ||
-                (!includeDescriptiveStatistics.isSelected() || !notincludeDescriptiveStatistics.isSelected())) {
+        if ((!checkboxPieChart.isSelected() && !checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()) ||
+                (!redcolorPreference.isSelected() && !purplecolorPreference.isSelected() && !orangecolorPreference.isSelected() && !bluecolorPreference.isSelected()) ||
+                (!includeDescriptiveStatistics.isSelected() && !notincludeDescriptiveStatistics.isSelected())) {
             Alert alert_five = new Alert(Alert.AlertType.WARNING);
             alert_five.setTitle("Missed either of the parameters! ");
             alert_five.setHeaderText(null);
