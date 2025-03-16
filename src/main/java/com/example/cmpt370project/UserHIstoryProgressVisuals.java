@@ -424,6 +424,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         String endYear = yearSelector_right.toString();
 
         /* Creating the piecharts */
+
+
         /* Adding all the elements into the HBox*/
         pieChart_display.getChildren().add(pieChart);
         pieChart_display.setAlignment(Pos.BASELINE_LEFT);
