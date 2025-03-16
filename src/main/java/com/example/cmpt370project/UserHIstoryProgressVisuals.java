@@ -438,6 +438,7 @@ public class UserHIstoryProgressVisuals extends VBox {
      * includes all the default options including the checkboxes and radio options as well.
      */
     private void updateResetView(){
+        /* If user selected nothing, we need to inform user that they are already in default mode! */
         if (isNoneSelected()){
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Already in DEFAULT mode!");
