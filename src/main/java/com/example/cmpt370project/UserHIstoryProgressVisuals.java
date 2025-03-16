@@ -423,11 +423,13 @@ public class UserHIstoryProgressVisuals extends VBox {
      * @return: A VBox containing the Pie Chart inside it.
      */
     private VBox drawPieCharts() {
-        VBox pieChart_display = new VBox(30);
+        VBox pieChart_display = new VBox(10);
 
         /* Storing all useful information in the respective variables */
         pieChart = new PieChart();
         pieChart.setTitle("Setting goals by categories");
+        pieChart.setPrefWidth(600);
+        pieChart.setPrefHeight(600);
         String startDate = (leftgrid_dates.get() != null) ? leftgrid_dates.get().getText() : "0";
         String startMonth = leftmonth_grid_selector.getValue();
         String startYear = yearSelector_left.getValue();
@@ -445,6 +447,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         int mediumCount = (mediumGoals != null) ? mediumGoals.size() : 0;
         int hardCount = (hardGoals != null) ? hardGoals.size() : 0;
 
+        System.out.println("Easy Goals: " + easyGoals);
+        System.out.println("Medium Goals: " + mediumGoals);
+        System.out.println("Hard Goals: " + hardGoals);
+
         /* Use the Pie Chart data to create the pie chart required */
         ObservableList<PieChart.Data> data_PC  = FXCollections.observableArrayList(
                 new PieChart.Data("Easy", easyCount),
@@ -454,7 +460,7 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Adding all the elements into the HBox*/
         pieChart_display.getChildren().add(pieChart);
-        pieChart_display.setAlignment(Pos.BASELINE_LEFT);
+        pieChart_display.setAlignment(Pos.CENTER);
         getChildren().add(pieChart_display);
 
         return pieChart_display;
@@ -470,7 +476,9 @@ public class UserHIstoryProgressVisuals extends VBox {
         return new VBox(30);
     }
 
-    private void generateDescriptiveStatistics(){}
+    private HBox generateDescriptiveStatistics(){
+        return new HBox(30);
+    }
 
     void updatePieCharts(){}
 
@@ -492,20 +500,27 @@ public class UserHIstoryProgressVisuals extends VBox {
 
 
     private List<Goal> filteredGoalList(List<Goal> goals, LocalDate startDate, LocalDate endDate){
-        return goals.stream().filter(goal -> !goal.getStartDate().isAfter(startDate) && !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
+        return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) && !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
     }
 
     private void resultsPageView(){
         /* Adds all the charts on the top of the page - Pie Chart, Line Chart and Scatter Graph */
         HBox allCharts = new HBox(30);
-        allCharts.getChildren().addAll(drawPieCharts(), drawLineCharts());
+        allCharts.getChildren().addAll(drawPieCharts(), drawLineCharts(), drawScatterCharts());
         allCharts.setAlignment(Pos.TOP_CENTER);
         getChildren().add(allCharts);
 
+        /* The VBox containing the wholeDisplay will have everything we need which includes the three graphs
+        * as well as the descriptive statistics at the bottom. */
+        VBox wholeDisplay = new VBox(30);
+        wholeDisplay.getChildren().addAll(allCharts, generateDescriptiveStatistics());
+        wholeDisplay.setAlignment(Pos.CENTER);
+        getChildren().add(wholeDisplay);
+
         Dialog<Void> popupDialog = new Dialog<>();
         popupDialog.setTitle("Your Charts and Descriptive Statistics!");
-        popupDialog.getDialogPane().setContent(allCharts);
-        popupDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+        popupDialog.getDialogPane().setContent(wholeDisplay);
+        popupDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
         popupDialog.showAndWait();
     }
 
