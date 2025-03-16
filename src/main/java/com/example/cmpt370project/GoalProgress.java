@@ -1,14 +1,20 @@
 package com.example.cmpt370project;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.chart.*;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.Chart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.layout.VBox;
 
 /*
  * View class for visualizing the progress of goals.
@@ -129,9 +135,32 @@ public class GoalProgress extends VBox {
         long daysCompleted = totalDays - daysLeft;
 
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList(
-            new PieChart.Data("Completed", daysCompleted),
-            new PieChart.Data("Remaining", daysLeft)
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
+        ); //intiializes data and has a default that will work
+
+        if (daysCompleted == 1 && daysLeft != 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Day)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
         );
+        }else if (daysCompleted != 1 && daysLeft == 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Day)", daysLeft)
+        );
+        }else if (daysCompleted == 1 && daysLeft == 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Day)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Day)", daysLeft)
+        );
+        }else if (daysCompleted != 1 && daysLeft != 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
+        );
+        }
+        
         pieChart.setData(data);
         return pieChart;
     }

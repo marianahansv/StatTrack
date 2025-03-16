@@ -106,6 +106,13 @@ public class GoalView extends StackPane implements Subscriber {
         }*/
 
         for (Goal goal : goalModel.getGoals()) {
+            
+            if (goal.isCompleted()) {
+            //setStyle("-fx-text-fill: green;");
+
+            
+
+            }
             goalListView.getItems().add(goal);
         }
 
@@ -176,12 +183,18 @@ public class GoalView extends StackPane implements Subscriber {
         VBox dashboardControls = new VBox();
         dashboardControls.setAlignment(Pos.TOP_CENTER);
         dashboardControls.setSpacing(5);
+        //goalListView.setStyle("-fx-text-fill: red;");
+       
+
 
         dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
+        //goalListView.setStyle("-fx-text-fill: red;");
 
         // Add all UI elements to this UI view
 
         root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
+        System.out.println(goalListView.getItems());
+        goalListView.getItems();
     
         
         completeGoalButton.setOnAction(e -> {
@@ -212,7 +225,7 @@ public class GoalView extends StackPane implements Subscriber {
 
         root.getChildren().addAll(welcomeLabel, dashboardControls);
     }
-    private void drawEditGoalView(Goal goal) {
+    private void drawEditGoalView(Goal goal) { // cant edit twive in a row?
         // Clear current page
         this.getChildren().clear();
 
