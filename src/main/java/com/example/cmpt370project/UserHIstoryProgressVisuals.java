@@ -473,6 +473,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         pieChart_display.setAlignment(Pos.CENTER);
         getChildren().add(pieChart_display);
 
+        pieChart.setLegendVisible(false); // Will create our own legend from next function
         colorPieChart(pieChart); // To color our pie chart with the accurate shade color
 
         return pieChart_display;
@@ -482,10 +483,17 @@ public class UserHIstoryProgressVisuals extends VBox {
         String colorChosen = colorChosen();
         String[] shadesofColor = colorpreferenceShades(colorChosen);
         int current_index = 0;
+        /* Working on getting the right colors for the slices on the pie chart */
         for (PieChart.Data data: pieChart.getData()){
-            data.getNode().setStyle("-fx-pie-color: " + shadesofColor[current_index % shadesofColor.length] + ";");
+            String colorObserved = shadesofColor[current_index % shadesofColor.length];
+            data.getNode().setStyle("-fx-pie-color: " + colorObserved + ";");
             current_index++;
         }
+        /* Working on the legend box of pie chart to make sure that the color alignment matches well */
+        /* Working with the default one is tricky - we will hide the default one and only show our created */
+        /* legend box instead to the user. */
+
+
     }
 
     private VBox drawLineCharts() {
