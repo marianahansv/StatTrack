@@ -1,14 +1,28 @@
 package com.example.cmpt370project;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
-import java.time.LocalDate;
-import java.util.*;
 
 /**
  * View to handle organization UI elements of the home page.
@@ -386,8 +400,8 @@ public class HomeView extends StackPane implements Subscriber {
         this.getChildren().add(root);
         root.getChildren().addAll(
                 new Label("Goal Title:"), titleInput,
-                new Label("Difficulty:"), difficultyComboBox,
                 new Label("Sections:"), sectionButtons,
+                new Label("Difficulty:"), difficultyComboBox,
                 new Label("Start Date:"), startDatePicker,
                 new Label("End Date:"), endDatePicker,
                 submitGoalButton, cancelAddGoalButton

@@ -144,7 +144,7 @@ public class GoalModel {
      */
     public void completeGoal(Goal goal) {
         goal.setCompleted(true);
-        System.out.println(1111111);
+        //System.out.println(1111111);
         notifySubscribers(); // Make sure the view refreshes
         updateGoal(goal.getTitle(), goal);
         //save_goals_to_file();

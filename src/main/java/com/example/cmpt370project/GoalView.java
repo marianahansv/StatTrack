@@ -1,13 +1,21 @@
 package com.example.cmpt370project;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -163,7 +171,7 @@ public class GoalView extends StackPane implements Subscriber {
         
         completeGoalButton = new Button("Complete");
 
-        editGoalButton = new Button("Increase Deadline");
+        editGoalButton = new Button("Edit Goal");
 
         VBox dashboardControls = new VBox();
         dashboardControls.setAlignment(Pos.TOP_CENTER);
@@ -195,14 +203,112 @@ public class GoalView extends StackPane implements Subscriber {
             Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
             // Goal oldGoal = goalListView.getSelectionModel().getSelectedItem();
             // System.out.println(selectedGoal);
-            selectedGoal.setEndDate(selectedGoal.getEndDate().plusDays(1));;
+            selectedGoal.setEndDate(selectedGoal.getEndDate().plusDays(1));
             goalModel.updateGoal(selectedGoal.getTitle(), selectedGoal);
             goalModel.notifySubscribers();
+            drawEditGoalView(selectedGoal);
             System.out.println(4);
        });
 
         root.getChildren().addAll(welcomeLabel, dashboardControls);
     }
+    private void drawEditGoalView(Goal goal) {
+        // Clear current page
+        this.getChildren().clear();
+
+        SectionModel sectionModel = new SectionModel();
+
+        String OGTitle = (goal.getTitle());
+
+        // Create a new VBox to hold the edit form
+        VBox editRoot = new VBox(20);
+        editRoot.setAlignment(Pos.TOP_LEFT);
+        editRoot.setPadding(new Insets(20));
+    
+        // Create a TextField for editing the goal title and use prior title
+        TextField titleField = new TextField(goal.getTitle());
+    
+        // The difficulty combo box
+        ComboBox<String> editDifficultyComboBox = new ComboBox<>();
+        editDifficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
+        editDifficultyComboBox.setValue(goal.getDifficulty());
+    
+        // Create DatePickers for the start and end dates and set their values
+        DatePicker editStartDatePicker = new DatePicker(goal.getStartDate());
+        DatePicker editEndDatePicker = new DatePicker(goal.getEndDate());
+    
+        // Create an HBox and a new ToggleGroup for the section buttons
+        HBox editSectionButtons = new HBox(10);
+        ToggleGroup editSectionToggleGroup = new ToggleGroup();
+    
+        // Get the sections from the model and create ToggleButtons for each
+        List<String> sections = new ArrayList<>(sectionModel.getSections());
+        for (String section : sections) {
+            //System.out.println(section);
+            ToggleButton sectionButton = new ToggleButton(section);
+            sectionButton.setToggleGroup(editSectionToggleGroup);
+            if (section.equals(goal.getSection())) {
+                sectionButton.setSelected(true);
+            }
+            editSectionButtons.getChildren().add(sectionButton);
+        }
+    
+        // Create buttons for saving or canceling the edit
+        Button submitEditButton = new Button("Save Changes");
+        Button cancelEditButton = new Button("Cancel");
+    
+        // Set up the event handler for the Save button
+        submitEditButton.setOnAction(e -> {
+            String newTitle = titleField.getText();
+            String newDifficulty = editDifficultyComboBox.getValue();
+            Toggle selectedToggle = editSectionToggleGroup.getSelectedToggle();
+            if (selectedToggle == null) {
+                // Handle the error, e.g., alert the user that a section must be selected
+                return;
+            }
+            String newSection = ((ToggleButton) selectedToggle).getText();
+            LocalDate newStartDate = editStartDatePicker.getValue();
+            LocalDate newEndDate = editEndDatePicker.getValue();
+            
+            // Update the goal object with new values
+            goal.setTitle(newTitle);
+            goal.setDifficulty(newDifficulty);
+            goal.setSection(newSection);
+            goal.setStartDate(newStartDate);
+            goal.setEndDate(newEndDate);
+            
+            // Update the model and notify subscribers of the change
+            goalModel.updateGoal(OGTitle, goal);
+            goalModel.notifySubscribers();
+            //OGTitle = goal.getTitle();
+            
+            this.getChildren().clear();
+            this.getChildren().add(root);
+            drawView();
+        });
+    
+        // Set up the event handler for the Cancel button to return to the home view
+        cancelEditButton.setOnAction(e -> {
+            //getChildren().clear();
+            this.getChildren().clear();
+            this.getChildren().add(root);
+            drawView();
+        });
+    
+        // Build the edit form view
+        editRoot.getChildren().addAll(
+            new Label("Edit Goal Title:"), titleField,
+            new Label("Difficulty:"), editDifficultyComboBox,
+            new Label("Sections:"), editSectionButtons,
+            new Label("Start Date:"), editStartDatePicker,
+            new Label("End Date:"), editEndDatePicker,
+            submitEditButton, cancelEditButton
+        );
+    
+        // Add the edit view to the scene
+        this.getChildren().add(editRoot);
+    }
+    
 
 
 
