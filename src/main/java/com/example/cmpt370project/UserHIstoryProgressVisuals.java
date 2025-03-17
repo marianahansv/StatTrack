@@ -105,7 +105,7 @@ public class UserHIstoryProgressVisuals extends VBox {
     /**
      * Scatter chart for the visualization purposes.
      */
-    private ScatterChart<String, Integer> scatterChart;
+    private ScatterChart<String, Number> scatterChart;
 
     /**
      * A VBox to store the descriptive statistics of the user's goals.
@@ -602,9 +602,12 @@ public class UserHIstoryProgressVisuals extends VBox {
         String[] shadesofColor_LC = colorpreferenceShades(colorChosen_LC);
         int current_index_LC = 0;
         for (Object series: lineChart.getData()){
+            String colorObserved = shadesofColor_LC[current_index_LC % shadesofColor_LC.length];
             XYChart.Series<String, Number> series_LC = (XYChart.Series<String, Number>) series;
+            series_LC.getNode().lookup(".chart-series-line")
+                    .setStyle("-fx-stroke: " + colorObserved + "; -fx-stroke-width: 2px;");
+
             for (XYChart.Data<String, Number> data: series_LC.getData()){
-                String colorObserved = shadesofColor_LC[current_index_LC % shadesofColor_LC.length];
                 Node node = data.getNode();
                 node.setStyle("-fx-background-color: " + colorObserved + ";");
                 current_index_LC++;
@@ -615,9 +618,7 @@ public class UserHIstoryProgressVisuals extends VBox {
     private HBox curatedLegendLineChart(){
         String colorChosen_LC = colorChosen();
         String[] shadesofColor_LC = colorpreferenceShades(colorChosen_LC);
-        /* Working on the legend box of pie chart to make sure that the color alignment matches well */
-        /* Working with the default one is tricky - we will hide the default one and only show our created */
-        /* legend box instead to the user. */
+
         HBox curatedLegend_LC = new HBox(10);
         int current_index_again_LC = 0;
         for (Object series: lineChart.getData()){
@@ -644,7 +645,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         NumberAxis y_axis = new NumberAxis();
         x_axis.setLabel("Date");
         y_axis.setLabel("Goals Created Per Day");
-        ScatterChart<String, Number> scatterChart = new ScatterChart<>(x_axis, y_axis);
+        scatterChart = new ScatterChart<>(x_axis, y_axis);
         scatterChart.setTitle("Goals Created Per Category");
 
         XYChart.Series<String, Number> personalGoals = new XYChart.Series<>();
@@ -663,10 +664,69 @@ public class UserHIstoryProgressVisuals extends VBox {
         List<Goal> filt_fitnessGoal_SC = filteredGoalList(historicalChartModel.fitnessGoals(), startFormatDate_SC, endFormatDate_SC);
         List<Goal> filt_generalGoal_SC = filteredGoalList(historicalChartModel.generalGoals(), startFormatDate_SC, endFormatDate_SC);
 
+        Map<LocalDate, Integer> personalGoalCount = new TreeMap<>();
+        Map<LocalDate, Integer> fitnessGoalCount = new TreeMap<>();
+        Map<LocalDate, Integer> generalGoalCount = new TreeMap<>();
 
-        scatterChart_display.getChildren().add(scatterChart);
+        for (Goal goal: filt_personalGoal_SC){
+            personalGoalCount.put(goal.getStartDate(), personalGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
+        }
+        for (Goal goal: filt_fitnessGoal_SC){
+            fitnessGoalCount.put(goal.getStartDate(), fitnessGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
+        }
+        for (Goal goal: filt_generalGoal_SC){
+            generalGoalCount.put(goal.getStartDate(), generalGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
+        }
+
+        for (Map.Entry<LocalDate, Integer> entry: personalGoalCount.entrySet()){
+            personalGoals.getData().add(new XYChart.Data<>(entry.getKey().toString(), entry.getValue()));
+        }
+        for (Map.Entry<LocalDate, Integer> entry: fitnessGoalCount.entrySet()){
+            fitnessGoals.getData().add(new XYChart.Data<>(entry.getKey().toString(), entry.getValue()));
+        }
+        for (Map.Entry<LocalDate, Integer> entry: generalGoalCount.entrySet()){
+            generalGoals.getData().add(new XYChart.Data<>(entry.getKey().toString(), entry.getValue()));
+        }
+
+        scatterChart.getData().addAll(personalGoals, fitnessGoals, generalGoals);
+        scatterChart.setLegendVisible(false);
+        colorScatterChart(scatterChart);
+        scatterChart_display.getChildren().addAll(scatterChart, curatedLegendScatterChart());
         getChildren().add(scatterChart_display);
         return scatterChart_display;
+    }
+
+    private HBox curatedLegendScatterChart(){
+        String colorChosen_SC = colorChosen();
+        String[] shadesofColor_SC = colorpreferenceShades(colorChosen_SC);
+
+        HBox curatedLegend_SC = new HBox(10);
+        int current_index_again_SC = 0;
+        for (Object series: scatterChart.getData()){
+            XYChart.Series<String, Number> series_SC = (XYChart.Series<String, Number>) series;
+            Rectangle colorbox_SC = new Rectangle(20, 20); // Square to store the color
+            colorbox_SC.setFill(Color.web(shadesofColor_SC[current_index_again_SC % shadesofColor_SC.length]));
+            Text label_info = new Text(series_SC.getName());
+            curatedLegend_SC.getChildren().addAll(colorbox_SC, label_info);
+            current_index_again_SC ++;
+        }
+        curatedLegend_SC.setAlignment(Pos.CENTER);
+        return curatedLegend_SC;
+    }
+
+    private void colorScatterChart(ScatterChart scatterChart) {
+        String colorChosen_SC = colorChosen();
+        String[] shadesofColor_SC = colorpreferenceShades(colorChosen_SC);
+        int current_index_SC = 0;
+        for (Object series: scatterChart.getData()){
+            XYChart.Series<String, Number> series_SC = (XYChart.Series<String, Number>) series;
+            for (XYChart.Data<String, Number> data: series_SC.getData()){
+                String colorObserved = shadesofColor_SC[current_index_SC % shadesofColor_SC.length];
+                Node node = data.getNode();
+                node.setStyle("-fx-background-color: " + colorObserved + ";");
+                current_index_SC++;
+            }
+        }
     }
 
     private VBox generateDescriptiveStatistics(){
