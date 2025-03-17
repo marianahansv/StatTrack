@@ -36,6 +36,12 @@ public class UserProgressHIstoryVisModel extends GoalModel{
         return getGoalsByDifficulty("Hard");
     }
 
+    public List<Goal> personalGoals(){return getGoalsForSection("Personal");}
+
+    public List<Goal> fitnessGoals(){return getGoalsForSection("Fitness");}
+
+    public List<Goal> generalGoals(){return getGoalsForSection("General");}
+
     public String numericalMonth(String monthName){
         switch(monthName){
             case "January": return "01";

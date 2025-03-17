@@ -523,6 +523,12 @@ public class UserHIstoryProgressVisuals extends VBox {
         return curatedLegend;
     }
 
+    /**
+     * The line chart displays the number of goals that are created on a day during the specific timeframe that has been
+     * set.
+     * @return: A VBox where the line chart is drawn and will be used to be added into the display page when the
+     * generate button is clicked.
+     */
     private VBox drawLineCharts() {
         VBox lineChart_display = new VBox(10);
 
@@ -626,6 +632,10 @@ public class UserHIstoryProgressVisuals extends VBox {
         return curatedLegend_LC;
     }
 
+    /**
+     * The scatter graph displays the number of
+     * @return
+     */
     private VBox drawScatterCharts(){
         VBox scatterChart_display = new VBox(10);
         return scatterChart_display;
@@ -633,7 +643,6 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private VBox generateDescriptiveStatistics(){
         descriptiveStatisticsTable = new VBox(10);
-
 
         /* Label for each respective line to ensure that the spacing and all the elements are well-placed */
         Label introductionL = new Label("These are your achievements so far: ");
@@ -659,7 +668,6 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Creating the HBox and the required responses to the users */
         HBox introductionHB = new HBox(10);
-        HBox startedGoalsHB = new HBox(10);
         HBox easyGoalsHB = new HBox(10);
         HBox mediumGoalsHB = new HBox(10);
         HBox hardGoalsHB = new HBox(10);
@@ -670,22 +678,21 @@ public class UserHIstoryProgressVisuals extends VBox {
 
         /* Adding the labels and the calculations to my HBox respectively */
         introductionHB.getChildren().addAll(introductionL);
-        startedGoalsHB.getChildren().addAll(startedGoalsL);
         easyGoalsHB.getChildren().addAll(easyGoalsL, geteasyGoals());
-        mediumGoalsHB.getChildren().addAll(mediumGoalsL);
-        hardGoalsHB.getChildren().addAll(hardGoalL);
-        generalGoalsHB.getChildren().addAll(generalGoalL);
-        fitnessGoalsHB.getChildren().addAll(fitnessGoalL);
-        personalGoalsHB.getChildren().addAll(personalGoalL);
-        meanDailyGoalsHB.getChildren().addAll(meanDailyGoalL);
+        mediumGoalsHB.getChildren().addAll(mediumGoalsL, getmediumGoals());
+        hardGoalsHB.getChildren().addAll(hardGoalL, gethardGoals());
+        generalGoalsHB.getChildren().addAll(generalGoalL, getGeneralGoals());
+        fitnessGoalsHB.getChildren().addAll(fitnessGoalL, getFitnessGoals());
+        personalGoalsHB.getChildren().addAll(personalGoalL, getpersonalGoals());
+        meanDailyGoalsHB.getChildren().addAll(meanDailyGoalL, meanGoals());
 
-        HBox[] all_HB = new HBox[]{introductionHB, startedGoalsHB, easyGoalsHB,mediumGoalsHB, hardGoalsHB, generalGoalsHB,
+        HBox[] all_HB = new HBox[]{introductionHB, easyGoalsHB,mediumGoalsHB, hardGoalsHB, generalGoalsHB,
                                     fitnessGoalsHB, personalGoalsHB, meanDailyGoalsHB};
         for (HBox oneHB: all_HB){
             oneHB.setStyle("-fx-alignment: center;");
         }
         /* Putting all the elements together into the main descriptive statistics table */
-        descriptiveStatisticsTable.getChildren().addAll(introductionHB, startedGoalsHB, easyGoalsHB, mediumGoalsHB,
+        descriptiveStatisticsTable.getChildren().addAll(introductionHB, easyGoalsHB, mediumGoalsHB,
                                                         hardGoalsHB, generalGoalsHB, fitnessGoalsHB, personalGoalsHB,
                                                         meanDailyGoalsHB);
 
@@ -697,29 +704,99 @@ public class UserHIstoryProgressVisuals extends VBox {
         return descriptiveStatisticsTable;
     }
 
+    private HBox meanGoals(){
+        HBox meanGoalvalue = new HBox(10);
+        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_easyGoals_MG= filteredGoalList(historicalChartModel.getGoals(), startFormatDate_MG, endFormatDate_MG);
+        return gethBox(meanGoalvalue, filt_easyGoals_MG);
+    }
     private HBox geteasyGoals(){
         HBox easyGoalvalue = new HBox(10);
-        LocalDate startFormatDate_LC = dateFormatting(historicalChartController.getStartYear(),
+        LocalDate startFormatDate_EG = dateFormatting(historicalChartController.getStartYear(),
                 historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_LC = dateFormatting(historicalChartController.getEndYear(),
+        LocalDate endFormatDate_EG = dateFormatting(historicalChartController.getEndYear(),
                 historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_easyGoals_LC= filteredGoalList(historicalChartModel.easyGoals(), startFormatDate_LC, endFormatDate_LC);
+        List<Goal> filt_easyGoals_EG= filteredGoalList(historicalChartModel.easyGoals(), startFormatDate_EG, endFormatDate_EG);
 
-        Map<LocalDate, Integer> easyGoalsCount = new TreeMap<>();
+        return gethBox(easyGoalvalue, filt_easyGoals_EG);
+    }
 
-        for (Goal easyGoals: filt_easyGoals_LC){
-            easyGoalsCount.put(easyGoals.getStartDate(), easyGoalsCount.getOrDefault(easyGoals.getStartDate(), 0) + 1);
+    private HBox getmediumGoals(){
+        HBox mediumGoalvalue = new HBox(10);
+        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_mediumGoals_MG = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate_MG, endFormatDate_MG);
+
+        return gethBox(mediumGoalvalue, filt_mediumGoals_MG);
+    }
+
+    private HBox gethardGoals(){
+        HBox hardGoalvalue = new HBox(10);
+        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_hardGoals_MG = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate_MG, endFormatDate_MG);
+
+        return gethBox(hardGoalvalue, filt_hardGoals_MG);
+    }
+
+    private HBox getpersonalGoals(){
+        HBox personalGoalvalue = new HBox(10);
+        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_personalGoals_MG = filteredGoalList(historicalChartModel.personalGoals(), startFormatDate_MG, endFormatDate_MG);
+
+        return gethBox(personalGoalvalue, filt_personalGoals_MG);
+    }
+
+    private HBox getFitnessGoals(){
+        HBox fitnessGoalvalue = new HBox(10);
+        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_fitnessGoals_MG = filteredGoalList(historicalChartModel.fitnessGoals(), startFormatDate_MG, endFormatDate_MG);
+
+        return gethBox(fitnessGoalvalue, filt_fitnessGoals_MG);
+    }
+
+    private HBox getGeneralGoals(){
+        HBox generalGoalvalue = new HBox(10);
+        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_generalGoals_MG = filteredGoalList(historicalChartModel.generalGoals(), startFormatDate_MG, endFormatDate_MG);
+
+        return gethBox(generalGoalvalue, filt_generalGoals_MG);
+    }
+
+    private HBox gethBox(HBox Goalvalue, List<Goal> filt_Goals_MG) {
+        Map<LocalDate, Integer> GoalsCount = new TreeMap<>();
+
+        for (Goal Goals: filt_Goals_MG){
+            GoalsCount.put(Goals.getStartDate(), GoalsCount.getOrDefault(Goals.getStartDate(), 0) + 1);
         }
 
         int totalGoals = historicalChartModel.getGoalCount();
         double percentage = 0;
         if (totalGoals != 0) {
-            percentage = (double) easyGoalsCount.size() / totalGoals * 100;
+            percentage = (double) GoalsCount.size() / totalGoals * 100;
         }
-        easyGoalvalue.getChildren().clear();
+        Goalvalue.getChildren().clear();
         Label percentageLabel = new Label(String.format("%.2f%%", percentage));
-        easyGoalvalue.getChildren().add(percentageLabel);
-        return easyGoalvalue;
+        colorDescriptiveStatisticsL(percentageLabel);
+        Goalvalue.getChildren().add(percentageLabel);
+        colorDescriptiveStatisticsHB(Goalvalue);
+        return Goalvalue;
     }
 
     private void colorDescriptiveStatistics(VBox descriptiveStatisticsTable){
@@ -728,13 +805,21 @@ public class UserHIstoryProgressVisuals extends VBox {
         descriptiveStatisticsTable.setStyle("-fx-background-color: " + shadesofColorDS[0] + ";" + "-fx-background-radius: 10px;");
     }
 
+    private void colorDescriptiveStatisticsHB(HBox descriptiveStatisticsHB){
+        String colorChosen_HB = colorChosen();
+        String[] shadesofColorDS_HB = colorpreferenceShades(colorChosen_HB);
+        descriptiveStatisticsHB.setStyle("-fx-background-color: " + shadesofColorDS_HB[1] + ";" + "-fx-padding: 5px;" +
+                "-fx-text-fill: white;" + "-fx-font-size: 14px;" + "-fx-background-radius: 5px;" +
+                "-fx-font-weight: bold;");
+    }
+
     private void colorDescriptiveStatisticsL(Label descriptiveStatisticsL){
-        String colorChosen_DS_HB = colorChosen();
-        String[] shadesofColorDS_HB = colorpreferenceShades(colorChosen_DS_HB);
+        String colorChosen_DS_L = colorChosen();
+        String[] shadesofColorDS_L = colorpreferenceShades(colorChosen_DS_L);
         descriptiveStatisticsL.setTextFill(Color.WHITE);
         descriptiveStatisticsL.setFont(Font.font("Sans-serif"));
         descriptiveStatisticsL.setPrefWidth(Control.USE_COMPUTED_SIZE); // the HBox will only surrond the label now
-        descriptiveStatisticsL.setStyle("-fx-background-color: " + shadesofColorDS_HB[1] + ";" + "-fx-padding: 5px;" +
+        descriptiveStatisticsL.setStyle("-fx-background-color: " + shadesofColorDS_L[1] + ";" + "-fx-padding: 5px;" +
                                          "-fx-text-fill: white;" + "-fx-font-size: 14px;" + "-fx-background-radius: 5px;" +
                                          "-fx-font-weight: bold;");
         descriptiveStatisticsL.setAlignment(Pos.CENTER);
@@ -797,7 +882,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) &&
                                                         !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
     }
-
 
     /**
      * This function focuses on the arrangement and the display of the graphs. If a specific option of the graphs is
