@@ -626,6 +626,7 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private HBox generateDescriptiveStatistics(){
         HBox descriptiveStatistics_display = new HBox(10);
+
         return descriptiveStatistics_display;
     }
 

@@ -192,7 +192,7 @@ public class GoalView extends StackPane implements Subscriber {
 
         // Add all UI elements to this UI view
 
-        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
+        root.getChildren().addAll(goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
         System.out.println(goalListView.getItems());
         goalListView.getItems();
     
