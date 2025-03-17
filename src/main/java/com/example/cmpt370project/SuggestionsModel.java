@@ -23,14 +23,14 @@ public class SuggestionsModel {
      * try -> load file from user disk
      * if fail -> create empty file with no data
      */
-    public SuggestionsModel(){
+    /*public SuggestionsModel(){
         checkIfFileExists();
         try (Writer writer = new FileWriter(FILE_NAME)) {
-            gson.toJson(G.values(), writer);
+           // gson.toJson(G.values(), writer);
         } catch (IOException e) {
             System.err.println("Error saving goals to file: " + e.getMessage());
         }
-    }
+    }*/
     /**
      * Checks if file exists before reading or writing to it.
      * If it doesn't, it creates an empty file intialized with zero counters!
