@@ -7,19 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -41,6 +32,10 @@ public class HomeView extends StackPane implements Subscriber {
      * The user data model that this view gets goals completed data.
      */
     private UserHistoryDataModel userHistoryDataModel;
+    /**
+     * The suggestions data model that this view gets suggestions from.
+     */
+    private SuggestionsModel suggestionsModel;
     /**
      * List of sections.
      */
@@ -113,6 +108,7 @@ public class HomeView extends StackPane implements Subscriber {
     private final DatePicker endDatePicker;
     private final Button createSectionButton;
     private final Button deleteSectionButton;
+    private final Button giveMeSuggestionsButton;
 
 
     /**
@@ -156,6 +152,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         // Add goal page elements
         submitGoalButton = new Button("Add Goal");
+        giveMeSuggestionsButton = new Button("Give me suggestions");
 
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
@@ -290,6 +287,14 @@ public class HomeView extends StackPane implements Subscriber {
     }
 
     /**
+     * Set the suggestions model of this view.
+     * @param suggestionsModel the suggestion model that this view will pull data from.
+     */
+    public void setSuggestionsModel(SuggestionsModel suggestionsModel) {
+        this.suggestionsModel = suggestionsModel;
+    }
+
+    /**
      * Set the user data model for this view.
      * @param userHistoryDataModel the user data model for this view.
      */
@@ -315,22 +320,24 @@ public class HomeView extends StackPane implements Subscriber {
      * Set up interaction with a controller for this view.
      * @param c the controller that will handle changing model data for user interactions on this page.
      */
-    public void setupEvents(HomeController c) {
+    public void setupEvents(HomeController c, SuggestionsController s) {
         // ********* HOME PAGE EVENTS *********
         // No events needed for the home page yet.
-
         // ********* ADD GOAL PAGE EVENTS *********
+        //pulling data from input fields
         submitGoalButton.setOnAction(e -> {
             // Handle the submission of a new goal (pass to the controller)
-            String difficulty = difficultyComboBox.getValue();
-            Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
-            String section = ((ToggleButton) selectedToggle).getText();
-            LocalDate startDate = startDatePicker.getValue();
-            LocalDate endDate = endDatePicker.getValue();
-            boolean completed = false; // Why would you add a goal you completed?
             //handle any user input errors if exceptions are thrown by the controller
             try {
-                c.handleButtonPress(e, titleInput.getText(), section, difficulty, startDate, endDate, completed);
+                String difficulty = difficultyComboBox.getValue();
+                Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
+                String section;
+                section = ((ToggleButton) selectedToggle).getText();
+                LocalDate startDate = startDatePicker.getValue();
+                LocalDate endDate = endDatePicker.getValue();
+                boolean completed = false; // Why would you add a goal you completed?
+                c.handleButtonPressValidateInput(e, titleInput.getText(), section, difficulty, startDate, endDate, completed);
+                c.handleGoalSubmissionButton(titleInput.getText(), section, difficulty, startDate, endDate, completed);
                 changePage(HomeViewPage.HOME); // Return to the summary page after submission
                 resetAddGoalPage();
             } catch (InputMismatchException error){
@@ -342,7 +349,20 @@ public class HomeView extends StackPane implements Subscriber {
                 alert.showAndWait();
             }
         });
-
+        //guys this is so monkey code I'll fix it later <3
+        giveMeSuggestionsButton.setOnAction(e -> {
+            String difficulty = difficultyComboBox.getValue();
+            Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
+            String section;
+            section = ((ToggleButton) selectedToggle).getText();
+            LocalDate startDate = startDatePicker.getValue();
+            LocalDate endDate = endDatePicker.getValue();
+            boolean completed = false; // Why would you add a goal you completed?
+            Goal newGoal = new Goal(titleInput.getText(), section, difficulty, startDate, endDate, completed);
+            String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
+            s.handleButtonPress(timelineSuggestion);
+            submitGoalButton.setVisible(true);
+        });
         clearGoalsButton.setOnAction(c::removeButtonPress);
     }
 
@@ -404,7 +424,7 @@ public class HomeView extends StackPane implements Subscriber {
                 new Label("Difficulty:"), difficultyComboBox,
                 new Label("Start Date:"), startDatePicker,
                 new Label("End Date:"), endDatePicker,
-                submitGoalButton, cancelAddGoalButton
+                submitGoalButton, cancelAddGoalButton, giveMeSuggestionsButton
         );
         //selecting general section toggle
         Toggle default_toggle = sectionToggleGroup.getToggles().getFirst();
@@ -413,6 +433,7 @@ public class HomeView extends StackPane implements Subscriber {
             else {t.setSelected(false);}
 
         }
+        submitGoalButton.setVisible(false);
     }
 
     /**

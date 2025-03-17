@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,8 +32,7 @@ import javafx.collections.ObservableList;
 public class GoalModel {
     private static final String FILE_NAME = System.getProperty("user.home") + "/GoalApplication/goals.json";
 
-    private HashMap<String, Goal> goals;
-    private ObservableList<Goal> goalList;
+    private HashMap<String, Goal> goals = new HashMap<>();
     private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
             context.serialize(src.format(format))).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
@@ -47,9 +47,7 @@ public class GoalModel {
     public GoalModel(UserHistoryDataModel userHistoryDataModel){
         //UserHistoryDataModel historyModel = new UserHistoryDataModel();
         this.userHistoryDataModel = userHistoryDataModel;
-        goals = new HashMap<>();
         subscribers = new ArrayList<Subscriber>();
-        goalList = (ObservableList<Goal>) goals.values();
         load_goals_from_file();
     }
 
@@ -107,7 +105,6 @@ public class GoalModel {
      */
     public void clearGoals() {
         goals.clear();
-        goalList.clear();
         save_goals_to_file();
         notifySubscribers();
     }
@@ -145,8 +142,9 @@ public class GoalModel {
     /**
      * @return list of all goals. (I'm thinking of future sorting/filtering operations for which we'll need a list)
      */
-    public ObservableList<Goal> getGoals(){
-        return (ObservableList<Goal>) goals.values();
+    public List<Goal> getGoals(){
+        if (goals.values().isEmpty()) return new ArrayList<Goal>();
+        return new ArrayList<>(goals.values());
     }
 
     /**

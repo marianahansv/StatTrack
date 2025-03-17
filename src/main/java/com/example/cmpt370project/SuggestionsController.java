@@ -2,6 +2,8 @@ package com.example.cmpt370project;
 
 import com.google.gson.Gson;
 import javafx.collections.ListChangeListener;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class SuggestionsController{
     private GoalModel goalModel;
@@ -17,19 +20,31 @@ public class SuggestionsController{
     /**
      * Initialize the Suggestion Controller
      */
-    public SuggestionsController(GoalModel goalModel, SuggestionsModel suggestionsModel, HomeView homeView){
+    public SuggestionsController(GoalModel goalModel, SuggestionsModel suggestionsModel){
         this.goalModel = goalModel;
         this.suggestionsModel = suggestionsModel;
-        this.homeView = homeView;
 
         updateSuggestionsModel();
         suggestionsModel.initializeSuggestionsModel(goalModel.getGoals());
-        //listen for changes in goalModel to update suggestions model
-        goalModel.getGoals().addListener((ListChangeListener<? super Goal>) change -> updateSuggestionsModel());
+
     }
 
     private void updateSuggestionsModel(){
         suggestionsModel.updateGoalList(goalModel.getGoals());
+    }
+
+    /**
+     * Handles user choice between accepting suggested changes or not!*/
+    public void handleButtonPress(String timelineSuggestion){
+        //creating a little dialog!
+        Alert alert = new Alert(Alert.AlertType.valueOf("CONFIRMATION"));
+        alert.setTitle("Your Suggestions");
+        alert.setHeaderText(null);
+        alert.setContentText(timelineSuggestion);
+        //ButtonType buttonYesChanges = new ButtonType("Accept Changes");
+        //ButtonType buttonNoChanges = new ButtonType("No Changes");
+        //alert.getButtonTypes().setAll(buttonYesChanges,buttonNoChanges);
+        alert.showAndWait();
     }
 
 
