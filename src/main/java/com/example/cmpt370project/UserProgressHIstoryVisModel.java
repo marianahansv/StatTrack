@@ -1,7 +1,6 @@
 package com.example.cmpt370project;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 public class UserProgressHIstoryVisModel extends GoalModel{
     private HashMap<String,Goal> goals;
@@ -73,4 +72,5 @@ public class UserProgressHIstoryVisModel extends GoalModel{
     public int completedGoals(){
         return dataHistoricalModel.getDailyCompletedGoals();
     }
+
 }

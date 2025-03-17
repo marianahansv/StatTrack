@@ -671,7 +671,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         /* Adding the labels and the calculations to my HBox respectively */
         introductionHB.getChildren().addAll(introductionL);
         startedGoalsHB.getChildren().addAll(startedGoalsL);
-        easyGoalsHB.getChildren().addAll(easyGoalsL);
+        easyGoalsHB.getChildren().addAll(easyGoalsL, geteasyGoals());
         mediumGoalsHB.getChildren().addAll(mediumGoalsL);
         hardGoalsHB.getChildren().addAll(hardGoalL);
         generalGoalsHB.getChildren().addAll(generalGoalL);
@@ -695,6 +695,31 @@ public class UserHIstoryProgressVisuals extends VBox {
         colorDescriptiveStatistics(descriptiveStatisticsTable);
         getChildren().add(descriptiveStatisticsTable);
         return descriptiveStatisticsTable;
+    }
+
+    private HBox geteasyGoals(){
+        HBox easyGoalvalue = new HBox(10);
+        LocalDate startFormatDate_LC = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_LC = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_easyGoals_LC= filteredGoalList(historicalChartModel.easyGoals(), startFormatDate_LC, endFormatDate_LC);
+
+        Map<LocalDate, Integer> easyGoalsCount = new TreeMap<>();
+
+        for (Goal easyGoals: filt_easyGoals_LC){
+            easyGoalsCount.put(easyGoals.getStartDate(), easyGoalsCount.getOrDefault(easyGoals.getStartDate(), 0) + 1);
+        }
+
+        int totalGoals = historicalChartModel.getGoalCount();
+        double percentage = 0;
+        if (totalGoals != 0) {
+            percentage = (double) easyGoalsCount.size() / totalGoals * 100;
+        }
+        easyGoalvalue.getChildren().clear();
+        Label percentageLabel = new Label(String.format("%.2f%%", percentage));
+        easyGoalvalue.getChildren().add(percentageLabel);
+        return easyGoalvalue;
     }
 
     private void colorDescriptiveStatistics(VBox descriptiveStatisticsTable){
