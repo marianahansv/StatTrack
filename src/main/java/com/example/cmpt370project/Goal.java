@@ -95,6 +95,9 @@ public class Goal {
         updateCompletionDate(LocalDate.now());
 
     }
+    public LocalDate getCompletionDate(){
+        return this.completionDate;
+    }
     private void updateCompletionDate(LocalDate now){
         this.completionDate = now;
     }

@@ -20,15 +20,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 
 /**
  * The GoalModel holds all the Goals data in the application. It handles the CRUD operations, and
- * serialization (storage) of Goals.
+ * serialization (storage) of Goals. It also provides filtering operations
  */
 public class GoalModel {
     private static final String FILE_NAME = System.getProperty("user.home") + "/GoalApplication/goals.json";
 
     private HashMap<String, Goal> goals;
+    private ObservableList<Goal> goalList;
     private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
             context.serialize(src.format(format))).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
@@ -45,6 +49,7 @@ public class GoalModel {
         this.userHistoryDataModel = userHistoryDataModel;
         goals = new HashMap<>();
         subscribers = new ArrayList<Subscriber>();
+        goalList = (ObservableList<Goal>) goals.values();
         load_goals_from_file();
     }
 
@@ -102,6 +107,7 @@ public class GoalModel {
      */
     public void clearGoals() {
         goals.clear();
+        goalList.clear();
         save_goals_to_file();
         notifySubscribers();
     }
@@ -139,8 +145,8 @@ public class GoalModel {
     /**
      * @return list of all goals. (I'm thinking of future sorting/filtering operations for which we'll need a list)
      */
-    public List<Goal> getGoals(){
-        return new ArrayList<>(goals.values());
+    public ObservableList<Goal> getGoals(){
+        return (ObservableList<Goal>) goals.values();
     }
 
     /**

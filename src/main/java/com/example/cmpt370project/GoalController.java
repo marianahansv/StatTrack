@@ -2,7 +2,6 @@ package com.example.cmpt370project;
 
 public class GoalController {
     private GoalModel goalModel;
-    //private SuggestionsModel suggestionsModel;
     private GoalView goalView;
 
     /**
