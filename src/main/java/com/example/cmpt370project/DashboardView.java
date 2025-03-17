@@ -225,8 +225,8 @@ public class DashboardView extends BorderPane {
         userHistoryDataModel.setWeeklyCompletedGoals(2);
 
         // Set username to test on the HomeView page
-        userHistoryDataModel.setUserName("HasAPlanFran");
-        historicalChartButton.setOnAction(e -> this.setCenter(historicalChartView)); */
+        userHistoryDataModel.setUserName("HasAPlanFran");*/
+        historicalChartButton.setOnAction(e -> this.setCenter(historicalChartView)); 
     }
 
     /**
