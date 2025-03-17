@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class SuggestionsModel {
     private List<Goal> goals = new ArrayList<>();
     private int timelineSuggestionPlusMinusDays = 10; // +-10 days in completion calculations
+    private int taskBreakdownSuggestionPlusMinusGoals = 3;
     public SuggestionsModel(){}
     public void initializeSuggestionsModel(List<Goal> goals){
         this.goals = goals;
@@ -21,52 +22,71 @@ public class SuggestionsModel {
     /**
     * Generate suggestion based on difficulty!
     * **/
-    public String getDifficultySuggestion(Goal new_goal){
-        //count completed goals by difficulty!
-        Map<String, Long> difficultyCounters = goals.stream().filter(Goal::isCompleted).collect(Collectors.groupingBy(Goal::getDifficulty,Collectors.counting()));
+    public String getDifficultySuggestion(Goal new_goal) {
+        // Count completed goals by difficulty!
+        Map<String, Long> difficultyCounters = goals.stream()
+                .filter(Goal::isCompleted)
+                .collect(Collectors.groupingBy(Goal::getDifficulty, Collectors.counting()));
         long easyGoals = difficultyCounters.getOrDefault("easy", 0L);
         long mediumGoals = difficultyCounters.getOrDefault("medium", 0L);
-        long hardGoals = difficultyCounters.getOrDefault("hard",0L);
-        //count goals by early, ontime, overtime
-        long earlyGoals = goals.stream().filter(goal-> calculateDifferenceInDates(goal) < 0).count();
+        long hardGoals = difficultyCounters.getOrDefault("hard", 0L);
+
+        // Count goals by early, on-time, over-time
+        long earlyGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) < 0).count();
         long ontimeGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) == 0).count();
         long overtimeGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) > 0).count();
 
-        //get most common difficulty
+        // Get the most common difficulty
         String mostCommonDifficulty;
-        if (easyGoals>=mediumGoals && easyGoals >= hardGoals) mostCommonDifficulty = "easy";
-        if (mediumGoals >= easyGoals && mediumGoals >= hardGoals) mostCommonDifficulty = "medium";
+        if (easyGoals >= mediumGoals && easyGoals >= hardGoals) mostCommonDifficulty = "easy";
+        else if (mediumGoals >= easyGoals && mediumGoals >= hardGoals) mostCommonDifficulty = "medium";
         else mostCommonDifficulty = "hard";
 
-        //get most common completion
-        int mostCommonCompletion = (int) Math.max(earlyGoals,Math.max(ontimeGoals,overtimeGoals));
-        //compare new goal to past data and generate suggestions
+        // Get the most common completion status
+        String mostCommonCompletionStatus = "";
+        if (earlyGoals >= Math.max(ontimeGoals, overtimeGoals)) mostCommonCompletionStatus = "early";
+        else if (ontimeGoals >= Math.max(earlyGoals, overtimeGoals)) mostCommonCompletionStatus = "ontime";
+        else if (overtimeGoals >= Math.max(earlyGoals, ontimeGoals)) mostCommonCompletionStatus = "overtime";
+
+        // Compare new goal to past data and generate suggestions
         String newGoalDifficulty = new_goal.getDifficulty();
-        //if user matches thei past behaviour, keep it up!
-        if (newGoalDifficulty.equals(mostCommonDifficulty)){
+
+        // If user matches their past behavior, keep it up!
+        if (newGoalDifficulty.equals(mostCommonDifficulty)) {
             return "Based on your history, this goal is perfect for you! Keep it up :)";
         }
-        //if user takes longer than the deadline
-        if (overtimeGoals == mostCommonCompletion){
-            //we have too many easy goals, suggest making bigger (harder ones)
-            if (newGoalDifficulty.equals("easy") && hardGoals > easyGoals){
-                return "You often delay easy tasks. Consider consolidating " + (int) easyGoals*0.5 + " easy tasks into a bigger one!";
+
+        // If user tends to finish goals late (overtime goals are the most common completion status)
+        if (mostCommonCompletionStatus.equals("overtime")) {
+            if (mostCommonDifficulty.equals("easy")) {
+                return "You often delay easy goals. Consider consolidating " + (int) (easyGoals * 0.5) + " easy goals into a bigger one!";
+            } else if (mostCommonDifficulty.equals("hard")) {
+                return "You often delay hard goals. Consider breaking down " + (int) (hardGoals) + " hard goals into a smaller one!";
             }
-            //otherwise just let them know!
-            return "You tend to delay similar goals. Try grouping smaller tasks!";
+            return "You tend to delay similar goals. Try grouping smaller tasks into bigger ones!";
         }
-        //if user finishes too early
-        if (earlyGoals==mostCommonCompletion){
-            //completes too many easy ones, suggest they keep doing the same
-            if (newGoalDifficulty.equals("hard") && easyGoals > hardGoals){
-                return "You're on fire! You often finish easy goals early. Consider breaking this big goal into smaller ones!";
+
+        // If user finishes goals too early (early goals are the most common completion status)
+        if (mostCommonCompletionStatus.equals("early")) {
+            if (mostCommonDifficulty.equals("easy")) {
+                return "You tend to complete easy goals quickly! It's time to level up ;) Consider a more challenging goal!";
             }
-            //otherwise just let them know!
-            return "You tend to complete goals quickly! It's time to level up ;)";
+            // If the new goal is harder, suggest breaking it down
+            else if (mostCommonDifficulty.equals("hard") && newGoalDifficulty.equals("easy")) {
+                return "You're on fire! You often finish hard goals early. Consider making this a bigger goal!";
+            }
         }
-        //else anything medium should stay the way it is :)
-        return "You've achieved balance! This goal difficulty should be fine! Keep up the good work :D";
+
+        // If goal is medium difficulty, keep it!!
+        if (newGoalDifficulty.equals("medium")) {
+            return "You've achieved balance! This goal difficulty should be fine! Keep up the good work :D";
+        }
+
+        // Default message if no conditions match
+        return "Your goal seems unique. Keep going and refine your strategy as you go!";
     }
+
+
 
     /**
      * Generate suggestion based on timeline!
@@ -115,7 +135,11 @@ public class SuggestionsModel {
     }
 
     //unit testing (this is good to understand how it works!)
+
+
     public static void main(String[] args) {
+
+        //Testing Timeline Suggestions
         // Goal 1: Completed early (suggest subtract days)
         Goal goal1 = new Goal("1", "a", "medium", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 10), true);
         goal1.setCompletionDate(LocalDate.of(2025, 3, 8));  // Completed 2 days early
@@ -161,5 +185,84 @@ public class SuggestionsModel {
         Goal newGoalKeep = new Goal("test3", "b", "medium", LocalDate.of(2025, 3, 10), LocalDate.of(2025, 3, 20), false);
         String timelineSuggestionKeep = suggestionsModel.getTimelineSuggestion(newGoalKeep);
         System.out.println("Keep the Same Days Suggestion: " + timelineSuggestionKeep);
+
+        //Testing Task Breakdown Suggestions
+        // Test Case 1: User completes easy goals late
+        goal1 = new Goal("1", "a", "easy", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 10), true);
+        goal2 = new Goal("2", "a", "easy", LocalDate.of(2025, 2, 5), LocalDate.of(2025, 2, 10), true);
+        goal3 = new Goal("3", "c", "medium", LocalDate.of(2025, 3, 10), LocalDate.of(2025, 3, 20), true);
+        goal1.setCompletionDate(LocalDate.of(2025, 3, 15));  // Late
+        goal2.setCompletionDate(LocalDate.of(2025, 2, 20));  // Late
+        goal3.setCompletionDate(LocalDate.of(2025, 3, 18));  // Late
+
+        List<Goal> goalList1 = new ArrayList<>();
+        goalList1.add(goal1);
+        goalList1.add(goal2);
+        goalList1.add(goal3);
+
+        SuggestionsModel suggestionsModel1 = new SuggestionsModel();
+        suggestionsModel1.initializeSuggestionsModel(goalList1);
+
+        Goal newGoal1 = new Goal("test1", "a", "easy", LocalDate.of(2025, 3, 10), LocalDate.of(2025, 3, 20), false);
+        System.out.println("Test 1 Suggestion: " + suggestionsModel1.getDifficultySuggestion(newGoal1));
+
+        // Test Case 2: User completes easy goals early
+        goal4 = new Goal("4", "b", "easy", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 10), true);
+        Goal goal5 = new Goal("5", "b", "easy", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 10), true);
+        Goal goal6 = new Goal("6", "d", "hard", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 10), true);
+        goal4.setCompletionDate(LocalDate.of(2025, 3, 5));  // Early
+        goal5.setCompletionDate(LocalDate.of(2025, 2, 5));  // Early
+        goal6.setCompletionDate(LocalDate.of(2025, 3, 3));  // Early
+
+        List<Goal> goalList2 = new ArrayList<>();
+        goalList2.add(goal4);
+        goalList2.add(goal5);
+        goalList2.add(goal6);
+
+        SuggestionsModel suggestionsModel2 = new SuggestionsModel();
+        suggestionsModel2.initializeSuggestionsModel(goalList2);
+
+        Goal newGoal2 = new Goal("test2", "d", "hard", LocalDate.of(2025, 3, 10), LocalDate.of(2025, 3, 20), false);
+        System.out.println("Test 2 Suggestion: " + suggestionsModel2.getDifficultySuggestion(newGoal2));
+
+        // Test Case 3: User completes all goals on time and new goal is medium
+        Goal goal7 = new Goal("7", "e", "easy", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 10), true);
+        Goal goal8 = new Goal("8", "f", "medium", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 10), true);
+        Goal goal9 = new Goal("9", "g", "hard", LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 10), true);
+        goal7.setCompletionDate(LocalDate.of(2025, 3, 10));  // On time
+        goal8.setCompletionDate(LocalDate.of(2025, 2, 10));  // On time
+        goal9.setCompletionDate(LocalDate.of(2025, 1, 10));  // On time
+
+        List<Goal> goalList3 = new ArrayList<>();
+        goalList3.add(goal7);
+        goalList3.add(goal8);
+        goalList3.add(goal9);
+
+        SuggestionsModel suggestionsModel3 = new SuggestionsModel();
+        suggestionsModel3.initializeSuggestionsModel(goalList3);
+
+        Goal newGoal3 = new Goal("test3", "g", "medium", LocalDate.of(2025, 3, 10), LocalDate.of(2025, 3, 20), false);
+        System.out.println("Test 3 Suggestion: " + suggestionsModel3.getDifficultySuggestion(newGoal3));
+
+        // Test Case 4: User completes medium and hard goals late, easy goals early
+        Goal goal10 = new Goal("10", "h", "easy", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 10), true);
+        Goal goal11 = new Goal("11", "i", "medium", LocalDate.of(2025, 2, 5), LocalDate.of(2025, 2, 15), true);
+        Goal goal12 = new Goal("12", "j", "hard", LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 10), true);
+        goal10.setCompletionDate(LocalDate.of(2025, 3, 2));  // Early
+        goal11.setCompletionDate(LocalDate.of(2025, 2, 20));  // Late
+        goal12.setCompletionDate(LocalDate.of(2025, 1, 5));  // Late
+
+        List<Goal> goalList4 = new ArrayList<>();
+        goalList4.add(goal10);
+        goalList4.add(goal11);
+        goalList4.add(goal12);
+
+        SuggestionsModel suggestionsModel4 = new SuggestionsModel();
+        suggestionsModel4.initializeSuggestionsModel(goalList4);
+
+        Goal newGoal4 = new Goal("test4", "h", "medium", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 15), false);
+        System.out.println("Test 4 Suggestion: " + suggestionsModel4.getDifficultySuggestion(newGoal4));
     }
+
 }
+
