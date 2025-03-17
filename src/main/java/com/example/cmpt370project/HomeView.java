@@ -377,9 +377,8 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private void handleSuggestions(SuggestionsController s){
         Goal newGoal = getGoalFromInput();
-        String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
-        String taskBreakdownSuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
-        s.handleButtonPress(timelineSuggestion,taskBreakdownSuggestion);
+        String suggestionsInText = s.handleButtonPress(newGoal);
+        suggestionsContentLabel.setText(suggestionsInText);
     }
      /**
      * Helper method to handle the creation of the error alert message
@@ -434,6 +433,7 @@ public class HomeView extends StackPane implements Subscriber {
             }
         }
     }
+
     /**
      * Draws the UI of the Add Goal page.
      */
@@ -462,6 +462,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         //box for suggestions!
         Label sectionLabel = new Label("Your Suggestions, Dani:");
+        sectionLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
         String suggestionsContent = "Click the button to find out!";
         suggestionsContentLabel.setText(suggestionsContent);
 
@@ -469,11 +470,12 @@ public class HomeView extends StackPane implements Subscriber {
         suggestionsBox.setSpacing(10);
         suggestionsBox.setPadding(new Insets(10));
         suggestionsBox.setStyle("-fx-border-color: grey; -fx-border-width: 2px; -fx-background-color: #f9f9f9;");
-        suggestionsBox.getChildren().addAll(sectionLabel, suggestionsContentLabel);
+        suggestionsBox.getChildren().addAll(suggestionsContentLabel);
 
         root.getChildren().addAll(
                 addGoalTitleLabel,
                 addGoalForm,
+                sectionLabel,
                 suggestionsBox
         );
 
