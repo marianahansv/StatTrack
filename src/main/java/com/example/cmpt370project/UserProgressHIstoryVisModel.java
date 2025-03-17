@@ -8,6 +8,7 @@ public class UserProgressHIstoryVisModel extends GoalModel{
     private List<Subscriber> subscribers;
     private String userName;
     private Integer goalsCompletedforDay;
+    public UserHistoryDataModel dataHistoricalModel;
 
     public UserProgressHIstoryVisModel(){
         goals = new HashMap<>();
@@ -66,5 +67,10 @@ public class UserProgressHIstoryVisModel extends GoalModel{
             case "9": return "09";
             default: return null;
         }
+    }
+
+    /* Returns the number of goals completed for that day specifically */
+    public int completedGoals(){
+        return dataHistoricalModel.getDailyCompletedGoals();
     }
 }
