@@ -196,12 +196,12 @@ public class GoalView extends StackPane implements Subscriber {
        
 
 
-        dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
+        dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
         //goalListView.setStyle("-fx-text-fill: red;");
 
         // Add all UI elements to this UI view
 
-        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
+        //root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
         //System.out.println(goalListView.getItems());
         goalListView.getItems();
     
@@ -216,7 +216,8 @@ public class GoalView extends StackPane implements Subscriber {
 
              /**if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
                 goalController.completeGoal(selectedGoal); // Controller not needed
-            } **/
+           
+                } **/
         });
 
 
