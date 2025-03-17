@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
@@ -116,12 +117,36 @@ public class GoalView extends StackPane implements Subscriber {
             
             if (goal.isCompleted()) {
             //setStyle("-fx-text-fill: green;");
-
-            
-
             }
             goalListView.getItems().add(goal);
         }
+
+
+    
+        // Yo Cell Factories are poggers
+    goalListView.setCellFactory(lv -> new ListCell<Goal>() {
+        
+    protected void updateItem(Goal goal, boolean empty) {
+        super.updateItem(goal, empty);
+        if (empty || goal == null) {
+            setText(null);
+            setStyle("");
+        } else {
+            setText(goal.toString());
+            if (goal.isCompleted()) {
+                // Change the text color to green if the goal is complete
+                setStyle("-fx-text-fill: green;");
+            } else if (!goal.isCompleted() && goal.getEndDate().isBefore(LocalDate.now())) {
+                // Change the text color to red if the goal is incomplete and past due
+                setStyle("-fx-text-fill: red;");
+            } else {
+                // Otherwise, use the default text color
+                setStyle("-fx-text-fill: black;");
+            }
+        }
+        }
+        });
+
 
         
 
