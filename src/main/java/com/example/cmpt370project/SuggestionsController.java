@@ -35,12 +35,14 @@ public class SuggestionsController{
 
     /**
      * Handles user choice between accepting suggested changes or not!*/
-    public void handleButtonPress(String timelineSuggestion){
+    public void handleButtonPress(String timelineSuggestion, String taskBreakdownSuggestion){
         //creating a little dialog!
         Alert alert = new Alert(Alert.AlertType.valueOf("CONFIRMATION"));
+        alert.setWidth(200);
+        alert.setHeight(300);
         alert.setTitle("Your Suggestions");
         alert.setHeaderText(null);
-        alert.setContentText(timelineSuggestion);
+        alert.setContentText(timelineSuggestion + "\n" + taskBreakdownSuggestion);
         //ButtonType buttonYesChanges = new ButtonType("Accept Changes");
         //ButtonType buttonNoChanges = new ButtonType("No Changes");
         //alert.getButtonTypes().setAll(buttonYesChanges,buttonNoChanges);

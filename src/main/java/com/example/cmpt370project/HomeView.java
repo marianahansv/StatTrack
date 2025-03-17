@@ -360,7 +360,8 @@ public class HomeView extends StackPane implements Subscriber {
             boolean completed = false; // Why would you add a goal you completed?
             Goal newGoal = new Goal(titleInput.getText(), section, difficulty, startDate, endDate, completed);
             String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
-            s.handleButtonPress(timelineSuggestion);
+            String taskBreakdownSuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
+            s.handleButtonPress(timelineSuggestion, taskBreakdownSuggestion);
             submitGoalButton.setVisible(true);
         });
         clearGoalsButton.setOnAction(c::removeButtonPress);
