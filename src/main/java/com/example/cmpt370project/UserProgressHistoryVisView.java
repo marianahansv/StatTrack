@@ -16,14 +16,19 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
     private UserProgressHIstoryVisModel historicalChartModel;
 
     /**
-     * The view where the pie charts, line charts, scatter plots visualization.
+     * The view where the selection buttons for the charts and the descriptive statistics are placed.
      */
     private UserHIstoryProgressVisuals historicalChartProgress;
 
     /**
+     * The controller that stores some functions that both the view and the model will require.
+     */
+    private UserProgressHistoryController historicalChartController;
+
+    /**
      * Create a historical visualization representation page
      */
-    public UserProgressHistoryVisView(UserProgressHIstoryVisModel historicalChartModel){
+    public UserProgressHistoryVisView(UserProgressHIstoryVisModel historicalChartModel, UserProgressHistoryController historicalChartController) {
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
@@ -33,7 +38,7 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
 
         root.getChildren().add(enterlabel);
         root.setAlignment(Pos.TOP_LEFT);
-        historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartModel);
+        historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartModel, historicalChartController);
         root.getChildren().add(historicalChartProgress);
         this.getChildren().add(root);
     }
@@ -47,6 +52,9 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber{
         this.historicalChartModel = historicalChartModel;
     }
 
+    public void setHistoricalChartController(UserProgressHistoryController historicalChartController){
+        this.historicalChartController = historicalChartController;
+    }
     /**
      * Helps to update the view whenever there are any changes made to the model
      */

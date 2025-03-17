@@ -49,6 +49,10 @@ public class DashboardView extends BorderPane {
      */
     private GoalPlanController goalPlanController;
 
+    /**
+     * The historicalChartController of the application (goes with the historical goal page).
+     */
+    private UserProgressHistoryController historicalChartController;
     // Consider removing this later since it is not really doing anything now
     //private GoalChartController chartController;
 
@@ -76,11 +80,15 @@ public class DashboardView extends BorderPane {
 
     //private GoalProgress goalChartView;
 
-
     /**
      *  The user progress historical visualization page of the application
      */
     private UserProgressHistoryVisView historicalChartView;
+
+    /**
+     * The visualization of the front end UI and the generation of the graphs for the application.
+     */
+    private UserHIstoryProgressVisuals historicalChartProgress;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
@@ -131,13 +139,14 @@ public class DashboardView extends BorderPane {
         homeController = new HomeController();
         goalPlanController = new GoalPlanController();
         chartController = new GoalChartController(goalChartView, goalModel);
+        historicalChartController = new UserProgressHistoryController(historicalChartProgress, historicalChartModel);
 
         // VIEWS
         this.homePage = new HomeView();
         this.goalsPage = new GoalView();
         this.goalPlanPage = new GoalPlanView();
         this.goalVisPage = new GoalVisView(goalModel);
-        this.historicalChartView = new UserProgressHistoryVisView(historicalChartModel);
+        this.historicalChartView = new UserProgressHistoryVisView(historicalChartModel, historicalChartController);
 
         //goalChartView = new GoalProgress(goalModel);
 
