@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SuggestionsModel {
@@ -21,8 +22,50 @@ public class SuggestionsModel {
     * Generate suggestion based on difficulty!
     * **/
     public String getDifficultySuggestion(Goal new_goal){
+        //count completed goals by difficulty!
+        Map<String, Long> difficultyCounters = goals.stream().filter(Goal::isCompleted).collect(Collectors.groupingBy(Goal::getDifficulty,Collectors.counting()));
+        long easyGoals = difficultyCounters.getOrDefault("easy", 0L);
+        long mediumGoals = difficultyCounters.getOrDefault("medium", 0L);
+        long hardGoals = difficultyCounters.getOrDefault("hard",0L);
+        //count goals by early, ontime, overtime
+        long earlyGoals = goals.stream().filter(goal-> calculateDifferenceInDates(goal) < 0).count();
+        long ontimeGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) == 0).count();
+        long overtimeGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) > 0).count();
 
-        return "";
+        //get most common difficulty
+        String mostCommonDifficulty;
+        if (easyGoals>=mediumGoals && easyGoals >= hardGoals) mostCommonDifficulty = "easy";
+        if (mediumGoals >= easyGoals && mediumGoals >= hardGoals) mostCommonDifficulty = "medium";
+        else mostCommonDifficulty = "hard";
+
+        //get most common completion
+        int mostCommonCompletion = (int) Math.max(earlyGoals,Math.max(ontimeGoals,overtimeGoals));
+        //compare new goal to past data and generate suggestions
+        String newGoalDifficulty = new_goal.getDifficulty();
+        //if user matches thei past behaviour, keep it up!
+        if (newGoalDifficulty.equals(mostCommonDifficulty)){
+            return "Based on your history, this goal is perfect for you! Keep it up :)";
+        }
+        //if user takes longer than the deadline
+        if (overtimeGoals == mostCommonCompletion){
+            //we have too many easy goals, suggest making bigger (harder ones)
+            if (newGoalDifficulty.equals("easy") && hardGoals > easyGoals){
+                return "You often delay easy tasks. Consider consolidating " + (int) easyGoals*0.5 + " easy tasks into a bigger one!";
+            }
+            //otherwise just let them know!
+            return "You tend to delay similar goals. Try grouping smaller tasks!";
+        }
+        //if user finishes too early
+        if (earlyGoals==mostCommonCompletion){
+            //completes too many easy ones, suggest they keep doing the same
+            if (newGoalDifficulty.equals("hard") && easyGoals > hardGoals){
+                return "You're on fire! You often finish easy goals early. Consider breaking this big goal into smaller ones!";
+            }
+            //otherwise just let them know!
+            return "You tend to complete goals quickly! It's time to level up ;)";
+        }
+        //else anything medium should stay the way it is :)
+        return "You've achieved balance! This goal difficulty should be fine! Keep up the good work :D";
     }
 
     /**
@@ -71,7 +114,7 @@ public class SuggestionsModel {
         return 0;
     }
 
-    //unit testing
+    //unit testing (this is good to understand how it works!)
     public static void main(String[] args) {
         // Goal 1: Completed early (suggest subtract days)
         Goal goal1 = new Goal("1", "a", "medium", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 10), true);
