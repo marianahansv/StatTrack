@@ -98,6 +98,10 @@ public class Goal {
     public LocalDate getCompletionDate(){
         return this.completionDate;
     }
+    //for testing purposes
+    public void setCompletionDate(LocalDate completionDate){
+        this.completionDate = completionDate;
+    }
     private void updateCompletionDate(LocalDate now){
         this.completionDate = now;
     }
