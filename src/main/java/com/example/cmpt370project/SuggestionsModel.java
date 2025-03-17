@@ -10,8 +10,7 @@ import java.util.stream.Collectors;
 
 public class SuggestionsModel {
     private List<Goal> goals = new ArrayList<>();
-    private int timelineSuggestionPlusMinusDays = 10; // +-10 days in completion calculations
-    private int taskBreakdownSuggestionPlusMinusGoals = 3;
+    private int timelineSuggestionPlusMinusDays = 5; // +-10 days in completion calculations
     public SuggestionsModel(){}
     public void initializeSuggestionsModel(List<Goal> goals){
         this.goals = goals;
@@ -23,116 +22,136 @@ public class SuggestionsModel {
     * Generate suggestion based on difficulty!
     * **/
     public String getDifficultySuggestion(Goal new_goal) {
-        // Count completed goals by difficulty!
+        // Count completed goals by difficulty
         Map<String, Long> difficultyCounters = goals.stream()
                 .filter(Goal::isCompleted)
                 .collect(Collectors.groupingBy(Goal::getDifficulty, Collectors.counting()));
+
         long easyGoals = difficultyCounters.getOrDefault("easy", 0L);
         long mediumGoals = difficultyCounters.getOrDefault("medium", 0L);
         long hardGoals = difficultyCounters.getOrDefault("hard", 0L);
 
-        // Count goals by early, on-time, over-time
+        // Count goals by early, on-time, over-time based on actual dates
         long earlyGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) < 0).count();
         long ontimeGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) == 0).count();
         long overtimeGoals = goals.stream().filter(goal -> calculateDifferenceInDates(goal) > 0).count();
 
-        // Get the most common difficulty
-        String mostCommonDifficulty;
-        if (easyGoals >= mediumGoals && easyGoals >= hardGoals) mostCommonDifficulty = "easy";
-        else if (mediumGoals >= easyGoals && mediumGoals >= hardGoals) mostCommonDifficulty = "medium";
-        else mostCommonDifficulty = "hard";
-
-        // Get the most common completion status
-        String mostCommonCompletionStatus = "";
-        if (earlyGoals >= Math.max(ontimeGoals, overtimeGoals)) mostCommonCompletionStatus = "early";
-        else if (ontimeGoals >= Math.max(earlyGoals, overtimeGoals)) mostCommonCompletionStatus = "ontime";
-        else if (overtimeGoals >= Math.max(earlyGoals, ontimeGoals)) mostCommonCompletionStatus = "overtime";
+        // Calculate user tendencies for early, on-time, overtime (just like "average behavior")
+        String mostCommonCompletionStatus = getMostCommonCompletionStatus(earlyGoals, ontimeGoals, overtimeGoals);
 
         // Compare new goal to past data and generate suggestions
         String newGoalDifficulty = new_goal.getDifficulty();
 
-        // If user matches their past behavior, keep it up!
-        if (newGoalDifficulty.equals(mostCommonDifficulty)) {
+        // If user matches their past behavior, encourage them
+        if (newGoalDifficulty.equals(getMostCommonDifficulty(easyGoals, mediumGoals, hardGoals))) {
             return "Based on your history, this goal is perfect for you! Keep it up :)";
         }
 
-        // If user tends to finish goals late (overtime goals are the most common completion status)
+        // Handle specific cases based on goal completion patterns
         if (mostCommonCompletionStatus.equals("overtime")) {
-            if (mostCommonDifficulty.equals("easy")) {
-                return "You often delay easy goals. Consider consolidating " + (int) (easyGoals * 0.5) + " easy goals into a bigger one!";
-            } else if (mostCommonDifficulty.equals("hard")) {
-                return "You often delay hard goals. Consider breaking down " + (int) (hardGoals) + " hard goals into a smaller one!";
-            }
-            return "You tend to delay similar goals. Try grouping smaller tasks into bigger ones!";
+            return handleOvertimeGoals(easyGoals, mediumGoals, hardGoals);
+        } else if (mostCommonCompletionStatus.equals("early")) {
+            return handleEarlyGoals(easyGoals, mediumGoals, hardGoals);
         }
 
-        // If user finishes goals too early (early goals are the most common completion status)
-        if (mostCommonCompletionStatus.equals("early")) {
-            if (mostCommonDifficulty.equals("easy")) {
-                return "You tend to complete easy goals quickly! It's time to level up ;) Consider a more challenging goal!";
-            }
-            // If the new goal is harder, suggest breaking it down
-            else if (mostCommonDifficulty.equals("hard") && newGoalDifficulty.equals("easy")) {
-                return "You're on fire! You often finish hard goals early. Consider making this a bigger goal!";
-            }
-        }
-
-        // If goal is medium difficulty, keep it!!
-        if (newGoalDifficulty.equals("medium")) {
-            return "You've achieved balance! This goal difficulty should be fine! Keep up the good work :D";
-        }
-
-        // Default message if no conditions match
+        // Default message if no clear pattern is found
         return "Your goal seems unique. Keep going and refine your strategy as you go!";
     }
 
+    private String getMostCommonCompletionStatus(long earlyGoals, long ontimeGoals, long overtimeGoals) {
+        if (earlyGoals >= Math.max(ontimeGoals, overtimeGoals)) return "early";
+        else if (ontimeGoals >= Math.max(earlyGoals, overtimeGoals)) return "ontime";
+        else return "overtime";
+    }
 
+    private String getMostCommonDifficulty(long easyGoals, long mediumGoals, long hardGoals) {
+        if (easyGoals >= mediumGoals && easyGoals >= hardGoals) return "easy";
+        else if (mediumGoals >= easyGoals && mediumGoals >= hardGoals) return "medium";
+        else return "hard";
+    }
+
+    private String handleOvertimeGoals(long easyGoals, long mediumGoals, long hardGoals) {
+        // Suggestions for users who tend to finish goals late
+        if (easyGoals > mediumGoals && easyGoals > hardGoals) {
+            return "You tend to delay easy goals. Try to group them into bigger tasks!";
+        } else if (mediumGoals > easyGoals && mediumGoals > hardGoals) {
+            return "You often delay medium goals. Consider breaking them down into smaller chunks!";
+        } else {
+            return "You often delay hard goals. Break them down into smaller tasks for better success!";
+        }
+    }
+
+    private String handleEarlyGoals(long easyGoals, long mediumGoals, long hardGoals) {
+        // Suggestion for early goal completions
+        if (easyGoals > mediumGoals && easyGoals > hardGoals) {
+            return "You tend to finish easy goals too quickly! Consider aiming for more challenging goals!";
+        } else if (mediumGoals > easyGoals && mediumGoals > hardGoals) {
+            return "You finish medium goals early! Time to take on some harder goals!";
+        } else {
+            return "You finish hard goals early! Maybe try making them even bigger or more complex!";
+        }
+    }
 
     /**
      * Generate suggestion based on timeline!
      * **/
     public String getTimelineSuggestion(Goal new_goal){
         long thisGoalDuration = calculateScheduledDaysforGoalCompletion(new_goal);
-        //find similar length goals within a threshold
-        List<Goal> similarGoals = goals.stream().filter(goal -> Math.abs(calculateScheduledDaysforGoalCompletion(goal)-thisGoalDuration) <= timelineSuggestionPlusMinusDays)
-                .toList();
-        //find all deadline vs actual completion date differences in # of days
-        List<Long> allCompletionDifferences = similarGoals.stream().map(this::calculateDifferenceInDates).toList();
-        //calculate average completion difference (this will give the days to add/minus)
-        long averageDays;
-        if (allCompletionDifferences.isEmpty()) averageDays = 0;
-        //sum all completion differences in days and divide by total number of goals
-        else averageDays = (allCompletionDifferences.stream().mapToLong(Long::longValue).sum()) / allCompletionDifferences.size();
 
-        //generate the suggestion!
-        if (Math.abs(averageDays) < 1){
-            return "Based on your history this deadline is great!";
-        } else if (averageDays > 0) {
-            return "Based on your history consider adding " + Math.ceil(averageDays) + " days to your deadline. We want to make sure you complete this goal!";
+        // Find similar goals based on a threshold of scheduled days
+        List<Goal> similarGoals = goals.stream()
+                .filter(goal -> Math.abs(calculateScheduledDaysforGoalCompletion(goal) - thisGoalDuration) <= timelineSuggestionPlusMinusDays)
+                .toList();
+
+        // Find all the differences in the actual completion dates
+        List<Long> allCompletionDifferences = similarGoals.stream().map(this::calculateDifferenceInDates).toList();
+
+        // Calculate the average completion difference
+        long averageDays;
+        if (allCompletionDifferences.isEmpty()) {
+            averageDays = 0;
         } else {
-            return "Based on your history consider subtracting " + Math.abs(Math.ceil(averageDays)) + " days to your deadline. Good job completing those goals!";
+            averageDays = (allCompletionDifferences.stream().mapToLong(Long::longValue).sum()) / allCompletionDifferences.size();
+        }
+
+        System.out.println(averageDays);
+        // Generate the suggestion based on the average difference
+        if (Math.abs(averageDays) < -3) {
+            return "Based on your history, this deadline looks great! Keep it up!";
+        } else if (averageDays > 0) {
+            return "Based on your history, consider adding " + Math.ceil(averageDays) + " days to your deadline to give yourself more flexibility!";
+        } else {
+            // Avoid recommending subtracting time unless it's too easy
+            if (averageDays < -5) {
+                return "Based on your history, you might be able to subtract " + Math.abs(Math.ceil(averageDays)/2) + " days from your deadline. You’ve been completing goals early!";
+            }
+            return "Based on your history, your timeline seems to be working well. You might want to consider sticking to the current deadline!";
         }
     }
+
     /**
-     * Helper method to calculate number of days scheduled to complete a goal
+     * Helper method to calculate number of days scheduled for goal completion
      * (does NOT consider actual completion date)
-     * */
+     */
     private long calculateScheduledDaysforGoalCompletion(Goal goal){
         LocalDate newGoalStartDate = goal.getStartDate();
         LocalDate newGoalEndDate = goal.getEndDate();
-        return ChronoUnit.DAYS.between(newGoalStartDate,newGoalEndDate);
+        return ChronoUnit.DAYS.between(newGoalStartDate, newGoalEndDate);
     }
+
     /**
-     * Helper method to calculate the difference in days between scheduled deadline
+     * Helper method to calculate the difference in days between the scheduled deadline
      * and actual completion date.
-     * */
+     */
     private long calculateDifferenceInDates(Goal goal){
-        if (goal.isCompleted()){
-            return ChronoUnit.DAYS.between(goal.getEndDate(),goal.getCompletionDate());
+        if (goal.isCompleted()) {
+            return ChronoUnit.DAYS.between(goal.getEndDate(), goal.getCompletionDate());
         }
-        //if not completed yet, there's no difference
+        // If not completed yet, there's no difference
         return 0;
     }
+
+
 
     //unit testing (this is good to understand how it works!)
 

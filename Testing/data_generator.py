@@ -86,8 +86,8 @@ def generate_fake_data(n):
         if n >= 0:
             for title in titles:
                 difficulty = random.choice(difficulties)
-                start_date = date.today() + timedelta(days=random.randint(-30, 30))
-                end_date = start_date + timedelta(days=random.randint(1, 30))
+                start_date = date.today() + timedelta(days=random.randint(-60, 60))
+                end_date = start_date + timedelta(days=random.randint(1, 60))
                 completed = random.choice([True, False])  # Randomly decide if the goal is completed
 
                 if completed:
