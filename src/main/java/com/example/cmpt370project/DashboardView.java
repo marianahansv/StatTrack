@@ -166,6 +166,7 @@ public class DashboardView extends BorderPane {
         userHistoryDataModel.addSubscriber(homePage);
         historicalChartModel.addSubscriber(historicalChartView);
 
+
         // ********* 3. Setup controller with each view *********
 
         // HOMEPAGE CONTROLLER

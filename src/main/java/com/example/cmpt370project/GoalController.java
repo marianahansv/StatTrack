@@ -2,7 +2,7 @@ package com.example.cmpt370project;
 
 public class GoalController {
     private GoalModel goalModel;
-    private SuggestionsModel suggestionsModel;
+    //private SuggestionsModel suggestionsModel;
     private GoalView goalView;
 
     /**
@@ -27,7 +27,7 @@ public class GoalController {
      */
     public void completeGoal(Goal goal) {
         goalModel.completeGoal(goal);
-        suggestionsModel.onGoalCompletedUpdate(goal);
+        //suggestionsModel.onGoalCompletedUpdate(goal);
         //System.out.println(55555);
     }
     

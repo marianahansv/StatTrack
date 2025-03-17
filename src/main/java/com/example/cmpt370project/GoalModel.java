@@ -40,9 +40,6 @@ public class GoalModel {
     private String currentFilter = "All"; // Stores the currently selected difficulty filter
     private UserHistoryDataModel userHistoryDataModel;
 
-    
-    
-
     public GoalModel(UserHistoryDataModel userHistoryDataModel){
         //UserHistoryDataModel historyModel = new UserHistoryDataModel();
         this.userHistoryDataModel = userHistoryDataModel;
