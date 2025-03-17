@@ -2,6 +2,7 @@ package com.example.cmpt370project;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
@@ -11,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.time.LocalDate;
@@ -104,6 +106,11 @@ public class UserHIstoryProgressVisuals extends VBox {
      * Scatter chart for the visualization purposes.
      */
     private ScatterChart<String, Integer> scatterChart;
+
+    /**
+     * A VBox to store the descriptive statistics of the user's goals.
+     */
+    private VBox descriptiveStatisticsTable;
 
     /**
      * The month grid on the left-hand side of the page.
@@ -624,9 +631,89 @@ public class UserHIstoryProgressVisuals extends VBox {
         return scatterChart_display;
     }
 
-    private HBox generateDescriptiveStatistics(){
-        HBox descriptiveStatistics_display = new HBox(10);
-        return descriptiveStatistics_display;
+    private VBox generateDescriptiveStatistics(){
+        descriptiveStatisticsTable = new VBox(10);
+
+
+        /* Label for each respective line to ensure that the spacing and all the elements are well-placed */
+        Label introductionL = new Label("These are your achievements so far: ");
+        Label startedGoalsL = new Label("Number of goals created: ");
+        Label easyGoalsL= new Label("Percentage of easy goals: ");
+        Label mediumGoalsL = new Label("Percentage of medium goals: ");
+        Label hardGoalL = new Label("Percentage of hard goals: ");
+        Label generalGoalL = new Label("Percentage of general goals: ");
+        Label fitnessGoalL = new Label("Percentage of fitness goals: ");
+        Label personalGoalL = new Label("Percentage of personal goals: ");
+        Label meanDailyGoalL = new Label("Mean number of goals per day: ");
+
+        /* Working on the styling for the Labels on the left-hand side */
+        colorDescriptiveStatisticsL(introductionL);
+        colorDescriptiveStatisticsL(startedGoalsL);
+        colorDescriptiveStatisticsL(easyGoalsL);
+        colorDescriptiveStatisticsL(mediumGoalsL);
+        colorDescriptiveStatisticsL(hardGoalL);
+        colorDescriptiveStatisticsL(generalGoalL);
+        colorDescriptiveStatisticsL(fitnessGoalL);
+        colorDescriptiveStatisticsL(personalGoalL);
+        colorDescriptiveStatisticsL(meanDailyGoalL);
+
+        /* Creating the HBox and the required responses to the users */
+        HBox introductionHB = new HBox(10);
+        HBox startedGoalsHB = new HBox(10);
+        HBox easyGoalsHB = new HBox(10);
+        HBox mediumGoalsHB = new HBox(10);
+        HBox hardGoalsHB = new HBox(10);
+        HBox generalGoalsHB = new HBox(10);
+        HBox fitnessGoalsHB = new HBox(10);
+        HBox personalGoalsHB = new HBox(10);
+        HBox meanDailyGoalsHB = new HBox(10);
+
+        /* Adding the labels and the calculations to my HBox respectively */
+        introductionHB.getChildren().addAll(introductionL);
+        startedGoalsHB.getChildren().addAll(startedGoalsL);
+        easyGoalsHB.getChildren().addAll(easyGoalsL);
+        mediumGoalsHB.getChildren().addAll(mediumGoalsL);
+        hardGoalsHB.getChildren().addAll(hardGoalL);
+        generalGoalsHB.getChildren().addAll(generalGoalL);
+        fitnessGoalsHB.getChildren().addAll(fitnessGoalL);
+        personalGoalsHB.getChildren().addAll(personalGoalL);
+        meanDailyGoalsHB.getChildren().addAll(meanDailyGoalL);
+
+        HBox[] all_HB = new HBox[]{introductionHB, startedGoalsHB, easyGoalsHB,mediumGoalsHB, hardGoalsHB, generalGoalsHB,
+                                    fitnessGoalsHB, personalGoalsHB, meanDailyGoalsHB};
+        for (HBox oneHB: all_HB){
+            oneHB.setStyle("-fx-alignment: center;");
+        }
+        /* Putting all the elements together into the main descriptive statistics table */
+        descriptiveStatisticsTable.getChildren().addAll(introductionHB, startedGoalsHB, easyGoalsHB, mediumGoalsHB,
+                                                        hardGoalsHB, generalGoalsHB, fitnessGoalsHB, personalGoalsHB,
+                                                        meanDailyGoalsHB);
+
+        descriptiveStatisticsTable.setStyle("-fx-padding: 10px;");
+        descriptiveStatisticsTable.setPadding(new Insets(10));
+        descriptiveStatisticsTable.setAlignment(Pos.CENTER); // TO ensure that the labels are well centered
+        colorDescriptiveStatistics(descriptiveStatisticsTable);
+        getChildren().add(descriptiveStatisticsTable);
+        return descriptiveStatisticsTable;
+    }
+
+    private void colorDescriptiveStatistics(VBox descriptiveStatisticsTable){
+        String colorChosen_DS = colorChosen();
+        String[] shadesofColorDS = colorpreferenceShades(colorChosen_DS);
+        descriptiveStatisticsTable.setStyle("-fx-background-color: " + shadesofColorDS[0] + ";" + "-fx-background-radius: 10px;");
+    }
+
+    private void colorDescriptiveStatisticsL(Label descriptiveStatisticsL){
+        String colorChosen_DS_HB = colorChosen();
+        String[] shadesofColorDS_HB = colorpreferenceShades(colorChosen_DS_HB);
+        descriptiveStatisticsL.setTextFill(Color.WHITE);
+        descriptiveStatisticsL.setFont(Font.font("Sans-serif"));
+        descriptiveStatisticsL.setPrefWidth(Control.USE_COMPUTED_SIZE); // the HBox will only surrond the label now
+        descriptiveStatisticsL.setStyle("-fx-background-color: " + shadesofColorDS_HB[1] + ";" + "-fx-padding: 5px;" +
+                                         "-fx-text-fill: white;" + "-fx-font-size: 14px;" + "-fx-background-radius: 5px;" +
+                                         "-fx-font-weight: bold;");
+        descriptiveStatisticsL.setAlignment(Pos.CENTER);
+
     }
 
     void updatePieCharts(){}
@@ -648,19 +735,19 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private String[] colorpreferenceShades(String colorChosen){
         if (colorChosen.equals("Red")){
-            return new String[]{"#FF6961", "#FF7F7F", "#FF9999", "#FFB3B3", "#FFCCCC", "#FFA0A0", "#F4C1C1", "#FDAAAA",
+            return new String[]{"#FFB3B3","#a32821", "#FF7F7F", "#FF9999","#FFCCCC", "#FFA0A0", "#F4C1C1", "#FDAAAA",
                                 "#EE6969", "#F97C7C"};
         }
         else if (colorChosen.equals("Purple")){
-            return new String[]{"#9F2B68", "#800020", "#702963", "#483248", "#CBC3E3", "#AA98A9", "#915F6D", "#770737",
+            return new String[]{"#AA98A9", "#9F2B68", "#800020", "#702963", "#483248", "#CBC3E3", "#915F6D", "#770737",
                                 "#673147", "#A95C68", "#800080"};
         }
         else if (colorChosen.equals("Orange")){
-            return new String[]{"#FDC883", "#FFE5B4", "#FAD9C4", "#FFD68A", "#FFB52E", "#FF6C8B", "#FFC55C", "#FF9138",
+            return new String[]{"#FDC883", "#b0622a", "#FAD9C4", "#FFD68A", "#FFB52E", "#FF6C8B", "#FFC55C", "#FF9138",
                                 "#FF681F", "#FF681F"};
         }
         // Otherwise, it will be Blue
-        return new String[]{"#A7C7E7", "#CCCCFF", "#B6D0E2", "#96DED1", "#87CEEB", "#89CFF0", "#ADD8E6", "#9ACEEB",
+        return new String[]{"#A7C7E7", "#404073", "#B6D0E2", "#96DED1", "#87CEEB", "#89CFF0", "#ADD8E6", "#9ACEEB",
                             "#B3CEE5", "#6699CC"};
     }
 
