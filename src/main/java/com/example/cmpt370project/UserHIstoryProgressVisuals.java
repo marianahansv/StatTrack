@@ -354,7 +354,7 @@ public class UserHIstoryProgressVisuals extends VBox {
      * to create a visually pleasing experience for the user.
      */
     private void allPreferencesarrangement(){
-        VBox bigcontainer = new VBox(30);
+        VBox bigcontainer = new VBox(20);
 
         /* Two grid boxes for the calendar month and dates */
         /* Create distinct separation between the buttons to add styling on each respectively */
