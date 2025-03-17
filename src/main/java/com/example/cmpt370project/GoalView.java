@@ -41,7 +41,7 @@ public class GoalView extends StackPane implements Subscriber {
     /**
      * The user data model that this view gets goals completed data.
      */
-    private UserHistoryDataModel userHistoryDataModel;
+    private UserHistoryDataModel historyModel;
 
     /**
      * The root of this view.
@@ -62,12 +62,19 @@ public class GoalView extends StackPane implements Subscriber {
     private Button completeGoalButton;
 
     private Button editGoalButton;
+
+    
     
 
     /**
      * Create a new goal view page.
      */
     public GoalView() {
+        /*UserHistoryDataModel historyModel = new UserHistoryDataModel();
+        GoalModel goalModel = new GoalModel(historyModel);
+        goalModel.setUserHistoryDataModel(historyModel);*/
+
+
         root = new VBox();
         root.setSpacing(20);
         root.setPadding(new Insets(20));
@@ -75,7 +82,7 @@ public class GoalView extends StackPane implements Subscriber {
         Label goalsLabel = new Label("My Goals:");
         goalListView = new ListView<>();
         //goalListViewGoal = new ListView<>();goalListViewGoal
-        root.getChildren().addAll(goalsLabel, goalListView );
+        root.getChildren().addAll(goalsLabel, goalListView);
 
         // Add the root UI element to this view
         this.getChildren().add(root);
@@ -106,6 +113,13 @@ public class GoalView extends StackPane implements Subscriber {
         }*/
 
         for (Goal goal : goalModel.getGoals()) {
+            
+            if (goal.isCompleted()) {
+            //setStyle("-fx-text-fill: green;");
+
+            
+
+            }
             goalListView.getItems().add(goal);
         }
 
@@ -131,11 +145,13 @@ public class GoalView extends StackPane implements Subscriber {
             switch(goalPlanModel.getGoalPlanTimeline()) {
                 case DAILY -> {
                     planTimelineString = "DAY";
-                    timelineCompleted = userHistoryDataModel.getDailyCompletedGoals();
+                    timelineCompleted = historyModel.getDailyCompletedGoals();
                 }
                 case WEEKLY -> {
                     planTimelineString = "WEEK";
-                    timelineCompleted = userHistoryDataModel.getWeeklyCompletedGoals();
+                    timelineCompleted = historyModel.getWeeklyCompletedGoals();
+                    System.out.println(timelineCompleted + " 99");
+
                 }
             }
 
@@ -176,12 +192,23 @@ public class GoalView extends StackPane implements Subscriber {
         VBox dashboardControls = new VBox();
         dashboardControls.setAlignment(Pos.TOP_CENTER);
         dashboardControls.setSpacing(5);
+        //goalListView.setStyle("-fx-text-fill: red;");
+       
 
-        dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
+
+        dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
+        //goalListView.setStyle("-fx-text-fill: red;");
 
         // Add all UI elements to this UI view
 
-        root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
+
+        //root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
+        //System.out.println(goalListView.getItems());
+
+        //root.getChildren().addAll(goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
+        //System.out.println(goalListView.getItems());
+
+        goalListView.getItems();
     
         
         completeGoalButton.setOnAction(e -> {
@@ -194,7 +221,8 @@ public class GoalView extends StackPane implements Subscriber {
 
              /**if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
                 goalController.completeGoal(selectedGoal); // Controller not needed
-            } **/
+           
+                } **/
         });
 
 
@@ -207,18 +235,18 @@ public class GoalView extends StackPane implements Subscriber {
             goalModel.updateGoal(selectedGoal.getTitle(), selectedGoal);
             goalModel.notifySubscribers();
             drawEditGoalView(selectedGoal);
-            System.out.println(4);
+            //System.out.println(4);
        });
 
         root.getChildren().addAll(welcomeLabel, dashboardControls);
     }
-    private void drawEditGoalView(Goal goal) {
+    private void drawEditGoalView(Goal goal) { // cant edit twive in a row?
         // Clear current page
         this.getChildren().clear();
 
         SectionModel sectionModel = new SectionModel();
 
-        String OGTitle = (goal.getTitle());
+        
 
         // Create a new VBox to hold the edit form
         VBox editRoot = new VBox(20);
@@ -259,6 +287,7 @@ public class GoalView extends StackPane implements Subscriber {
     
         // Set up the event handler for the Save button
         submitEditButton.setOnAction(e -> {
+            String OGTitle = (goal.getTitle());
             String newTitle = titleField.getText();
             String newDifficulty = editDifficultyComboBox.getValue();
             Toggle selectedToggle = editSectionToggleGroup.getSelectedToggle();
@@ -281,6 +310,10 @@ public class GoalView extends StackPane implements Subscriber {
             goalModel.updateGoal(OGTitle, goal);
             goalModel.notifySubscribers();
             //OGTitle = goal.getTitle();
+
+            historyModel.notifySubscribers();
+            historyModel.completeGoal(LocalDate.now());
+            historyModel.saveDataToFile();
             
             this.getChildren().clear();
             this.getChildren().add(root);
@@ -319,8 +352,9 @@ public class GoalView extends StackPane implements Subscriber {
      */
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
+        goalModel.addSubscriber(this);
 
-        if (userHistoryDataModel != null && goalPlanModel != null) {
+        if (historyModel != null && goalPlanModel != null) {
             modelUpdated();
         }
     }
@@ -332,7 +366,7 @@ public class GoalView extends StackPane implements Subscriber {
     public void setGoalPlanModel(GoalPlanModel gpModel) {
         this.goalPlanModel = gpModel;
 
-        if (userHistoryDataModel != null && goalModel != null) {
+        if (historyModel != null && goalModel != null) {
             modelUpdated();
         }
     }
@@ -341,8 +375,8 @@ public class GoalView extends StackPane implements Subscriber {
      * Set the user data model for this view.
      * @param userHistoryDataModel the user data model for this view.
      */
-    public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
-        this.userHistoryDataModel = userHistoryDataModel;
+    public void setUserHistoryDataModel(UserHistoryDataModel historyModel) {
+        this.historyModel = historyModel;
 
         if (goalPlanModel != null && goalModel != null) {
             modelUpdated();

@@ -1,20 +1,27 @@
 package com.example.cmpt370project;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.chart.*;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.Axis;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.Chart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.layout.VBox;
 
 /*
  * View class for visualizing the progress of goals.
  * This view displays each goal's progress using separate charts.
  */
-public class GoalProgress extends VBox {
+public class GoalProgress extends VBox implements Subscriber {
  /**
      * The goal model that provides goal data.
      */
@@ -46,9 +53,17 @@ public class GoalProgress extends VBox {
      */ 
     public GoalProgress(GoalModel goalModel) {
         this.goalModel = goalModel;
+        //this.goalModel.notifySubscribers();
+        goalModel.addSubscriber(this);
         setupChartSelector();
         setupChart();
         updateChart();  // Initialize with data
+    }
+
+    @Override
+    public void modelUpdated() {
+        // When the model changes, update the chart automatically.
+        updateChart();
     }
 
     /**
@@ -120,6 +135,7 @@ public class GoalProgress extends VBox {
      * @return a PieChart representing the goal's progress.
      */    
     private PieChart createPieChartForGoal(Goal goal) {
+        
         PieChart pieChart = new PieChart();
         pieChart.setTitle(goal.getTitle());
         // Calculate total days, days left, and days completed.
@@ -129,9 +145,32 @@ public class GoalProgress extends VBox {
         long daysCompleted = totalDays - daysLeft;
 
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList(
-            new PieChart.Data("Completed", daysCompleted),
-            new PieChart.Data("Remaining", daysLeft)
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
+        ); //intiializes data and has a default that will work
+
+        if (daysCompleted == 1 && daysLeft != 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Day)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
         );
+        }else if (daysCompleted != 1 && daysLeft == 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Day)", daysLeft)
+        );
+        }else if (daysCompleted == 1 && daysLeft == 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Day)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Day)", daysLeft)
+        );
+        }else if (daysCompleted != 1 && daysLeft != 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
+        );
+        }
+        
         pieChart.setData(data);
         return pieChart;
     }
@@ -160,11 +199,11 @@ public class GoalProgress extends VBox {
  * Each goal gets a separate series with its own start and end data points.
  */
 private void updateLineChart() {
-    goalModel.notifySubscribers();
     // Clear any existing data from the LineChart
     lineChart.getData().clear();
     // Makes the X Axis consistent
     CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
+    Axis<Number> yAxis = (Axis<Number>) lineChart.getYAxis();
     // List to hold dates as categories (so they can overlap and not connect)
     ObservableList<String> categories = FXCollections.observableArrayList();
 
@@ -215,6 +254,8 @@ private void updateLineChart() {
     }
     // Set the sorted categories on the X axis
     xAxis.setCategories(categories);
+    //xAxis.setLabel("Days");
+    yAxis.setLabel("Days Left");
     
     
     // Loop through each goal in the model

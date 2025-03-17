@@ -1,8 +1,10 @@
 package com.example.cmpt370project;
 
-import com.google.gson.*;
-
-import java.io.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +14,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * Holds all data related to the user and their current/previous goa behaviours.
@@ -218,13 +226,18 @@ public class UserHistoryDataModel {
 
         if (currentDate.equals(dataDay)) {
             dailyCompletedGoals += 1;
+            //System.out.println(1);
         }
+        //System.out.println(2);
 
         LocalDate currWeek = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
 
         if (currWeek.equals(dataWeek)) {
             weeklyCompletedGoals += 1;
+            //System.out.println(3);
         }
+        //System.out.println(4);
+        //updateCompletedValues(currentDate);
 
         notifySubscribers();
         saveDataToFile();
