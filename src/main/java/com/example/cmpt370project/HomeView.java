@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -114,6 +113,7 @@ public class HomeView extends StackPane implements Subscriber {
     private final Button createSectionButton;
     private final Button deleteSectionButton;
     private final Button giveMeSuggestionsButton;
+    private final Label suggestionsContentLabel;
 
 
     /**
@@ -172,6 +172,8 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalFormRow2 = new HBox(20);
         addGoalFormRow3 = new HBox(20);
         addGoalForm = new VBox(20);
+
+        suggestionsContentLabel = new Label("");
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
@@ -367,7 +369,7 @@ public class HomeView extends StackPane implements Subscriber {
             changePage(HomeViewPage.HOME);
             resetAddGoalPage();
         } catch (InputMismatchException e){
-            showErrorAlert("Oops!", e.getMessage());
+            showErrorAlert(e.getMessage());
         }
     }
     /**
@@ -382,9 +384,9 @@ public class HomeView extends StackPane implements Subscriber {
      /**
      * Helper method to handle the creation of the error alert message
      * */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
+        alert.setTitle("Oops!");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -406,7 +408,7 @@ public class HomeView extends StackPane implements Subscriber {
         VBox sectionBox = new VBox();
         sectionBox.setSpacing(10);
         sectionBox.setPadding(new Insets(10));
-        sectionBox.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
+        sectionBox.setStyle("-fx-border-color: grey; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
         Label sectionLabel = new Label("Sections:");
         sectionBox.getChildren().addAll(sectionLabel, sectionButtons);
 
@@ -448,7 +450,7 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalFormRow3.getChildren().clear();
         addGoalForm.getChildren().clear();
 
-        //organize add goal UI elements
+        //organize UI elements
         addGoalFormRow1.getChildren().addAll(new Label("Goal Title:"), titleInput, new Label("Sections:"), sectionButtons);
         addGoalFormRow2.getChildren().addAll(new Label("Difficulty:"), difficultyComboBox,
                 new Label("Start Date:"), startDatePicker,
@@ -458,10 +460,23 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalForm.getChildren().addAll(addGoalFormRow1,addGoalFormRow2,addGoalFormRow3);
         titleInput.setPrefWidth(275);
 
+        //box for suggestions!
+        Label sectionLabel = new Label("Your Suggestions, Dani:");
+        String suggestionsContent = "Click the button to find out!";
+        suggestionsContentLabel.setText(suggestionsContent);
+
+        VBox suggestionsBox = new VBox();
+        suggestionsBox.setSpacing(10);
+        suggestionsBox.setPadding(new Insets(10));
+        suggestionsBox.setStyle("-fx-border-color: grey; -fx-border-width: 2px; -fx-background-color: #f9f9f9;");
+        suggestionsBox.getChildren().addAll(sectionLabel, suggestionsContentLabel);
+
         root.getChildren().addAll(
                 addGoalTitleLabel,
-                addGoalForm
+                addGoalForm,
+                suggestionsBox
         );
+
         //selecting general section toggle
         Toggle default_toggle = sectionToggleGroup.getToggles().getFirst();
         for (Toggle t: sectionToggleGroup.getToggles()) {
