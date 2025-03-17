@@ -536,9 +536,9 @@ public class UserHIstoryProgressVisuals extends VBox {
         CategoryAxis x_axis = new CategoryAxis();
         NumberAxis y_axis = new NumberAxis();
         x_axis.setLabel("Date");
-        y_axis.setLabel("Goals Completed Per Day");
+        y_axis.setLabel("Goals Created Per Day");
         lineChart = new LineChart<>(x_axis, y_axis);
-        lineChart.setTitle("Goals Completed Per Day");
+        lineChart.setTitle("Goals Created Per Difficulty Level");
         XYChart.Series<String, Number> easyGoals_LC = new XYChart.Series<>();
         easyGoals_LC.setName("Easy");
         XYChart.Series<String, Number> mediumGoals_LC = new XYChart.Series<>();
@@ -633,11 +633,39 @@ public class UserHIstoryProgressVisuals extends VBox {
     }
 
     /**
-     * The scatter graph displays the number of
-     * @return
+     * The scatter graph displays the number of goals in each categorical level - "Personal", "Fitness", "General"
+     * @return: The scatter graph inside a VBox which is then added onto the display page for the user.
      */
     private VBox drawScatterCharts(){
         VBox scatterChart_display = new VBox(10);
+
+        /* Adding all the basic elements of the scatter chart together */
+        CategoryAxis x_axis = new CategoryAxis();
+        NumberAxis y_axis = new NumberAxis();
+        x_axis.setLabel("Date");
+        y_axis.setLabel("Goals Created Per Day");
+        ScatterChart<String, Number> scatterChart = new ScatterChart<>(x_axis, y_axis);
+        scatterChart.setTitle("Goals Created Per Category");
+
+        XYChart.Series<String, Number> personalGoals = new XYChart.Series<>();
+        personalGoals.setName("Personal Goals");
+        XYChart.Series<String, Number> fitnessGoals = new XYChart.Series<>();
+        fitnessGoals.setName("Fitness Goals");
+        XYChart.Series<String, Number> generalGoals = new XYChart.Series<>();
+        generalGoals.setName("General Goals");
+
+        LocalDate startFormatDate_SC = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_SC = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+
+        List<Goal> filt_personalGoal_SC = filteredGoalList(historicalChartModel.personalGoals(), startFormatDate_SC, endFormatDate_SC);
+        List<Goal> filt_fitnessGoal_SC = filteredGoalList(historicalChartModel.fitnessGoals(), startFormatDate_SC, endFormatDate_SC);
+        List<Goal> filt_generalGoal_SC = filteredGoalList(historicalChartModel.generalGoals(), startFormatDate_SC, endFormatDate_SC);
+
+
+        scatterChart_display.getChildren().add(scatterChart);
+        getChildren().add(scatterChart_display);
         return scatterChart_display;
     }
 
