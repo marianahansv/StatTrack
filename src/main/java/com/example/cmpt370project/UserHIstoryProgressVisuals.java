@@ -15,7 +15,10 @@ import javafx.scene.text.Text;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -523,12 +526,67 @@ public class UserHIstoryProgressVisuals extends VBox {
         y_axis.setLabel("Goals Completed Per Day");
         LineChart<String, Number> lineChart = new LineChart<>(x_axis, y_axis);
         lineChart.setTitle("Goals Completed Per Day");
+        XYChart.Series<String, Number> easyGoals_LC = new XYChart.Series<>();
+        easyGoals_LC.setName("Easy");
+        XYChart.Series<String, Number> mediumGoals_LC = new XYChart.Series<>();
+        mediumGoals_LC.setName("Medium");
+        XYChart.Series<String, Number> hardGoals_LC = new XYChart.Series<>();
+        hardGoals_LC.setName("Hard");
 
-        /* Adding all the elements into hte VBox */
+        easyGoals_LC.getData().clear();
+        mediumGoals_LC.getData().clear();
+        hardGoals_LC.getData().clear();
+
+        /* Deriving all the required calculations to build our line chart accurately */
+        LocalDate startFormatDate_LC = dateFormatting(historicalChartController.getStartYear(),
+                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
+        LocalDate endFormatDate_LC = dateFormatting(historicalChartController.getEndYear(),
+                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
+        List<Goal> filt_easyGoals_LC= filteredGoalList(historicalChartModel.easyGoals(), startFormatDate_LC, endFormatDate_LC);
+        List<Goal> filt_mediumGoals_LC = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate_LC, endFormatDate_LC);
+        List<Goal> filt_hardGoals_LC = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate_LC, endFormatDate_LC);
+
+        /* Counting each of the goals per day based on the creation dates */
+        Map<LocalDate, Integer> easyGoalsCount = new TreeMap<>();
+        Map<LocalDate, Integer> mediumGoalsCount = new TreeMap<>();
+        Map<LocalDate, Integer> hardGoalsCount = new TreeMap<>();
+
+        for (Goal easyGoals: filt_easyGoals_LC){
+            easyGoalsCount.put(easyGoals.getStartDate(), easyGoalsCount.getOrDefault(easyGoals.getStartDate(), 0) + 1);
+        }
+        for (Goal mediumGoals: filt_mediumGoals_LC){
+            mediumGoalsCount.put(mediumGoals.getStartDate(), mediumGoalsCount.getOrDefault(mediumGoals.getStartDate(), 0) + 1);
+        }
+        for (Goal hardGoals: filt_hardGoals_LC){
+            hardGoalsCount.put(hardGoals.getStartDate(), hardGoalsCount.getOrDefault(hardGoals.getStartDate(), 0) + 1);
+        }
+
+        /* Adding the data into our chart */
+        for (Map.Entry<LocalDate, Integer> entry: easyGoalsCount.entrySet()){
+            easyGoals_LC.getData().add(new XYChart.Data<>(entry.getKey().toString(), entry.getValue()));
+        }
+        for (Map.Entry<LocalDate, Integer> entry: mediumGoalsCount.entrySet()){
+            mediumGoals_LC.getData().add(new XYChart.Data<>(entry.getKey().toString(), entry.getValue()));
+        }
+        for (Map.Entry<LocalDate, Integer> entry: hardGoalsCount.entrySet()){
+            hardGoals_LC.getData().add(new XYChart.Data<>(entry.getKey().toString(), entry.getValue()));
+        }
+
+        lineChart.getData().addAll(easyGoals_LC, mediumGoals_LC, hardGoals_LC);
+
+        /* Adding all the elements into the VBox */
         lineChart_display.getChildren().add(lineChart);
         lineChart_display.setAlignment(Pos.CENTER);
         getChildren().add(lineChart_display);
+
+        colorLineChart(lineChart);
         return lineChart_display;
+    }
+
+    private void colorLineChart(LineChart lineChart) {
+        String colorChosen_LC = colorChosen();
+        String[] shadesofColor_LC = colorpreferenceShades(colorChosen_LC);
+        int current_index_LC = 0;
     }
 
     private VBox drawScatterCharts(){
@@ -585,11 +643,19 @@ public class UserHIstoryProgressVisuals extends VBox {
         return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + day, format);
     }
 
-
+    /**
+     * The method is used to filter out all the goals based on the starting and ending dates that the user picks. It can
+     * be used by all the graphs - Pie Chart, Line Graphs and Scatter Charts.
+     * @param goals: The list of goals in the user's computer
+     * @param startDate: The starting date of the goals we want to assess
+     * @param endDate: The ending date of the goals we want to assess
+     * @return: A list of goals that belong to a specific timeframe given the start date and the end date by the user.
+     */
     private List<Goal> filteredGoalList(List<Goal> goals, LocalDate startDate, LocalDate endDate){
         return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) &&
                                                         !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
     }
+
 
     /**
      * This function focuses on the arrangement and the display of the graphs. If a specific option of the graphs is
