@@ -580,6 +580,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         getChildren().add(lineChart_display);
 
         colorLineChart(lineChart);
+        lineChart.setLegendVisible(false);
         return lineChart_display;
     }
 
