@@ -88,13 +88,22 @@ def generate_fake_data(n):
                 difficulty = random.choice(difficulties)
                 start_date = date.today() + timedelta(days=random.randint(-30, 30))
                 end_date = start_date + timedelta(days=random.randint(1, 30))
+                completed = random.choice([True, False])  # Randomly decide if the goal is completed
 
+                if completed:
+                    completion_date = start_date + timedelta(days=random.randint(0, (end_date - start_date).days))  # Random completion date
+                else:
+                    completion_date = None
+
+                # Goal data including completion status and completion date
                 goal = {
                     "title": title,
                     "section": section,
                     "difficulty": difficulty,
                     "startDate": start_date.strftime("%Y-%m-%d"),
                     "endDate": end_date.strftime("%Y-%m-%d"),
+                    "completed": completed,
+                    "completionDate": completion_date.strftime("%Y-%m-%d") if completed else None,
                 }
                 goals.append(goal)
         n -= 1
