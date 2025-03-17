@@ -1,17 +1,25 @@
 
 package com.example.cmpt370project;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import com.google.gson.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializer;
 
 /**
  * The GoalModel holds all the Goals data in the application. It handles the CRUD operations, and
@@ -28,10 +36,15 @@ public class GoalModel {
      * The subscriber list (i.e. the view), which will update when the view changes.
      */
     private List<Subscriber> subscribers;
-
     private String currentFilter = "All"; // Stores the currently selected difficulty filter
+    private UserHistoryDataModel userHistoryDataModel;
 
-    public GoalModel(){
+    
+    
+
+    public GoalModel(UserHistoryDataModel userHistoryDataModel){
+        //UserHistoryDataModel historyModel = new UserHistoryDataModel();
+        this.userHistoryDataModel = userHistoryDataModel;
         goals = new HashMap<>();
         subscribers = new ArrayList<Subscriber>();
         load_goals_from_file();
@@ -51,6 +64,11 @@ public class GoalModel {
         save_goals_to_file();
         notifySubscribers();
     }
+
+    public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
+        this.userHistoryDataModel = userHistoryDataModel;
+    }
+    
 
     /**
      * Create a new goal and add it to the dictionary.
@@ -145,8 +163,17 @@ public class GoalModel {
     public void completeGoal(Goal goal) {
         goal.setCompleted(true);
         //System.out.println(1111111);
-        notifySubscribers(); // Make sure the view refreshes
+        // notifySubscribers(); // Make sure the view refreshes
         updateGoal(goal.getTitle(), goal);
+        /*userHistoryDataModel = new UserHistoryDataModel(); //instantiates UH
+        System.out.println(userHistoryDataModel.getDailyCompletedGoals());
+        userHistoryDataModel.completeGoal(LocalDate.now()); //UH is updated
+        System.out.println(userHistoryDataModel.getDailyCompletedGoals());
+        userHistoryDataModel.notifySubscribers(); */
+        userHistoryDataModel.completeGoal(LocalDate.now());
+        userHistoryDataModel.saveDataToFile();
+        userHistoryDataModel.notifySubscribers();
+        notifySubscribers();
         //save_goals_to_file();
         //deleteGoal(goal.getTitle());
         
@@ -263,7 +290,10 @@ public class GoalModel {
 
     // Unit Testing :)
     public static void main(String[] args) {
-        GoalModel model = new GoalModel();
+
+       /*  UserHistoryDataModel userHistoryDataModel;
+        this.userHistoryDataModel = userHistoryDataModel;
+        GoalModel model = new GoalModel(userHistoryDataModel);
         // Create some goals
         Goal goal1 = new Goal("Run a marathon", "Fitness", "Hard",
                 LocalDate.of(2025, 2, 1), LocalDate.of(2025, 6, 1), false);
@@ -293,11 +323,13 @@ public class GoalModel {
 
         //test save_to_file and load_from_file (saving should have happened when adding/updating goals)
         System.out.println("Goals loaded from file:");
-        GoalModel emptyModel = new GoalModel();
+        GoalModel emptyModel = new GoalModel(userHistoryDataModel);
         for (Goal goal: emptyModel.getGoals()) {
             System.out.println(goal.toString());
-        }
+        }*/
     }
+
+
 
 }
 

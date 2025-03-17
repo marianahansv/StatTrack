@@ -121,10 +121,11 @@ public class DashboardView extends BorderPane {
         // ********* 1. Create all the MVC components *********
 
         // MODElS
-        goalModel = new GoalModel();
+       
         goalPlanModel = new GoalPlanModel();
         historicalChartModel = new UserProgressHIstoryVisModel();
-        userHistoryDataModel = new UserHistoryDataModel();
+        userHistoryDataModel = new UserHistoryDataModel(); 
+        goalModel = new GoalModel(userHistoryDataModel);
 
         // CONTROLLERS
         homeController = new HomeController();
@@ -211,12 +212,12 @@ public class DashboardView extends BorderPane {
         // Here is where we can manually set data to show for testing/demo purposes!!
 
         // Set completed goals to test on GoalPlan page
-        userHistoryDataModel.setDailyCompletedGoals(12);
+        /* userHistoryDataModel.setDailyCompletedGoals(12);
         userHistoryDataModel.setWeeklyCompletedGoals(2);
 
         // Set username to test on the HomeView page
         userHistoryDataModel.setUserName("HasAPlanFran");
-        historicalChartButton.setOnAction(e -> this.setCenter(historicalChartView));
+        historicalChartButton.setOnAction(e -> this.setCenter(historicalChartView)); */
     }
 
     /**
