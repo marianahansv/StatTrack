@@ -131,8 +131,8 @@ public class DashboardView extends BorderPane {
         // MODElS
        
         goalPlanModel = new GoalPlanModel();
-        historicalChartModel = new UserProgressHIstoryVisModel();
         userHistoryDataModel = new UserHistoryDataModel(); 
+        historicalChartModel = new UserProgressHIstoryVisModel(userHistoryDataModel);
         goalModel = new GoalModel(userHistoryDataModel);
 
         // CONTROLLERS
