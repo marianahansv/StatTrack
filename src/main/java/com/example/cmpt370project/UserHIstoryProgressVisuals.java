@@ -98,7 +98,7 @@ public class UserHIstoryProgressVisuals extends VBox {
     /**
      * Linechart for the visualization purposes.
      */
-    private LineChart<String, Integer> lineChart;
+    private LineChart<String, Number> lineChart;
 
     /**
      * Scatter chart for the visualization purposes.
@@ -524,7 +524,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         NumberAxis y_axis = new NumberAxis();
         x_axis.setLabel("Date");
         y_axis.setLabel("Goals Completed Per Day");
-        LineChart<String, Number> lineChart = new LineChart<>(x_axis, y_axis);
+        lineChart = new LineChart<>(x_axis, y_axis);
         lineChart.setTitle("Goals Completed Per Day");
         XYChart.Series<String, Number> easyGoals_LC = new XYChart.Series<>();
         easyGoals_LC.setName("Easy");
@@ -575,7 +575,7 @@ public class UserHIstoryProgressVisuals extends VBox {
         lineChart.getData().addAll(easyGoals_LC, mediumGoals_LC, hardGoals_LC);
 
         /* Adding all the elements into the VBox */
-        lineChart_display.getChildren().add(lineChart);
+        lineChart_display.getChildren().addAll(lineChart, curatedLegendLineChart());
         lineChart_display.setAlignment(Pos.CENTER);
         getChildren().add(lineChart_display);
 
@@ -587,6 +587,35 @@ public class UserHIstoryProgressVisuals extends VBox {
         String colorChosen_LC = colorChosen();
         String[] shadesofColor_LC = colorpreferenceShades(colorChosen_LC);
         int current_index_LC = 0;
+        for (Object series: lineChart.getData()){
+            XYChart.Series<String, Number> series_LC = (XYChart.Series<String, Number>) series;
+            for (XYChart.Data<String, Number> data: series_LC.getData()){
+                String colorObserved = shadesofColor_LC[current_index_LC % shadesofColor_LC.length];
+                Node node = data.getNode();
+                node.setStyle("-fx-background-color: " + colorObserved + ";");
+                current_index_LC++;
+            }
+        }
+    }
+
+    private HBox curatedLegendLineChart(){
+        String colorChosen_LC = colorChosen();
+        String[] shadesofColor_LC = colorpreferenceShades(colorChosen_LC);
+        /* Working on the legend box of pie chart to make sure that the color alignment matches well */
+        /* Working with the default one is tricky - we will hide the default one and only show our created */
+        /* legend box instead to the user. */
+        HBox curatedLegend_LC = new HBox(10);
+        int current_index_again_LC = 0;
+        for (Object series: lineChart.getData()){
+            XYChart.Series<String, Number> series_LC = (XYChart.Series<String, Number>) series;
+            Rectangle colorbox_LC = new Rectangle(20, 20); // Square to store the color
+            colorbox_LC.setFill(Color.web(shadesofColor_LC[current_index_again_LC % shadesofColor_LC.length]));
+            Text label_info = new Text(series_LC.getName());
+            curatedLegend_LC.getChildren().addAll(colorbox_LC, label_info);
+            current_index_again_LC ++;
+        }
+        curatedLegend_LC.setAlignment(Pos.CENTER);
+        return curatedLegend_LC;
     }
 
     private VBox drawScatterCharts(){
