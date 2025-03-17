@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class SuggestionsModel {
     private List<Goal> goals = new ArrayList<>();
-    private int timelineSuggestionPlusMinusDays = 5; // +-5 days in completion calculations
+    private int timelineSuggestionPlusMinusDays = 10; // +-10 days in completion calculations
     public SuggestionsModel(){}
     public void initializeSuggestionsModel(List<Goal> goals){
         this.goals = goals;
