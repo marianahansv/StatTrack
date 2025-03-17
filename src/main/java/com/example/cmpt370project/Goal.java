@@ -92,6 +92,7 @@ public class Goal {
     }
     public void setCompleted(boolean completed) {
         this.completed = completed;
+
     }
 
 //    /**

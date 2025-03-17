@@ -45,7 +45,6 @@ public class HomeController {
 
     }
 
-
     /**
      * Handles making the model change when the user clears their goals using the button.
      * @param actionEvent the event that happens when the button is pressed.

@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class GoalModel {
     private static final String FILE_NAME = System.getProperty("user.home") + "/GoalApplication/goals.json";
+
     private HashMap<String, Goal> goals;
     private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
@@ -89,10 +90,6 @@ public class GoalModel {
         save_goals_to_file();
         notifySubscribers();
     }
-
-
-  
-    
 
     /**
      * Update an existing goal by replacing the goal with the same title.
