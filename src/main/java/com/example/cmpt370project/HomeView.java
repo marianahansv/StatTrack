@@ -98,11 +98,16 @@ public class HomeView extends StackPane implements Subscriber {
     private String currentGreeting;
 
     // ********* ADD GOAL PAGE ELEMENTS *********
+    private final Label addGoalTitleLabel;
     private final TextField titleInput;
     private final Button cancelAddGoalButton;
     private final Button submitGoalButton;
     private final ComboBox<String> difficultyComboBox;
     private HBox sectionButtons;
+    private HBox addGoalFormRow1;
+    private HBox addGoalFormRow2;
+    private HBox addGoalFormRow3;
+    private VBox addGoalForm;
     private ToggleGroup sectionToggleGroup;
     private final DatePicker startDatePicker;
     private final DatePicker endDatePicker;
@@ -151,6 +156,9 @@ public class HomeView extends StackPane implements Subscriber {
         userGreeting.setText(currentGreeting + ", User! Let's complete some goals.");
 
         // Add goal page elements
+        addGoalTitleLabel = new Label("Add a Goal!");
+        addGoalTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
         submitGoalButton = new Button("Add Goal");
         giveMeSuggestionsButton = new Button("Give me suggestions");
 
@@ -159,6 +167,11 @@ public class HomeView extends StackPane implements Subscriber {
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
         difficultyComboBox.setValue("Medium"); //default value
+
+        addGoalFormRow1 = new HBox(20);
+        addGoalFormRow2 = new HBox(20);
+        addGoalFormRow3 = new HBox(20);
+        addGoalForm = new VBox(20);
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
@@ -323,50 +336,59 @@ public class HomeView extends StackPane implements Subscriber {
     public void setupEvents(HomeController c, SuggestionsController s) {
         // ********* HOME PAGE EVENTS *********
         // No events needed for the home page yet.
+
         // ********* ADD GOAL PAGE EVENTS *********
         //pulling data from input fields
-        submitGoalButton.setOnAction(e -> {
-            // Handle the submission of a new goal (pass to the controller)
-            //handle any user input errors if exceptions are thrown by the controller
-            try {
-                String difficulty = difficultyComboBox.getValue();
-                Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
-                String section;
-                section = ((ToggleButton) selectedToggle).getText();
-                LocalDate startDate = startDatePicker.getValue();
-                LocalDate endDate = endDatePicker.getValue();
-                boolean completed = false; // Why would you add a goal you completed?
-                c.handleButtonPressValidateInput(e, titleInput.getText(), section, difficulty, startDate, endDate, completed);
-                c.handleGoalSubmissionButton(titleInput.getText(), section, difficulty, startDate, endDate, completed);
-                changePage(HomeViewPage.HOME); // Return to the summary page after submission
-                resetAddGoalPage();
-            } catch (InputMismatchException error){
-                // Display error message
-                Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
-                alert.setTitle("Input Error");
-                alert.setHeaderText(null);
-                alert.setContentText(error.getMessage());
-                alert.showAndWait();
-            }
-        });
-        //guys this is so monkey code I'll fix it later <3
-        giveMeSuggestionsButton.setOnAction(e -> {
-            String difficulty = difficultyComboBox.getValue();
-            Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
-            String section;
-            section = ((ToggleButton) selectedToggle).getText();
-            LocalDate startDate = startDatePicker.getValue();
-            LocalDate endDate = endDatePicker.getValue();
-            boolean completed = false; // Why would you add a goal you completed?
-            Goal newGoal = new Goal(titleInput.getText(), section, difficulty, startDate, endDate, completed);
-            String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
-            String taskBreakdownSuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
-            s.handleButtonPress(timelineSuggestion, taskBreakdownSuggestion);
-            submitGoalButton.setVisible(true);
-        });
+        submitGoalButton.setOnAction(e -> handleGoalSubmission(c));
+        giveMeSuggestionsButton.setOnAction(e -> handleSuggestions(s));
         clearGoalsButton.setOnAction(c::removeButtonPress);
     }
 
+    /**
+     * Helper method that handles getting goal from user input to pass it to the controller
+    **/
+    private Goal getGoalFromInput() {
+        String difficulty = difficultyComboBox.getValue();
+        Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
+        String section = selectedToggle != null ? ((ToggleButton) selectedToggle).getText() : "Uncategorized";
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+        return new Goal(titleInput.getText(), section, difficulty, startDate, endDate, false);
+    }
+
+    /**
+     * Method to encapsulate logic to give user input data to the home controller
+    */
+    private void handleGoalSubmission(HomeController c){
+        try {
+            Goal newGoal = getGoalFromInput();
+            c.handleButtonPressValidateInput(null, newGoal.getTitle(),newGoal.getSection(),newGoal.getDifficulty(),newGoal.getStartDate(),newGoal.getEndDate(),newGoal.isCompleted());
+            c.handleGoalSubmissionButton(newGoal.getTitle(),newGoal.getSection(),newGoal.getDifficulty(),newGoal.getStartDate(),newGoal.getEndDate(),newGoal.isCompleted());
+            changePage(HomeViewPage.HOME);
+            resetAddGoalPage();
+        } catch (InputMismatchException e){
+            showErrorAlert("Oops!", e.getMessage());
+        }
+    }
+    /**
+     * Method to encapsulate logic to give user input data to the suggestions controller
+     */
+    private void handleSuggestions(SuggestionsController s){
+        Goal newGoal = getGoalFromInput();
+        String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
+        String taskBreakdownSuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
+        s.handleButtonPress(timelineSuggestion,taskBreakdownSuggestion);
+    }
+     /**
+     * Helper method to handle the creation of the error alert message
+     * */
+    private void showErrorAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
     private void resetAddGoalPage(){
         titleInput.clear();
         difficultyComboBox.setValue("Medium");
@@ -415,17 +437,30 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private void drawAddGoalView() {
         VBox root = new VBox();
+        root.setPadding(new Insets(30));
         root.setAlignment(Pos.TOP_LEFT);
-        root.setSpacing(20);
-        root.setPadding(new Insets(20));
+        root.setSpacing(30);
         this.getChildren().add(root);
-        root.getChildren().addAll(
-                new Label("Goal Title:"), titleInput,
-                new Label("Sections:"), sectionButtons,
-                new Label("Difficulty:"), difficultyComboBox,
+
+        //clear to avoid dupes
+        addGoalFormRow1.getChildren().clear();
+        addGoalFormRow2.getChildren().clear();
+        addGoalFormRow3.getChildren().clear();
+        addGoalForm.getChildren().clear();
+
+        //organize add goal UI elements
+        addGoalFormRow1.getChildren().addAll(new Label("Goal Title:"), titleInput, new Label("Sections:"), sectionButtons);
+        addGoalFormRow2.getChildren().addAll(new Label("Difficulty:"), difficultyComboBox,
                 new Label("Start Date:"), startDatePicker,
-                new Label("End Date:"), endDatePicker,
-                submitGoalButton, cancelAddGoalButton, giveMeSuggestionsButton
+                new Label("End Date:"), endDatePicker);
+        addGoalFormRow3.getChildren().addAll(giveMeSuggestionsButton, submitGoalButton, cancelAddGoalButton);
+
+        addGoalForm.getChildren().addAll(addGoalFormRow1,addGoalFormRow2,addGoalFormRow3);
+        titleInput.setPrefWidth(275);
+
+        root.getChildren().addAll(
+                addGoalTitleLabel,
+                addGoalForm
         );
         //selecting general section toggle
         Toggle default_toggle = sectionToggleGroup.getToggles().getFirst();
@@ -434,7 +469,6 @@ public class HomeView extends StackPane implements Subscriber {
             else {t.setSelected(false);}
 
         }
-        submitGoalButton.setVisible(false);
     }
 
     /**
