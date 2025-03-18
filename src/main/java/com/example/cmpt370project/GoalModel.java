@@ -285,6 +285,19 @@ public class GoalModel {
         return filteredGoals;
     }
 
+    /**
+     * Deletes all goals belonging to a specific section.
+     * Ensures goals are removed from memory and JSON file.
+     * @param section The section whose goals need to be deleted.
+     */
+    public void deleteGoalsInSection(String section) {
+        boolean removed = goals.entrySet().removeIf(entry -> entry.getValue().getSection().equalsIgnoreCase(section));
+
+        if (removed) {
+            save_goals_to_file();
+            notifySubscribers();
+        }
+    }
 
     /**
      * Notify the subscribers of this model that the data has changed.

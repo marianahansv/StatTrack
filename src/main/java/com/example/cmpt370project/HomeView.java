@@ -1,16 +1,17 @@
 package com.example.cmpt370project;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -45,10 +46,12 @@ public class HomeView extends StackPane implements Subscriber {
      * The root of this view.
      */
     private VBox root;
+
     /**
      * All the possible pages of the home view.
      */
     private enum HomeViewPage {HOME, ADD_GOAL}
+
     /**
      * The current page that the home view should show.
      */
@@ -98,17 +101,23 @@ public class HomeView extends StackPane implements Subscriber {
     private String currentGreeting;
 
     // ********* ADD GOAL PAGE ELEMENTS *********
+    private final Label addGoalTitleLabel;
     private final TextField titleInput;
     private final Button cancelAddGoalButton;
     private final Button submitGoalButton;
     private final ComboBox<String> difficultyComboBox;
-    private HBox sectionButtons;
+    private FlowPane sectionButtons;
+    private HBox addGoalFormRow1;
+    private HBox addGoalFormRow2;
+    private HBox addGoalFormRow3;
+    private VBox addGoalForm;
     private ToggleGroup sectionToggleGroup;
     private final DatePicker startDatePicker;
     private final DatePicker endDatePicker;
     private final Button createSectionButton;
     private final Button deleteSectionButton;
     private final Button giveMeSuggestionsButton;
+    private final Label suggestionsContentLabel;
 
 
     /**
@@ -121,22 +130,29 @@ public class HomeView extends StackPane implements Subscriber {
      */
     public HomeView() {
         root = new VBox();
-        // Home page element
+        // Load the CSS file
+        this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
+
+        // Home page elements
         addGoalButton = new Button("Add Goal");
+        addGoalButton.getStyleClass().add("button");
+        addGoalButton.getStyleClass().add("add-goal-button");
+
         welcomeLabel = new Label("Welcome to Your Personal Goal Tracker!");
-        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+        welcomeLabel.getStyleClass().add("welcome-label");
 
         clearGoalsButton = new Button("Clear Goals");
+        clearGoalsButton.getStyleClass().add("button");
+        clearGoalsButton.getStyleClass().add("clear-goals-button");
 
         // Motivational Message module
         motivationModule = new VBox(20);
         motivationModule.setAlignment(Pos.CENTER_LEFT);
-        motivationModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
-        motivationModule.setPadding(new Insets(20));
+        motivationModule.getStyleClass().add("motivation-module");
 
         // Greeting text configuration
         userGreeting = new Label();
-        userGreeting.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        userGreeting.getStyleClass().add("user-greeting");
         motivationModule.getChildren().add(userGreeting);
 
         // Get randomized motivational message and greeting
@@ -144,6 +160,7 @@ public class HomeView extends StackPane implements Subscriber {
         int randomIndex = random.nextInt(motivationalMessages.length);
         motivationalLabel = new Label();
         motivationalLabel.setText(motivationalMessages[randomIndex]);
+        motivationalLabel.getStyleClass().add("motivational-label");
         motivationModule.getChildren().add(motivationalLabel);
 
         randomIndex = random.nextInt(greetings.length);
@@ -151,14 +168,26 @@ public class HomeView extends StackPane implements Subscriber {
         userGreeting.setText(currentGreeting + ", User! Let's complete some goals.");
 
         // Add goal page elements
+        addGoalTitleLabel = new Label("Add a Goal!");
+        addGoalTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
         submitGoalButton = new Button("Add Goal");
         giveMeSuggestionsButton = new Button("Give me suggestions");
 
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
+        cancelAddGoalButton.getStyleClass().add("button");
+
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
         difficultyComboBox.setValue("Medium"); //default value
+
+        addGoalFormRow1 = new HBox(20);
+        addGoalFormRow2 = new HBox(20);
+        addGoalFormRow3 = new HBox(20);
+        addGoalForm = new VBox(20);
+
+        suggestionsContentLabel = new Label("");
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
@@ -169,13 +198,18 @@ public class HomeView extends StackPane implements Subscriber {
         sectionModel = new SectionModel();
         sectionsList = new ArrayList<>(sectionModel.getSections());
 
-        // ToggleGroup for sections
+        sectionButtons = new FlowPane();
+
+        sectionButtons.setHgap(10);
+        sectionButtons.setVgap(10);
         sectionToggleGroup = new ToggleGroup();
-        sectionButtons = new HBox(10);
         sectionButtons.setAlignment(Pos.CENTER);
+
         for (String section : sectionsList) {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
+            sectionButton.getStyleClass().add("button");
+            sectionButton.getStyleClass().add("section-button");
             sectionButton.setOnAction(e -> {
                 currentSelectedSection = section; // update the currently selected section
                 updateGoalsDisplay(section);
@@ -187,8 +221,11 @@ public class HomeView extends StackPane implements Subscriber {
         startDatePicker = new DatePicker(LocalDate.now());
         endDatePicker = new DatePicker(LocalDate.now().plusDays(7));
 
-        //  "Create New Section" feature
+        // "Create New Section" feature
         createSectionButton = new Button("Create New Section");
+        createSectionButton.getStyleClass().add("button");
+        createSectionButton.getStyleClass().add("create-section-button");
+
         createSectionButton.setOnAction(e -> {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("New Section");
@@ -196,22 +233,37 @@ public class HomeView extends StackPane implements Subscriber {
             dialog.setContentText("Enter section name:");
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent() && !result.get().isBlank()) {
-                String newSection = result.get();
-                // Persist the new section using SectionModel
-                sectionModel.addSection(newSection);
-                sectionsList.add(newSection);
-                ToggleButton sectionButton = new ToggleButton(newSection);
-                sectionButton.setToggleGroup(sectionToggleGroup);
-                sectionButton.setOnAction(ev -> {
-                    currentSelectedSection = newSection;
-                    updateGoalsDisplay(newSection);
-                });
-                sectionButtons.getChildren().add(sectionButton);
+                String newSection = result.get().trim();
+
+                // check if the section already exists
+                if (!sectionModel.addSection(newSection)) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Duplicate Section");
+                    alert.setHeaderText(null);
+                    alert.setContentText("A section with this name already exists.");
+                    alert.showAndWait();
+                } else {
+                    // add section to UI only if it was successfully added to the model
+                    sectionsList.add(newSection);
+                    ToggleButton sectionButton = new ToggleButton(newSection);
+                    sectionButton.setToggleGroup(sectionToggleGroup);
+                    sectionButton.getStyleClass().add("button");
+                    sectionButton.getStyleClass().add("section-button");
+                    sectionButton.setOnAction(ev -> {
+                        currentSelectedSection = newSection;
+                        updateGoalsDisplay(newSection);
+                    });
+                    sectionButtons.getChildren().add(sectionButton);
+                    drawView();
+                }
             }
         });
 
         // "Delete Section" feature
         deleteSectionButton = new Button("Delete Section");
+        deleteSectionButton.getStyleClass().add("button");
+        deleteSectionButton.getStyleClass().add("delete-section-button");
+
         deleteSectionButton.setOnAction(e -> {
             // ChoiceDialog to let the user select a section to delete
             ChoiceDialog<String> dialog = new ChoiceDialog<>(null, new ArrayList<>(sectionModel.getSections()));
@@ -222,19 +274,27 @@ public class HomeView extends StackPane implements Subscriber {
             result.ifPresent(selectedSection -> {
                 // Delete the section from the model ONLY if there's more than one left
                 if (sectionModel.getSections().size() <= 1) {
-                    Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Warning");
                     alert.setHeaderText("Can't delete the only section left!");
                     alert.showAndWait();
-                }
-                else{
-                    boolean deleted = sectionModel.deleteSection(selectedSection);
-                    if (deleted) {
-                        // Remove section from the local list and remove its toggle button from the UI
-                        sectionsList.remove(selectedSection);
-                        sectionButtons.getChildren().removeIf(node ->
-                                node instanceof ToggleButton && ((ToggleButton)node).getText().equals(selectedSection)
-                        );
+                } else {
+                    Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmationAlert.setTitle("Delete Section");
+                    confirmationAlert.setHeaderText("Are you sure?");
+                    confirmationAlert.setContentText("Warning: This will delete all goals in this section!");
+
+                    Optional<ButtonType> confirmationResult = confirmationAlert.showAndWait();
+                    if (confirmationResult.isPresent() && confirmationResult.get() == ButtonType.OK) {
+                        boolean deleted = sectionModel.deleteSection(selectedSection, userHistoryDataModel);
+                        if (deleted) {
+                            sectionsList.remove(selectedSection);
+                            sectionButtons.getChildren().removeIf(node ->
+                                    node instanceof ToggleButton && ((ToggleButton) node).getText().equals(selectedSection)
+                            );
+                            drawView();
+                            goalModel.notifySubscribers();
+                        }
                     }
                 }
             });
@@ -244,7 +304,7 @@ public class HomeView extends StackPane implements Subscriber {
         goalsBox = new VBox();
         goalsBox.setSpacing(10);
         goalsBox.setPadding(new Insets(10));
-        goalsBox.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: #cdb6f3;");
+        goalsBox.getStyleClass().add("goals-box");
         goalsBox.setVisible(false);
         goalsBox.setManaged(false);
 
@@ -256,9 +316,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         drawView();
     }
-    /**
-     * Update the UI elements of this page when the model changes.
-     */
+
     private void drawView() {
         getChildren().clear();
         switch (currentViewPage) {
@@ -266,18 +324,12 @@ public class HomeView extends StackPane implements Subscriber {
             case ADD_GOAL -> drawAddGoalView();
         }
     }
-    /**
-     * Switch to a different page of this view.
-     * @param newPage the page this view should switch to.
-     */
+
     private void changePage(HomeViewPage newPage) {
         this.currentViewPage = newPage;
         drawView();
     }
-    /**
-     * Set the goal model of this view.
-     * @param goalModel the goal model that this view will pull data from.
-     */
+
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
 
@@ -296,6 +348,7 @@ public class HomeView extends StackPane implements Subscriber {
 
     /**
      * Set the user data model for this view.
+     *
      * @param userHistoryDataModel the user data model for this view.
      */
     public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
@@ -323,82 +376,116 @@ public class HomeView extends StackPane implements Subscriber {
     public void setupEvents(HomeController c, SuggestionsController s) {
         // ********* HOME PAGE EVENTS *********
         // No events needed for the home page yet.
+
         // ********* ADD GOAL PAGE EVENTS *********
         //pulling data from input fields
-        submitGoalButton.setOnAction(e -> {
-            // Handle the submission of a new goal (pass to the controller)
-            //handle any user input errors if exceptions are thrown by the controller
-            try {
-                String difficulty = difficultyComboBox.getValue();
-                Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
-                String section;
-                section = ((ToggleButton) selectedToggle).getText();
-                LocalDate startDate = startDatePicker.getValue();
-                LocalDate endDate = endDatePicker.getValue();
-                boolean completed = false; // Why would you add a goal you completed?
-                c.handleButtonPressValidateInput(e, titleInput.getText(), section, difficulty, startDate, endDate, completed);
-                c.handleGoalSubmissionButton(titleInput.getText(), section, difficulty, startDate, endDate, completed);
-                changePage(HomeViewPage.HOME); // Return to the summary page after submission
-                resetAddGoalPage();
-            } catch (InputMismatchException error){
-                // Display error message
-                Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
-                alert.setTitle("Input Error");
-                alert.setHeaderText(null);
-                alert.setContentText(error.getMessage());
-                alert.showAndWait();
-            }
-        });
-        //guys this is so monkey code I'll fix it later <3
-        giveMeSuggestionsButton.setOnAction(e -> {
-            String difficulty = difficultyComboBox.getValue();
-            Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
-            String section;
-            section = ((ToggleButton) selectedToggle).getText();
-            LocalDate startDate = startDatePicker.getValue();
-            LocalDate endDate = endDatePicker.getValue();
-            boolean completed = false; // Why would you add a goal you completed?
-            Goal newGoal = new Goal(titleInput.getText(), section, difficulty, startDate, endDate, completed);
-            String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
-            String taskBreakdownSuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
-            s.handleButtonPress(timelineSuggestion, taskBreakdownSuggestion);
-            submitGoalButton.setVisible(true);
-        });
+        submitGoalButton.setOnAction(e -> handleGoalSubmission(c));
+        giveMeSuggestionsButton.setOnAction(e -> handleSuggestions(s));
         clearGoalsButton.setOnAction(c::removeButtonPress);
     }
 
+    /**
+     * Helper method that handles getting goal from user input to pass it to the controller
+    **/
+    private Goal getGoalFromInput() {
+        String difficulty = difficultyComboBox.getValue();
+        Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
+        String section = selectedToggle != null ? ((ToggleButton) selectedToggle).getText() : "Uncategorized";
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+        return new Goal(titleInput.getText(), section, difficulty, startDate, endDate, false);
+    }
+
+    /**
+     * Method to encapsulate logic to give user input data to the home controller
+    */
+    private void handleGoalSubmission(HomeController c){
+        try {
+            Goal newGoal = getGoalFromInput();
+            c.handleButtonPressValidateInput(null, newGoal.getTitle(),newGoal.getSection(),newGoal.getDifficulty(),newGoal.getStartDate(),newGoal.getEndDate(),newGoal.isCompleted());
+            c.handleGoalSubmissionButton(newGoal.getTitle(),newGoal.getSection(),newGoal.getDifficulty(),newGoal.getStartDate(),newGoal.getEndDate(),newGoal.isCompleted());
+            changePage(HomeViewPage.HOME);
+            resetAddGoalPage();
+        } catch (InputMismatchException e){
+            showErrorAlert(e.getMessage());
+        }
+    }
+    /**
+     * Method to encapsulate logic to give user input data to the suggestions controller
+     */
+    private void handleSuggestions(SuggestionsController s){
+        Goal newGoal = getGoalFromInput();
+        String suggestionsInText = s.handleButtonPress(newGoal);
+        suggestionsContentLabel.setText(suggestionsInText);
+    }
+     /**
+     * Helper method to handle the creation of the error alert message
+     * */
+    private void showErrorAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Oops!");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
     private void resetAddGoalPage(){
         titleInput.clear();
         difficultyComboBox.setValue("Medium");
         sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().getFirst());
     }
-    /**
-     * Draws the UI of the Home page.
-     */
+
     private void drawHomeView() {
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(20);
         root.setPadding(new Insets(20));
-        // create a box to display sections
-        VBox sectionBox = new VBox();
-        sectionBox.setSpacing(10);
-        sectionBox.setPadding(new Insets(10));
-        sectionBox.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
-        Label sectionLabel = new Label("Sections:");
-        sectionBox.getChildren().addAll(sectionLabel, sectionButtons);
 
-        // Get and population user's name (once it has been set in the model)
+        Label sectionTitle = new Label("My Sections");
+        sectionTitle.getStyleClass().add("section-title");
+
+        // hbox for title and sections
+        HBox titleAndButtons = new HBox(10);
+        titleAndButtons.setAlignment(Pos.CENTER_LEFT);
+        titleAndButtons.getChildren().addAll(sectionTitle, createSectionButton, deleteSectionButton);
+
+        FlowPane sectionButtonsBox = new FlowPane();
+        sectionButtonsBox.getStyleClass().add("flow-pane");
+        sectionButtonsBox.setHgap(10);
+        sectionButtonsBox.setVgap(10);
+        sectionButtonsBox.setAlignment(Pos.TOP_LEFT);
+
+        // section button
+        for (String section : sectionsList) {
+            ToggleButton sectionButton = new ToggleButton(section);
+            sectionButton.setToggleGroup(sectionToggleGroup);
+            sectionButton.getStyleClass().add("button");
+            sectionButton.getStyleClass().add("section-button");
+
+            sectionButton.setOnAction(e -> {
+                currentSelectedSection = section;
+                updateGoalsDisplay(section);
+            });
+
+            sectionButtonsBox.getChildren().add(sectionButton);
+        }
+
+        VBox mySectionsBox = new VBox(15);
+        mySectionsBox.getStyleClass().add("my-sections-container");
+        mySectionsBox.setAlignment(Pos.CENTER);
+        mySectionsBox.getChildren().addAll(titleAndButtons, sectionButtonsBox);
+
+        VBox sectionsAndGoalsBox = new VBox(10);
+        sectionsAndGoalsBox.getChildren().addAll(mySectionsBox, goalsBox);
+
         if (userHistoryDataModel != null) {
             userGreeting.setText(currentGreeting + ", " + userHistoryDataModel.getUserName() + "! Let's complete some goals.");
         }
-
-        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton, clearGoalsButton, sectionBox, createSectionButton, deleteSectionButton, goalsBox);
+        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton, clearGoalsButton, sectionsAndGoalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.
         if (currentSelectedSection != null) {
-            for (javafx.scene.Node node : sectionButtons.getChildren()) {
+            for (javafx.scene.Node node : sectionButtonsBox.getChildren()) {
                 if (node instanceof ToggleButton) {
                     ToggleButton tb = (ToggleButton) node;
                     if (tb.getText().equalsIgnoreCase(currentSelectedSection)) {
@@ -410,55 +497,113 @@ public class HomeView extends StackPane implements Subscriber {
             }
         }
     }
+
     /**
      * Draws the UI of the Add Goal page.
      */
     private void drawAddGoalView() {
         VBox root = new VBox();
+        root.setPadding(new Insets(30));
         root.setAlignment(Pos.TOP_LEFT);
-        root.setSpacing(20);
-        root.setPadding(new Insets(20));
+        root.setSpacing(30);
         this.getChildren().add(root);
-        root.getChildren().addAll(
-                new Label("Goal Title:"), titleInput,
-                new Label("Sections:"), sectionButtons,
-                new Label("Difficulty:"), difficultyComboBox,
+
+        //clear to avoid dupes
+        addGoalFormRow1.getChildren().clear();
+        addGoalFormRow2.getChildren().clear();
+        addGoalFormRow3.getChildren().clear();
+        addGoalForm.getChildren().clear();
+
+        //organize UI elements
+        addGoalFormRow1.getChildren().addAll(new Label("Goal Title:"), titleInput, new Label("Sections:"), sectionButtons);
+        addGoalFormRow2.getChildren().addAll(new Label("Difficulty:"), difficultyComboBox,
                 new Label("Start Date:"), startDatePicker,
-                new Label("End Date:"), endDatePicker,
-                submitGoalButton, cancelAddGoalButton, giveMeSuggestionsButton
+                new Label("End Date:"), endDatePicker);
+        addGoalFormRow3.getChildren().addAll(giveMeSuggestionsButton, submitGoalButton, cancelAddGoalButton);
+
+        addGoalForm.getChildren().addAll(addGoalFormRow1,addGoalFormRow2,addGoalFormRow3);
+        titleInput.setPrefWidth(275);
+
+        //box for suggestions!
+        Label sectionLabel = new Label("Your Suggestions, Dani:");
+        sectionLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        String suggestionsContent = "Click the button to find out!";
+        suggestionsContentLabel.setText(suggestionsContent);
+
+        VBox suggestionsBox = new VBox();
+        suggestionsBox.setSpacing(10);
+        suggestionsBox.setPadding(new Insets(10));
+        suggestionsBox.setStyle("-fx-border-color: grey; -fx-border-width: 2px; -fx-background-color: #f9f9f9;");
+        suggestionsBox.getChildren().addAll(suggestionsContentLabel);
+
+        root.getChildren().addAll(
+                addGoalTitleLabel,
+                addGoalForm,
+                sectionLabel,
+                suggestionsBox
         );
+
         //selecting general section toggle
         Toggle default_toggle = sectionToggleGroup.getToggles().getFirst();
-        for (Toggle t: sectionToggleGroup.getToggles()) {
+        for (Toggle t : sectionToggleGroup.getToggles()) {
             if (default_toggle.equals(t)) t.setSelected(true);
-            else {t.setSelected(false);}
+            else {
+                t.setSelected(false);
+            }
 
         }
-        submitGoalButton.setVisible(false);
     }
 
     /**
      * Updates the goalsBox to display all goals in the given section.
      * Assumes goalModel.getGoalsForSection(section) returns a List of Goal objects.
      * If there are no goals, displays a default message.
+     *
      * @param section the section whose goals should be displayed.
      */
     private void updateGoalsDisplay(String section) {
         currentSelectedSection = section;
         goalsBox.getChildren().clear();
 
-        // the section box only shows up when the section is selected
+        Label goalsTitle = new Label("Goals in " + section);
+        goalsTitle.getStyleClass().add("goals-title");
+        goalsBox.getChildren().add(goalsTitle);
         goalsBox.setVisible(true);
         goalsBox.setManaged(true);
 
         List<Goal> goals = goalModel.getGoalsForSection(section);
         System.out.println("Updating goals display for section '" + section + "': " + goals.size() + " goal(s) found.");
         if (goals.isEmpty()) {
-            goalsBox.getChildren().add(new Label("No goals in this section."));
+            Label noGoalsLabel = new Label("No goals in this section.");
+            noGoalsLabel.getStyleClass().add("no-goals-label");
+            goalsBox.getChildren().add(noGoalsLabel);
         } else {
             for (Goal goal : goals) {
-                Label goalLabel = new Label(goal.toString());
-                goalsBox.getChildren().add(goalLabel);
+                VBox goalCard = new VBox(10);
+                goalCard.getStyleClass().add("goal-card");
+
+                Label titleLabel = new Label("Title: " + goal.getTitle());
+                titleLabel.getStyleClass().add("title-label");
+
+                Label difficultyLabel = new Label("Difficulty: " + goal.getDifficulty());
+                difficultyLabel.getStyleClass().add("label");
+
+                Label datesLabel = new Label(
+                        "Start: " + goal.getStartDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy")) +
+                                " | End: " + goal.getEndDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy"))
+                );
+                datesLabel.getStyleClass().add("label");
+
+                Label statusLabel = new Label("Completed: " + (goal.isCompleted() ? "✅" : "❌"));
+                statusLabel.getStyleClass().add("label");
+                if (goal.isCompleted()) {
+                    statusLabel.getStyleClass().add("status-completed");
+                } else {
+                    statusLabel.getStyleClass().add("status-incomplete");
+                }
+
+                goalCard.getChildren().addAll(titleLabel, difficultyLabel, datesLabel, statusLabel);
+                goalsBox.getChildren().add(goalCard);
             }
         }
     }
