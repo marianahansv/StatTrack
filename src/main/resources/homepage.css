@@ -144,3 +144,8 @@
     -fx-text-fill: black;
 }
 
+.flow-pane {
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+    -fx-alignment: top-left;
+}

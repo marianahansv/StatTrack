@@ -11,6 +11,7 @@ import java.util.Random;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -105,7 +106,7 @@ public class HomeView extends StackPane implements Subscriber {
     private final Button cancelAddGoalButton;
     private final Button submitGoalButton;
     private final ComboBox<String> difficultyComboBox;
-    private HBox sectionButtons;
+    private FlowPane sectionButtons;
     private HBox addGoalFormRow1;
     private HBox addGoalFormRow2;
     private HBox addGoalFormRow3;
@@ -197,10 +198,13 @@ public class HomeView extends StackPane implements Subscriber {
         sectionModel = new SectionModel();
         sectionsList = new ArrayList<>(sectionModel.getSections());
 
-        // ToggleGroup for sections
+        sectionButtons = new FlowPane();
+
+        sectionButtons.setHgap(10);
+        sectionButtons.setVgap(10);
         sectionToggleGroup = new ToggleGroup();
-        sectionButtons = new HBox(10);
         sectionButtons.setAlignment(Pos.CENTER);
+
         for (String section : sectionsList) {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
@@ -250,6 +254,7 @@ public class HomeView extends StackPane implements Subscriber {
                         updateGoalsDisplay(newSection);
                     });
                     sectionButtons.getChildren().add(sectionButton);
+                    drawView();
                 }
             }
         });
@@ -287,6 +292,7 @@ public class HomeView extends StackPane implements Subscriber {
                             sectionButtons.getChildren().removeIf(node ->
                                     node instanceof ToggleButton && ((ToggleButton) node).getText().equals(selectedSection)
                             );
+                            drawView();
                             goalModel.notifySubscribers();
                         }
                     }
@@ -441,7 +447,11 @@ public class HomeView extends StackPane implements Subscriber {
         HBox titleAndButtons = new HBox(10);
         titleAndButtons.setAlignment(Pos.CENTER_LEFT);
         titleAndButtons.getChildren().addAll(sectionTitle, createSectionButton, deleteSectionButton);
-        HBox sectionButtonsBox = new HBox(10);
+
+        FlowPane sectionButtonsBox = new FlowPane();
+        sectionButtonsBox.getStyleClass().add("flow-pane");
+        sectionButtonsBox.setHgap(10);
+        sectionButtonsBox.setVgap(10);
         sectionButtonsBox.setAlignment(Pos.TOP_LEFT);
 
         // section button
@@ -460,7 +470,7 @@ public class HomeView extends StackPane implements Subscriber {
         }
 
         VBox mySectionsBox = new VBox(15);
-        mySectionsBox.getStyleClass().add("my-sections-container"); // Apply the box style
+        mySectionsBox.getStyleClass().add("my-sections-container");
         mySectionsBox.setAlignment(Pos.CENTER);
         mySectionsBox.getChildren().addAll(titleAndButtons, sectionButtonsBox);
 
