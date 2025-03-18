@@ -66,6 +66,10 @@ public class GoalModel {
         notifySubscribers();
     }
 
+    /*
+     * Sets the User History Data Model
+     * @param userHistoryDataModel the data model for a the system to track
+     */
     public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
         this.userHistoryDataModel = userHistoryDataModel;
     }
@@ -254,6 +258,8 @@ public class GoalModel {
     /**
      * Sets the difficulty filter and notifies subscribers (View).
      * The View will update itself based on the new filter.
+     * @param difficulty the difficulty level to filter by (e.g., "Easy", "Medium", "Hard").
+     *                   If "All" is passed, it returns all goals.
      */
     public void setFilteredDifficulty(String difficulty) {
         this.currentFilter = difficulty;

@@ -180,7 +180,6 @@ public class GoalProgress extends VBox implements Subscriber {
      */
     private void updateBarChart() {
         barChart.getData().clear();
-        // lineChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Days Left");
 
@@ -242,19 +241,13 @@ private void updateLineChart() {
     if (today.isAfter(maxDate)) {
         maxDate = today;
     }
-    // String today = LocalDate.now().toString();
-    // categories.add(LocalDate.now().toString());
 
-    // Sort categories in chronological order (That is the default thank god I would have killed myself otherwise)
-    // FXCollections.sort(categories); //Doesnt need to be sorted anymore
-    
     // Gets every date between the min and max and adds them to the categories list as they will act as their own category making the x axis even
     for (LocalDate i = minDate; !i.isAfter(maxDate); i = i.plusDays(1)) { // Potentially change the one to someothing else or make it different depending on the span of days
         categories.add(i.toString());
     }
     // Set the sorted categories on the X axis
     xAxis.setCategories(categories);
-    //xAxis.setLabel("Days");
     yAxis.setLabel("Days Left");
     
     
@@ -262,6 +255,7 @@ private void updateLineChart() {
     for (Goal goal : goalModel.getGoals()) {
         // Create a new series for the current goal
         XYChart.Series<String, Number> series = new XYChart.Series<>();
+        if goal.getTitle() is in 
         series.setName(goal.getTitle()); // Set the series name to the goal's title
         
         // Calculate the total days from the start date to the end date
@@ -274,7 +268,6 @@ private void updateLineChart() {
         list.add(series);
     }
     list.add(todayLine);
-    // System.out.println(list);
     
     // Add all series to the LineChart so each goal appears as its own line
     lineChart.getData().addAll(list);

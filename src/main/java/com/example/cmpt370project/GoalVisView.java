@@ -68,6 +68,9 @@ public class GoalVisView extends StackPane implements Subscriber {
         this.goalPlanModel = gpModel;
     }
 
+    /**
+     * Model is updated
+     */
     @Override
     public void modelUpdated() {
         drawView();
