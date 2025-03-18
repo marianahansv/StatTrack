@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,14 +21,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 
 /**
  * The GoalModel holds all the Goals data in the application. It handles the CRUD operations, and
- * serialization (storage) of Goals.
+ * serialization (storage) of Goals. It also provides filtering operations
  */
 public class GoalModel {
     private static final String FILE_NAME = System.getProperty("user.home") + "/GoalApplication/goals.json";
-    private HashMap<String, Goal> goals;
+
+    private HashMap<String, Goal> goals = new HashMap<>();
     private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
             context.serialize(src.format(format))).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
@@ -39,13 +44,9 @@ public class GoalModel {
     private String currentFilter = "All"; // Stores the currently selected difficulty filter
     private UserHistoryDataModel userHistoryDataModel;
 
-    
-    
-
     public GoalModel(UserHistoryDataModel userHistoryDataModel){
         //UserHistoryDataModel historyModel = new UserHistoryDataModel();
         this.userHistoryDataModel = userHistoryDataModel;
-        goals = new HashMap<>();
         subscribers = new ArrayList<Subscriber>();
         load_goals_from_file();
     }
@@ -108,10 +109,6 @@ public class GoalModel {
         notifySubscribers();
     }
 
-
-  
-    
-
     /**
      * Update an existing goal by replacing the goal with the same title.
      * @param title The title of the goal to update.
@@ -146,6 +143,7 @@ public class GoalModel {
      * @return list of all goals. (I'm thinking of future sorting/filtering operations for which we'll need a list)
      */
     public List<Goal> getGoals(){
+        if (goals.values().isEmpty()) return new ArrayList<Goal>();
         return new ArrayList<>(goals.values());
     }
 

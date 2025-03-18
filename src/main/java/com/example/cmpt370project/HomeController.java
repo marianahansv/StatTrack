@@ -25,7 +25,7 @@ public class HomeController {
      * Handles making the model change when the user adds a goal using the button.
      * @param actionEvent the event that happens when the button is pressed.
      */
-    public void handleButtonPress(ActionEvent actionEvent, String title, String section, String difficulty, LocalDate start, LocalDate end, boolean completed) throws InputMismatchException {
+    public void handleButtonPressValidateInput(ActionEvent actionEvent, String title, String section, String difficulty, LocalDate start, LocalDate end, boolean completed) throws InputMismatchException {
         if (title.isBlank()){
             throw new InputMismatchException("Title cannot be empty.");
         }
@@ -37,14 +37,15 @@ public class HomeController {
         if(end.isBefore(start)){
             throw new InputMismatchException("End date cannot be before start date.");
         }
-        try {
-            gm.addGoal(title, section, difficulty, start, end, completed);
-        } catch (InputMismatchException e){
-            throw new InputMismatchException(e.getMessage());
-        }
-
     }
 
+    public void handleGoalSubmissionButton(String title, String section, String difficulty, LocalDate start, LocalDate end, boolean completed){
+        try {
+            gm.addGoal(title,section,difficulty,start,end,completed);
+        } catch (InputMismatchException e){
+            System.out.println(e.getMessage());
+        }
+    }
 
     /**
      * Handles making the model change when the user clears their goals using the button.
@@ -53,6 +54,5 @@ public class HomeController {
     public void removeButtonPress(ActionEvent actionEvent) {
         gm.clearGoals();
     }
-
 
 }

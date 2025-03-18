@@ -14,7 +14,7 @@ public class Goal {
     private LocalDate startDate = LocalDate.now();
     private LocalDate endDate = LocalDate.now();
     private boolean completed = false; // defaults to false as why would you make a goal if it is completed already
-
+    private LocalDate completionDate = endDate;
     // Constructors to initialize a new goal
     /**
      * Constructs a new Goal object with the specified attributes.
@@ -92,8 +92,19 @@ public class Goal {
     }
     public void setCompleted(boolean completed) {
         this.completed = completed;
-    }
+        updateCompletionDate(LocalDate.now());
 
+    }
+    public LocalDate getCompletionDate(){
+        return this.completionDate;
+    }
+    //for testing purposes
+    public void setCompletionDate(LocalDate completionDate){
+        this.completionDate = completionDate;
+    }
+    private void updateCompletionDate(LocalDate now){
+        this.completionDate = now;
+    }
 //    /**
 //     * Returns a string representation of the Goal
 //     */

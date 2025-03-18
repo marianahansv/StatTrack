@@ -17,12 +17,19 @@ public class DashboardView extends BorderPane {
     private GoalProgress goalChartView;
     private GoalChartController chartController;
 
+    /**
+     * Controller for the suggestions methods
+     * **/
+    private SuggestionsController suggestionsController;
     // ************************* APPLICATION MODELS *************************
     /**
      * The model that holds the goal data of the application.
      */
     private GoalModel goalModel;
-
+    /**
+     * The model that holds the suggestions data of the application.
+     */
+    private SuggestionsModel suggestionsModel;
     /**
      * The model that holds the goal plan data of the application.
      */
@@ -140,12 +147,14 @@ public class DashboardView extends BorderPane {
         userHistoryDataModel = new UserHistoryDataModel(); 
         historicalChartModel = new UserProgressHIstoryVisModel(userHistoryDataModel);
         goalModel = new GoalModel(userHistoryDataModel);
+        suggestionsModel = new SuggestionsModel();
 
         // CONTROLLERS
         homeController = new HomeController();
         goalPlanController = new GoalPlanController();
         chartController = new GoalChartController(goalChartView, goalModel);
         historicalChartController = new UserProgressHistoryController(historicalChartProgress, historicalChartModel);
+        suggestionsController = new SuggestionsController(goalModel,suggestionsModel);
 
         // VIEWS
         this.homePage = new HomeView();
@@ -175,7 +184,7 @@ public class DashboardView extends BorderPane {
         // ********* 3. Setup controller with each view *********
 
         // HOMEPAGE CONTROLLER
-        homePage.setupEvents(homeController);
+        homePage.setupEvents(homeController, suggestionsController);
 
         // GOAL PAGE CONTROLLER
 
@@ -199,8 +208,11 @@ public class DashboardView extends BorderPane {
         goalsPage.setGoalPlanModel(goalPlanModel);
         goalsPage.setUserHistoryDataModel(userHistoryDataModel);
 
+
         homePage.setGoalModel(goalModel);
         homePage.setUserHistoryDataModel(userHistoryDataModel);
+        homePage.setSuggestionsModel(suggestionsModel);
+
 
         goalVisPage.setGoalPlanModel(goalPlanModel);
         historicalChartView.setGoalPlanModel(historicalChartModel);

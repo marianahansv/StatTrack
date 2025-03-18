@@ -22,10 +22,11 @@ public class GoalController {
         goalModel.setFilteredDifficulty(difficulty); // updates the model
     }
     /**
-     * Compeletes goal.
+     * Compeletes goal and updates the Suggestions Model
      */
     public void completeGoal(Goal goal) {
         goalModel.completeGoal(goal);
+        //suggestionsModel.onGoalCompletedUpdate(goal);
         //System.out.println(55555);
     }
     

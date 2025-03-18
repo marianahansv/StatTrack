@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
@@ -30,7 +31,10 @@ public class GoalView extends StackPane implements Subscriber {
      * The goal model that this view gets goal data from.
      */
     private GoalModel goalModel;
-    
+
+    /**
+     * The goal Controller
+     */
     private GoalController goalController; // Controller need to display button
 
     /**
@@ -51,16 +55,10 @@ public class GoalView extends StackPane implements Subscriber {
     // ********* Add other ui elements as attributes here if needed (i.e. if they need to change in drawView()) *********
 
     private ListView<Goal> goalListView;
-
-    // private ListView<Goal> goalListViewGoal;
-
     private Label progressFeedback;
     private Label welcomeLabel;
-
     private ComboBox<String> difficultyComboBox;
-
     private Button completeGoalButton;
-
     private Button editGoalButton;
 
     
@@ -70,63 +68,69 @@ public class GoalView extends StackPane implements Subscriber {
      * Create a new goal view page.
      */
     public GoalView() {
-        /*UserHistoryDataModel historyModel = new UserHistoryDataModel();
-        GoalModel goalModel = new GoalModel(historyModel);
-        goalModel.setUserHistoryDataModel(historyModel);*/
-
-
+        // Create the main container
         root = new VBox();
         root.setSpacing(20);
         root.setPadding(new Insets(20));
 
+        // Label for the goals list
         Label goalsLabel = new Label("My Goals:");
+
+        // Initialize the list view for goals
         goalListView = new ListView<>();
-        //goalListViewGoal = new ListView<>();goalListViewGoal
+
+        // Add the goals label and list view to the root container
         root.getChildren().addAll(goalsLabel, goalListView);
 
-        // Add the root UI element to this view
+        // Add the root container to the main view (StackPane)
         this.getChildren().add(root);
 
-        // Initialize all other UI elements
+        // Initialize the feedback label (will be updated in drawView)
         progressFeedback = new Label();
     }
 
-    
-
     public void setGoalController(GoalController controller) {
-    this.goalController = controller;
+        this.goalController = controller;
     }
-
 
     /**
      * Update the UI elements of this page when the model changes.
      */
     private void drawView() {
-        //setGoalController(goalController);
-        
         if (goalModel == null) return;
 
         goalListView.getItems().clear();
-        //goalListViewGoal.getItems().clear();
-        /*for (Goal goal : goalModel.getGoals()) {
-            goalListView.getItems().add(goal.toString());
-        }*/
 
         for (Goal goal : goalModel.getGoals()) {
-            
-            if (goal.isCompleted()) {
-            //setStyle("-fx-text-fill: green;");
-
-            
-
-            }
             goalListView.getItems().add(goal);
         }
-
-        
+    
+        // Yo Cell Factories are poggers
+    goalListView.setCellFactory(lv -> new ListCell<Goal>() {  
+    protected void updateItem(Goal goal, boolean empty) {
+        super.updateItem(goal, empty);
+        if (empty || goal == null) {
+            setText(null);
+            setStyle("");
+        } else {
+            setText(goal.toString());
+            if (goal.isCompleted()) {
+                // Change the text color to green if the goal is complete
+                setStyle("-fx-text-fill: green;");
+            } else if (!goal.isCompleted() && goal.getEndDate().isBefore(LocalDate.now())) {
+                // Change the text color to red if the goal is incomplete and past due
+                setStyle("-fx-text-fill: red;");
+            } else {
+                // Otherwise, use the default text color
+                setStyle("-fx-text-fill: black;");
+            }
+        }
+        }
+        });
 
         root.getChildren().clear();
 
+        // Welcome label for dashboard
         welcomeLabel = new Label("Here's Your Current Goals:");
         welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -185,94 +189,81 @@ public class GoalView extends StackPane implements Subscriber {
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
         
+        // ********* Action Buttons *********
         completeGoalButton = new Button("Complete");
-
         editGoalButton = new Button("Edit Goal");
 
+        // Container for dashboard controls (list view, feedback, filtering, buttons)
         VBox dashboardControls = new VBox();
         dashboardControls.setAlignment(Pos.TOP_CENTER);
         dashboardControls.setSpacing(5);
-        //goalListView.setStyle("-fx-text-fill: red;");
-       
-
-
-        dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
-        //goalListView.setStyle("-fx-text-fill: red;");
-
-        // Add all UI elements to this UI view
-
-
-        //root.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
-        //System.out.println(goalListView.getItems());
-
-        //root.getChildren().addAll(goalProgressModule, difficultyComboBox, completeGoalButton, editGoalButton);
-        //System.out.println(goalListView.getItems());
+        dashboardControls.getChildren().addAll(
+                goalListView,
+                goalProgressModule,
+                difficultyComboBox,
+                completeGoalButton,
+                editGoalButton
+        );
 
         goalListView.getItems();
-    
         
+        //On Complete button pressed complete the goal
         completeGoalButton.setOnAction(e -> {
             
              Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
-             // System.out.println(selectedGoal);
+
              goalModel.completeGoal(selectedGoal);
-             // selectedGoal.setCompleted(true);
-             // goalModel.notifySubscribers();
 
-             /**if (selectedGoal != null && !selectedGoal.isCompleted() && goalController != null) {
-                goalController.completeGoal(selectedGoal); // Controller not needed
-           
-                } **/
         });
-
-
+        
+        // On edit button pressed take to editing page
         editGoalButton.setOnAction(e -> {
             
             Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
-            // Goal oldGoal = goalListView.getSelectionModel().getSelectedItem();
-            // System.out.println(selectedGoal);
+
             selectedGoal.setEndDate(selectedGoal.getEndDate().plusDays(1));
             goalModel.updateGoal(selectedGoal.getTitle(), selectedGoal);
             goalModel.notifySubscribers();
             drawEditGoalView(selectedGoal);
-            //System.out.println(4);
        });
 
         root.getChildren().addAll(welcomeLabel, dashboardControls);
+        goalModel.addSubscriber(this);
     }
-    private void drawEditGoalView(Goal goal) { // cant edit twive in a row?
-        // Clear current page
+      /**
+     * Draws the edit view for a selected goal.
+     * Provides form fields to modify the goal details and save or cancel changes.
+     * @param goal the goal to be edited.
+     */
+    private void drawEditGoalView(Goal goal) {
+        // Clear current view
         this.getChildren().clear();
 
-        SectionModel sectionModel = new SectionModel();
-
-        
-
-        // Create a new VBox to hold the edit form
+        // Create a new container for the edit form
         VBox editRoot = new VBox(20);
         editRoot.setAlignment(Pos.TOP_LEFT);
         editRoot.setPadding(new Insets(20));
-    
-        // Create a TextField for editing the goal title and use prior title
+
+        // Text field for editing the goal title (pre-populated with current title)
         TextField titleField = new TextField(goal.getTitle());
-    
-        // The difficulty combo box
+
+        // ComboBox for selecting the difficulty (pre-populated with current difficulty)
         ComboBox<String> editDifficultyComboBox = new ComboBox<>();
         editDifficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
         editDifficultyComboBox.setValue(goal.getDifficulty());
-    
-        // Create DatePickers for the start and end dates and set their values
+
+        // DatePickers for editing start and end dates
         DatePicker editStartDatePicker = new DatePicker(goal.getStartDate());
         DatePicker editEndDatePicker = new DatePicker(goal.getEndDate());
-    
-        // Create an HBox and a new ToggleGroup for the section buttons
+
+        // Create section selection buttons using ToggleGroup
         HBox editSectionButtons = new HBox(10);
         ToggleGroup editSectionToggleGroup = new ToggleGroup();
-    
-        // Get the sections from the model and create ToggleButtons for each
+
+        // Retrieve available sections from SectionModel and create ToggleButtons
+        SectionModel sectionModel = new SectionModel();
         List<String> sections = new ArrayList<>(sectionModel.getSections());
         for (String section : sections) {
-            //System.out.println(section);
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(editSectionToggleGroup);
             if (section.equals(goal.getSection())) {
@@ -280,65 +271,65 @@ public class GoalView extends StackPane implements Subscriber {
             }
             editSectionButtons.getChildren().add(sectionButton);
         }
-    
-        // Create buttons for saving or canceling the edit
+
+        // Buttons to submit or cancel the edit
         Button submitEditButton = new Button("Save Changes");
         Button cancelEditButton = new Button("Cancel");
-    
-        // Set up the event handler for the Save button
+
+        // Event handler for saving changes
         submitEditButton.setOnAction(e -> {
-            String OGTitle = (goal.getTitle());
+            String originalTitle = goal.getTitle();
             String newTitle = titleField.getText();
             String newDifficulty = editDifficultyComboBox.getValue();
             Toggle selectedToggle = editSectionToggleGroup.getSelectedToggle();
             if (selectedToggle == null) {
-                // Handle the error, e.g., alert the user that a section must be selected
+                // If no section is selected, exit the handler (could show an error dialog)
                 return;
             }
             String newSection = ((ToggleButton) selectedToggle).getText();
             LocalDate newStartDate = editStartDatePicker.getValue();
             LocalDate newEndDate = editEndDatePicker.getValue();
-            
-            // Update the goal object with new values
+
+            // Update the goal with new values
             goal.setTitle(newTitle);
             goal.setDifficulty(newDifficulty);
             goal.setSection(newSection);
             goal.setStartDate(newStartDate);
             goal.setEndDate(newEndDate);
-            
-            // Update the model and notify subscribers of the change
-            goalModel.updateGoal(OGTitle, goal);
-            goalModel.notifySubscribers();
-            //OGTitle = goal.getTitle();
 
+            // Update the model and notify subscribers
+            goalModel.updateGoal(originalTitle, goal);
+            goalModel.notifySubscribers();
+
+            // Update user history data
             historyModel.notifySubscribers();
             historyModel.completeGoal(LocalDate.now());
             historyModel.saveDataToFile();
-            
+
+            // Return to the main view
             this.getChildren().clear();
             this.getChildren().add(root);
             drawView();
         });
-    
-        // Set up the event handler for the Cancel button to return to the home view
+
+        // Event handler for canceling the edit and returning to the main view
         cancelEditButton.setOnAction(e -> {
-            //getChildren().clear();
             this.getChildren().clear();
             this.getChildren().add(root);
             drawView();
         });
-    
-        // Build the edit form view
+
+        // Build the edit form view by adding all UI elements
         editRoot.getChildren().addAll(
-            new Label("Edit Goal Title:"), titleField,
-            new Label("Difficulty:"), editDifficultyComboBox,
-            new Label("Sections:"), editSectionButtons,
-            new Label("Start Date:"), editStartDatePicker,
-            new Label("End Date:"), editEndDatePicker,
-            submitEditButton, cancelEditButton
+                new Label("Edit Goal Title:"), titleField,
+                new Label("Difficulty:"), editDifficultyComboBox,
+                new Label("Sections:"), editSectionButtons,
+                new Label("Start Date:"), editStartDatePicker,
+                new Label("End Date:"), editEndDatePicker,
+                submitEditButton, cancelEditButton
         );
-    
-        // Add the edit view to the scene
+
+        // Display the edit form in the view
         this.getChildren().add(editRoot);
     }
     
