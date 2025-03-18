@@ -3,6 +3,8 @@ package com.example.cmpt370project;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -251,26 +253,44 @@ private void updateLineChart() {
     yAxis.setLabel("Days Left");
     
     
+    
+    Map<String, Integer> startCount = new HashMap<>();
+    Map<String, Integer> endCount = new HashMap<>();
     // Loop through each goal in the model
     for (Goal goal : goalModel.getGoals()) {
         // Create a new series for the current goal
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        if goal.getTitle() is in 
-        series.setName(goal.getTitle()); // Set the series name to the goal's title
-        
+        series.setName(goal.getTitle());
+
+        // Format dates as strings
+        String startDateStr = goal.getStartDate().toString();
+        String endDateStr = goal.getEndDate().toString();
+
+        // Count how many times these dates have been seen
+        int startOffsetCount = startCount.getOrDefault(startDateStr, 0);
+        int endOffsetCount = endCount.getOrDefault(endDateStr, 0);
+
         // Calculate the total days from the start date to the end date
         long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
-        // Add the start point (at total days value) and the end point (0 ie the bottom of the graph)
-        series.getData().add(new XYChart.Data<>(goal.getStartDate().toString(), totalDays));
-        series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), 0));
-        
-        // Add the newly created series to the list
-        list.add(series);
+
+        // Defines a small offset value so the lines dont overlap too much
+        double offset = 0.5;
+
+        // Apply a small offset to each point based on the number of overlaps
+        double adjustedStartValue = totalDays + (startOffsetCount * offset);
+        double adjustedEndValue = 0 + (endOffsetCount * offset);
+
+        series.getData().add(new XYChart.Data<>(startDateStr, adjustedStartValue));
+        series.getData().add(new XYChart.Data<>(endDateStr, adjustedEndValue));
+
+        // Update the count maps for the next goal with the same date
+        startCount.put(startDateStr, startOffsetCount + 1);
+        endCount.put(endDateStr, endOffsetCount + 1);
+
+    list.add(series);
     }
-    list.add(todayLine);
-    
-    // Add all series to the LineChart so each goal appears as its own line
-    lineChart.getData().addAll(list);
+        list.add(todayLine);
+        lineChart.getData().addAll(list);
     }
 }
 
