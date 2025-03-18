@@ -9,17 +9,7 @@ import java.util.Random;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -234,19 +224,26 @@ public class HomeView extends StackPane implements Subscriber {
             result.ifPresent(selectedSection -> {
                 // Delete the section from the model ONLY if there's more than one left
                 if (sectionModel.getSections().size() <= 1) {
-                    Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Warning");
                     alert.setHeaderText("Can't delete the only section left!");
                     alert.showAndWait();
-                }
-                else{
-                    boolean deleted = sectionModel.deleteSection(selectedSection);
-                    if (deleted) {
-                        // Remove section from the local list and remove its toggle button from the UI
-                        sectionsList.remove(selectedSection);
-                        sectionButtons.getChildren().removeIf(node ->
-                                node instanceof ToggleButton && ((ToggleButton)node).getText().equals(selectedSection)
-                        );
+                } else {
+                    Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmationAlert.setTitle("Delete Section");
+                    confirmationAlert.setHeaderText("Are you sure?");
+                    confirmationAlert.setContentText("Warning: This will delete all goals in this section!");
+
+                    Optional<ButtonType> confirmationResult = confirmationAlert.showAndWait();
+                    if (confirmationResult.isPresent() && confirmationResult.get() == ButtonType.OK) {
+                        boolean deleted = sectionModel.deleteSection(selectedSection, userHistoryDataModel);
+                        if (deleted) {
+                            sectionsList.remove(selectedSection);
+                            sectionButtons.getChildren().removeIf(node ->
+                                    node instanceof ToggleButton && ((ToggleButton) node).getText().equals(selectedSection)
+                            );
+                            goalModel.notifySubscribers();
+                        }
                     }
                 }
             });
