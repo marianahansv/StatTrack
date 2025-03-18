@@ -118,7 +118,13 @@ public class GoalModel {
     public boolean updateGoal(String title, Goal updatedGoal) {
         if (goals.containsKey(title)) {
             System.out.println("Updating goal: " + title);
-            goals.put(title, updatedGoal);
+            // If the title has been changed in updatedGoal, update the map key accordingly.
+            if (!title.equals(updatedGoal.getTitle())) {
+                goals.remove(title);
+                goals.put(updatedGoal.getTitle(), updatedGoal);
+            } else {
+                goals.put(title, updatedGoal);
+            }
             save_goals_to_file();
             return true;
         }

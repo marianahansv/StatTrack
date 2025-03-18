@@ -154,7 +154,6 @@ public class GoalView extends StackPane implements Subscriber {
                 case WEEKLY -> {
                     planTimelineString = "WEEK";
                     timelineCompleted = historyModel.getWeeklyCompletedGoals();
-                    System.out.println(timelineCompleted + " 99");
 
                 }
             }
