@@ -40,10 +40,13 @@ public class SectionModel {
      *
      * @param section the name of the section to add
      */
-    public void addSection(String section) {
+    public boolean addSection(String section) {
         if (!sections.contains(section)) {
             sections.add(section);
             saveSectionsToFile();
+            return true;
+        } else {
+            return false; // Section already exists
         }
     }
 

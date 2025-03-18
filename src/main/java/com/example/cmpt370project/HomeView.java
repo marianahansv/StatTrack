@@ -199,17 +199,26 @@ public class HomeView extends StackPane implements Subscriber {
             dialog.setContentText("Enter section name:");
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent() && !result.get().isBlank()) {
-                String newSection = result.get();
-                // Persist the new section using SectionModel
-                sectionModel.addSection(newSection);
-                sectionsList.add(newSection);
-                ToggleButton sectionButton = new ToggleButton(newSection);
-                sectionButton.setToggleGroup(sectionToggleGroup);
-                sectionButton.setOnAction(ev -> {
-                    currentSelectedSection = newSection;
-                    updateGoalsDisplay(newSection);
-                });
-                sectionButtons.getChildren().add(sectionButton);
+                String newSection = result.get().trim();
+
+                // check if the section already exists
+                if (!sectionModel.addSection(newSection)) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Duplicate Section");
+                    alert.setHeaderText(null);
+                    alert.setContentText("A section with this name already exists.");
+                    alert.showAndWait();
+                } else {
+                    // add section to UI only if it was successfully added to the model
+                    sectionsList.add(newSection);
+                    ToggleButton sectionButton = new ToggleButton(newSection);
+                    sectionButton.setToggleGroup(sectionToggleGroup);
+                    sectionButton.setOnAction(ev -> {
+                        currentSelectedSection = newSection;
+                        updateGoalsDisplay(newSection);
+                    });
+                    sectionButtons.getChildren().add(sectionButton);
+                }
             }
         });
 
