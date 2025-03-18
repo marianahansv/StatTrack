@@ -40,10 +40,13 @@ public class SectionModel {
      *
      * @param section the name of the section to add
      */
-    public void addSection(String section) {
+    public boolean addSection(String section) {
         if (!sections.contains(section)) {
             sections.add(section);
             saveSectionsToFile();
+            return true;
+        } else {
+            return false; // Section already exists
         }
     }
 
@@ -53,12 +56,16 @@ public class SectionModel {
      * @param section the name of the section to delete
      * @return true if the section was deleted, false otherwise
      */
-    public boolean deleteSection(String section) {
-        boolean removed = sections.remove(section);
-        if (removed) {
-            saveSectionsToFile();
+    public boolean deleteSection(String section, UserHistoryDataModel userHistoryDataModel) {
+        if (!sections.contains(section)) {
+            return false;
         }
-        return removed;
+        GoalModel goalModel = new GoalModel(userHistoryDataModel);
+        goalModel.deleteGoalsInSection(section);
+        sections.remove(section);
+        saveSectionsToFile();
+
+        return true;
     }
 
     /**

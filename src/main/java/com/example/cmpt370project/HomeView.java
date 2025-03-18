@@ -1,6 +1,7 @@
 package com.example.cmpt370project;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -44,10 +45,12 @@ public class HomeView extends StackPane implements Subscriber {
      * The root of this view.
      */
     private VBox root;
+
     /**
      * All the possible pages of the home view.
      */
     private enum HomeViewPage {HOME, ADD_GOAL}
+
     /**
      * The current page that the home view should show.
      */
@@ -126,22 +129,29 @@ public class HomeView extends StackPane implements Subscriber {
      */
     public HomeView() {
         root = new VBox();
-        // Home page element
+        // Load the CSS file
+        this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
+
+        // Home page elements
         addGoalButton = new Button("Add Goal");
+        addGoalButton.getStyleClass().add("button");
+        addGoalButton.getStyleClass().add("add-goal-button");
+
         welcomeLabel = new Label("Welcome to Your Personal Goal Tracker!");
-        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+        welcomeLabel.getStyleClass().add("welcome-label");
 
         clearGoalsButton = new Button("Clear Goals");
+        clearGoalsButton.getStyleClass().add("button");
+        clearGoalsButton.getStyleClass().add("clear-goals-button");
 
         // Motivational Message module
         motivationModule = new VBox(20);
         motivationModule.setAlignment(Pos.CENTER_LEFT);
-        motivationModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
-        motivationModule.setPadding(new Insets(20));
+        motivationModule.getStyleClass().add("motivation-module");
 
         // Greeting text configuration
         userGreeting = new Label();
-        userGreeting.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        userGreeting.getStyleClass().add("user-greeting");
         motivationModule.getChildren().add(userGreeting);
 
         // Get randomized motivational message and greeting
@@ -149,6 +159,7 @@ public class HomeView extends StackPane implements Subscriber {
         int randomIndex = random.nextInt(motivationalMessages.length);
         motivationalLabel = new Label();
         motivationalLabel.setText(motivationalMessages[randomIndex]);
+        motivationalLabel.getStyleClass().add("motivational-label");
         motivationModule.getChildren().add(motivationalLabel);
 
         randomIndex = random.nextInt(greetings.length);
@@ -164,6 +175,8 @@ public class HomeView extends StackPane implements Subscriber {
 
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
+        cancelAddGoalButton.getStyleClass().add("button");
+
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
         difficultyComboBox.setValue("Medium"); //default value
@@ -191,6 +204,8 @@ public class HomeView extends StackPane implements Subscriber {
         for (String section : sectionsList) {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
+            sectionButton.getStyleClass().add("button");
+            sectionButton.getStyleClass().add("section-button");
             sectionButton.setOnAction(e -> {
                 currentSelectedSection = section; // update the currently selected section
                 updateGoalsDisplay(section);
@@ -202,8 +217,11 @@ public class HomeView extends StackPane implements Subscriber {
         startDatePicker = new DatePicker(LocalDate.now());
         endDatePicker = new DatePicker(LocalDate.now().plusDays(7));
 
-        //  "Create New Section" feature
+        // "Create New Section" feature
         createSectionButton = new Button("Create New Section");
+        createSectionButton.getStyleClass().add("button");
+        createSectionButton.getStyleClass().add("create-section-button");
+
         createSectionButton.setOnAction(e -> {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("New Section");
@@ -211,22 +229,36 @@ public class HomeView extends StackPane implements Subscriber {
             dialog.setContentText("Enter section name:");
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent() && !result.get().isBlank()) {
-                String newSection = result.get();
-                // Persist the new section using SectionModel
-                sectionModel.addSection(newSection);
-                sectionsList.add(newSection);
-                ToggleButton sectionButton = new ToggleButton(newSection);
-                sectionButton.setToggleGroup(sectionToggleGroup);
-                sectionButton.setOnAction(ev -> {
-                    currentSelectedSection = newSection;
-                    updateGoalsDisplay(newSection);
-                });
-                sectionButtons.getChildren().add(sectionButton);
+                String newSection = result.get().trim();
+
+                // check if the section already exists
+                if (!sectionModel.addSection(newSection)) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Duplicate Section");
+                    alert.setHeaderText(null);
+                    alert.setContentText("A section with this name already exists.");
+                    alert.showAndWait();
+                } else {
+                    // add section to UI only if it was successfully added to the model
+                    sectionsList.add(newSection);
+                    ToggleButton sectionButton = new ToggleButton(newSection);
+                    sectionButton.setToggleGroup(sectionToggleGroup);
+                    sectionButton.getStyleClass().add("button");
+                    sectionButton.getStyleClass().add("section-button");
+                    sectionButton.setOnAction(ev -> {
+                        currentSelectedSection = newSection;
+                        updateGoalsDisplay(newSection);
+                    });
+                    sectionButtons.getChildren().add(sectionButton);
+                }
             }
         });
 
         // "Delete Section" feature
         deleteSectionButton = new Button("Delete Section");
+        deleteSectionButton.getStyleClass().add("button");
+        deleteSectionButton.getStyleClass().add("delete-section-button");
+
         deleteSectionButton.setOnAction(e -> {
             // ChoiceDialog to let the user select a section to delete
             ChoiceDialog<String> dialog = new ChoiceDialog<>(null, new ArrayList<>(sectionModel.getSections()));
@@ -237,19 +269,26 @@ public class HomeView extends StackPane implements Subscriber {
             result.ifPresent(selectedSection -> {
                 // Delete the section from the model ONLY if there's more than one left
                 if (sectionModel.getSections().size() <= 1) {
-                    Alert alert = new Alert(Alert.AlertType.valueOf("ERROR"));
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Warning");
                     alert.setHeaderText("Can't delete the only section left!");
                     alert.showAndWait();
-                }
-                else{
-                    boolean deleted = sectionModel.deleteSection(selectedSection);
-                    if (deleted) {
-                        // Remove section from the local list and remove its toggle button from the UI
-                        sectionsList.remove(selectedSection);
-                        sectionButtons.getChildren().removeIf(node ->
-                                node instanceof ToggleButton && ((ToggleButton)node).getText().equals(selectedSection)
-                        );
+                } else {
+                    Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmationAlert.setTitle("Delete Section");
+                    confirmationAlert.setHeaderText("Are you sure?");
+                    confirmationAlert.setContentText("Warning: This will delete all goals in this section!");
+
+                    Optional<ButtonType> confirmationResult = confirmationAlert.showAndWait();
+                    if (confirmationResult.isPresent() && confirmationResult.get() == ButtonType.OK) {
+                        boolean deleted = sectionModel.deleteSection(selectedSection, userHistoryDataModel);
+                        if (deleted) {
+                            sectionsList.remove(selectedSection);
+                            sectionButtons.getChildren().removeIf(node ->
+                                    node instanceof ToggleButton && ((ToggleButton) node).getText().equals(selectedSection)
+                            );
+                            goalModel.notifySubscribers();
+                        }
                     }
                 }
             });
@@ -259,7 +298,7 @@ public class HomeView extends StackPane implements Subscriber {
         goalsBox = new VBox();
         goalsBox.setSpacing(10);
         goalsBox.setPadding(new Insets(10));
-        goalsBox.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: #cdb6f3;");
+        goalsBox.getStyleClass().add("goals-box");
         goalsBox.setVisible(false);
         goalsBox.setManaged(false);
 
@@ -271,9 +310,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         drawView();
     }
-    /**
-     * Update the UI elements of this page when the model changes.
-     */
+
     private void drawView() {
         getChildren().clear();
         switch (currentViewPage) {
@@ -281,18 +318,12 @@ public class HomeView extends StackPane implements Subscriber {
             case ADD_GOAL -> drawAddGoalView();
         }
     }
-    /**
-     * Switch to a different page of this view.
-     * @param newPage the page this view should switch to.
-     */
+
     private void changePage(HomeViewPage newPage) {
         this.currentViewPage = newPage;
         drawView();
     }
-    /**
-     * Set the goal model of this view.
-     * @param goalModel the goal model that this view will pull data from.
-     */
+
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
 
@@ -311,6 +342,7 @@ public class HomeView extends StackPane implements Subscriber {
 
     /**
      * Set the user data model for this view.
+     *
      * @param userHistoryDataModel the user data model for this view.
      */
     public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
@@ -395,33 +427,55 @@ public class HomeView extends StackPane implements Subscriber {
         difficultyComboBox.setValue("Medium");
         sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().getFirst());
     }
-    /**
-     * Draws the UI of the Home page.
-     */
+
     private void drawHomeView() {
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_LEFT);
         root.setSpacing(20);
         root.setPadding(new Insets(20));
-        // create a box to display sections
-        VBox sectionBox = new VBox();
-        sectionBox.setSpacing(10);
-        sectionBox.setPadding(new Insets(10));
-        sectionBox.setStyle("-fx-border-color: grey; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
-        Label sectionLabel = new Label("Sections:");
-        sectionBox.getChildren().addAll(sectionLabel, sectionButtons);
 
-        // Get and population user's name (once it has been set in the model)
+        Label sectionTitle = new Label("My Sections");
+        sectionTitle.getStyleClass().add("section-title");
+
+        // hbox for title and sections
+        HBox titleAndButtons = new HBox(10);
+        titleAndButtons.setAlignment(Pos.CENTER_LEFT);
+        titleAndButtons.getChildren().addAll(sectionTitle, createSectionButton, deleteSectionButton);
+        HBox sectionButtonsBox = new HBox(10);
+        sectionButtonsBox.setAlignment(Pos.TOP_LEFT);
+
+        // section button
+        for (String section : sectionsList) {
+            ToggleButton sectionButton = new ToggleButton(section);
+            sectionButton.setToggleGroup(sectionToggleGroup);
+            sectionButton.getStyleClass().add("button");
+            sectionButton.getStyleClass().add("section-button");
+
+            sectionButton.setOnAction(e -> {
+                currentSelectedSection = section;
+                updateGoalsDisplay(section);
+            });
+
+            sectionButtonsBox.getChildren().add(sectionButton);
+        }
+
+        VBox mySectionsBox = new VBox(15);
+        mySectionsBox.getStyleClass().add("my-sections-container"); // Apply the box style
+        mySectionsBox.setAlignment(Pos.CENTER);
+        mySectionsBox.getChildren().addAll(titleAndButtons, sectionButtonsBox);
+
+        VBox sectionsAndGoalsBox = new VBox(10);
+        sectionsAndGoalsBox.getChildren().addAll(mySectionsBox, goalsBox);
+
         if (userHistoryDataModel != null) {
             userGreeting.setText(currentGreeting + ", " + userHistoryDataModel.getUserName() + "! Let's complete some goals.");
         }
-
-        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton, clearGoalsButton, sectionBox, createSectionButton, deleteSectionButton, goalsBox);
+        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton, clearGoalsButton, sectionsAndGoalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.
         if (currentSelectedSection != null) {
-            for (javafx.scene.Node node : sectionButtons.getChildren()) {
+            for (javafx.scene.Node node : sectionButtonsBox.getChildren()) {
                 if (node instanceof ToggleButton) {
                     ToggleButton tb = (ToggleButton) node;
                     if (tb.getText().equalsIgnoreCase(currentSelectedSection)) {
@@ -481,9 +535,11 @@ public class HomeView extends StackPane implements Subscriber {
 
         //selecting general section toggle
         Toggle default_toggle = sectionToggleGroup.getToggles().getFirst();
-        for (Toggle t: sectionToggleGroup.getToggles()) {
+        for (Toggle t : sectionToggleGroup.getToggles()) {
             if (default_toggle.equals(t)) t.setSelected(true);
-            else {t.setSelected(false);}
+            else {
+                t.setSelected(false);
+            }
 
         }
     }
@@ -492,24 +548,52 @@ public class HomeView extends StackPane implements Subscriber {
      * Updates the goalsBox to display all goals in the given section.
      * Assumes goalModel.getGoalsForSection(section) returns a List of Goal objects.
      * If there are no goals, displays a default message.
+     *
      * @param section the section whose goals should be displayed.
      */
     private void updateGoalsDisplay(String section) {
         currentSelectedSection = section;
         goalsBox.getChildren().clear();
 
-        // the section box only shows up when the section is selected
+        Label goalsTitle = new Label("Goals in " + section);
+        goalsTitle.getStyleClass().add("goals-title");
+        goalsBox.getChildren().add(goalsTitle);
         goalsBox.setVisible(true);
         goalsBox.setManaged(true);
 
         List<Goal> goals = goalModel.getGoalsForSection(section);
         System.out.println("Updating goals display for section '" + section + "': " + goals.size() + " goal(s) found.");
         if (goals.isEmpty()) {
-            goalsBox.getChildren().add(new Label("No goals in this section."));
+            Label noGoalsLabel = new Label("No goals in this section.");
+            noGoalsLabel.getStyleClass().add("no-goals-label");
+            goalsBox.getChildren().add(noGoalsLabel);
         } else {
             for (Goal goal : goals) {
-                Label goalLabel = new Label(goal.toString());
-                goalsBox.getChildren().add(goalLabel);
+                VBox goalCard = new VBox(10);
+                goalCard.getStyleClass().add("goal-card");
+
+                Label titleLabel = new Label("Title: " + goal.getTitle());
+                titleLabel.getStyleClass().add("title-label");
+
+                Label difficultyLabel = new Label("Difficulty: " + goal.getDifficulty());
+                difficultyLabel.getStyleClass().add("label");
+
+                Label datesLabel = new Label(
+                        "Start: " + goal.getStartDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy")) +
+                                " | End: " + goal.getEndDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy"))
+                );
+                datesLabel.getStyleClass().add("label");
+
+                Label statusLabel = new Label("Completed: " + (goal.isCompleted() ? "✅" : "❌"));
+                statusLabel.getStyleClass().add("label");
+                if (goal.isCompleted()) {
+                    statusLabel.getStyleClass().add("status-completed");
+                } else {
+                    statusLabel.getStyleClass().add("status-incomplete");
+                }
+
+                goalCard.getChildren().addAll(titleLabel, difficultyLabel, datesLabel, statusLabel);
+                goalsBox.getChildren().add(goalCard);
             }
         }
     }
