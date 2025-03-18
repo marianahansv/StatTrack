@@ -37,8 +37,14 @@ public class SuggestionsController{
      * Handles user choice between accepting suggested changes or not!*/
     public String handleButtonPress(Goal newGoal) {
         String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
-        String taskBreakdownSuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
-        return "Here is what I found...\n" + "* "+ timelineSuggestion +"\n* " + taskBreakdownSuggestion;
+        String taskDifficultySuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
+        String taskBreakdownSuggestion = suggestionsModel.getTaskBreakdownSuggestion(newGoal);
+        String isRealisticGoal = suggestionsModel.checkUnrealisticDeadline(newGoal);
+        return "Here is what I found...\n" +
+                "* "+ timelineSuggestion +
+                "\n* " + taskDifficultySuggestion +
+                "\n* " + taskBreakdownSuggestion +
+                "\n* " + isRealisticGoal;
     }
 
 
