@@ -11,6 +11,7 @@ import java.util.Random;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -250,6 +251,7 @@ public class HomeView extends StackPane implements Subscriber {
                         updateGoalsDisplay(newSection);
                     });
                     sectionButtons.getChildren().add(sectionButton);
+                    drawView();
                 }
             }
         });
@@ -287,6 +289,7 @@ public class HomeView extends StackPane implements Subscriber {
                             sectionButtons.getChildren().removeIf(node ->
                                     node instanceof ToggleButton && ((ToggleButton) node).getText().equals(selectedSection)
                             );
+                            drawView();
                             goalModel.notifySubscribers();
                         }
                     }
