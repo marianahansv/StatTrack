@@ -68,6 +68,8 @@ public class GoalProgress extends VBox implements Subscriber {
         updateChart();
     }
 
+    
+
     /**
      * Sets up the chart type selector allowing the user to choose the visualization type.
      */
@@ -139,7 +141,7 @@ public class GoalProgress extends VBox implements Subscriber {
     private PieChart createPieChartForGoal(Goal goal) {
         
         PieChart pieChart = new PieChart();
-        pieChart.setTitle(goal.getTitle());
+        pieChart.setTitle((isDue(goal)));
         // Calculate total days, days left, and days completed.
         long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
         long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
@@ -189,7 +191,7 @@ public class GoalProgress extends VBox implements Subscriber {
             long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());
             if (daysLeft < 0) {continue;}
             
-            series.getData().add(new XYChart.Data<>(goal.getTitle(), daysLeft));
+            series.getData().add(new XYChart.Data<>((isDue(goal)), daysLeft));
         }
 
         barChart.getData().add(series);
@@ -260,7 +262,7 @@ private void updateLineChart() {
     for (Goal goal : goalModel.getGoals()) {
         // Create a new series for the current goal
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName(goal.getTitle());
+        series.setName(isDue(goal));
 
         // Format dates as strings
         String startDateStr = goal.getStartDate().toString();
@@ -292,5 +294,24 @@ private void updateLineChart() {
         list.add(todayLine);
         lineChart.getData().addAll(list);
     }
+   
+    /*
+     * Indicates if a goal is past due or due today
+     *  @param goal goal to be checked when its duedate is by comparision of today
+     */
+    private String isDue(Goal goal) {
+        String title = null;
+        LocalDate today = LocalDate.now();
+        
+        if (goal.getEndDate().isBefore(today)) {
+            title = (goal.getTitle()+ " (Past Due!)");
+        } else if (goal.getEndDate().isEqual(today)) {
+            title = (goal.getTitle()+ " (Due Today!)");
+        } else {
+            title = (goal.getTitle());
+        }
+        return title;
+        }
+
 }
 
