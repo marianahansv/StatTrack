@@ -12,10 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -238,6 +235,14 @@ public class GoalModel {
                 System.err.println("Error loading goals from file: " + e.getMessage());
             }
         }
+    }
+
+    /**
+     * Load goals from file into a hashmap - supporting function for UserProgressHistoryVisModel
+     */
+    public Map<String, Goal> load_goals_from_file_hashmap(){
+        load_goals_from_file();
+        return new HashMap<>(goals);
     }
 
     /**

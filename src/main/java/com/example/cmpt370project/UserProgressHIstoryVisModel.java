@@ -3,26 +3,29 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class UserProgressHIstoryVisModel extends GoalModel{
-    private HashMap<String,Goal> goals;
     private List<Subscriber> subscribers;
-    private String userName;
-    private Integer goalsCompletedforDay;
     public UserHistoryDataModel dataHistoricalModel;
 
+    /**
+     * The model for the user progress historical data that stores the logic required
+     * for the charts to utilize.
+     * @param UH: User history data model is used to access its
+     */
     public UserProgressHIstoryVisModel(UserHistoryDataModel UH){
         super(UH);
-        goals = new HashMap<>();
         subscribers = new ArrayList<>();
-        userName = null; //default
-        goalsCompletedforDay = 0; //default
     }
 
     public void addSubscriber(Subscriber subscriber) {
         subscribers.add(subscriber);
     }
 
-    public List<Goal> getUserGoals(){
-        return getGoals();
+    /**
+     * Helps to take the goals from the json file directly with the function from GoalModel.
+     * @return: A list of goals that the user has inputted into the system.
+     */
+    public List<Goal> getGoals(){
+        return new ArrayList<>(load_goals_from_file_hashmap().values());
     }
 
     public List<Goal> easyGoals(){
