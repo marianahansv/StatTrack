@@ -105,6 +105,7 @@ public class HomeView extends StackPane implements Subscriber {
     private final TextField titleInput;
     private final Button cancelAddGoalButton;
     private final Button submitGoalButton;
+    private final Button changeNameButton;
     private final ComboBox<String> difficultyComboBox;
     private FlowPane sectionButtons;
     private HBox addGoalFormRow1;
@@ -144,6 +145,10 @@ public class HomeView extends StackPane implements Subscriber {
         clearGoalsButton = new Button("Clear Goals");
         clearGoalsButton.getStyleClass().add("button");
         clearGoalsButton.getStyleClass().add("clear-goals-button");
+
+        changeNameButton = new Button("Change Name");
+        changeNameButton.getStyleClass().add("button");
+        changeNameButton.getStyleClass().add("change-name-button");
 
         // Motivational Message module
         motivationModule = new VBox(20);
@@ -382,6 +387,7 @@ public class HomeView extends StackPane implements Subscriber {
         submitGoalButton.setOnAction(e -> handleGoalSubmission(c));
         giveMeSuggestionsButton.setOnAction(e -> handleSuggestions(s));
         clearGoalsButton.setOnAction(c::removeButtonPress);
+        changeNameButton.setOnAction(c::handleChangeName);
     }
 
     /**
@@ -480,7 +486,7 @@ public class HomeView extends StackPane implements Subscriber {
         if (userHistoryDataModel != null) {
             userGreeting.setText(currentGreeting + ", " + userHistoryDataModel.getUserName() + "! Let's complete some goals.");
         }
-        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton, clearGoalsButton, sectionsAndGoalsBox);
+        root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton, clearGoalsButton, changeNameButton, sectionsAndGoalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.

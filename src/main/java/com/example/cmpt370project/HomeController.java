@@ -1,9 +1,11 @@
 package com.example.cmpt370project;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.TextInputDialog;
 
 import java.time.LocalDate;
 import java.util.InputMismatchException;
+import java.util.Optional;
 
 /**
  * Handles changing model according to the users actions. Only calls model using its public API!
@@ -11,14 +13,16 @@ import java.util.InputMismatchException;
  */
 public class HomeController {
     private GoalModel gm;
+    private UserHistoryDataModel userHistoryDataModel;
 
     // Could consider adding states for a state machine if that comes up later, depending on what our application requires...
     // (i.e. if there are different interaction states for a single view...)
 
     public HomeController() {}
 
-    public void setModel(GoalModel goalModel) {
+    public void setModel(GoalModel goalModel, UserHistoryDataModel userHistoryDataModel) {
         this.gm = goalModel;
+        this.userHistoryDataModel = userHistoryDataModel;
     }
 
     /**
@@ -53,6 +57,23 @@ public class HomeController {
      */
     public void removeButtonPress(ActionEvent actionEvent) {
         gm.clearGoals();
+    }
+
+    public void handleChangeName(ActionEvent actionEvent) {
+        // Create a TextInputDialog
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change your name.");
+        dialog.setHeaderText("Please enter your new user name:");
+        dialog.setContentText("Name:");
+
+        // Show the dialog and capture the input
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent() && !result.get().isBlank()) {
+            userHistoryDataModel.setUserName(result.get().trim());
+        } else {
+            userHistoryDataModel.setUserName("User");
+        }
     }
 
 }

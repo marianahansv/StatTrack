@@ -201,7 +201,7 @@ public class DashboardView extends BorderPane {
         // ********* 4. Set models of each Controller *********
 
         // SET HOME PAGE CONTROLLER MODEL
-        homeController.setModel(goalModel);
+        homeController.setModel(goalModel, userHistoryDataModel);
 
         // SET GOAL PLAN PAGE CONTROLLER MODEL
         goalPlanController.setModel(goalPlanModel);
