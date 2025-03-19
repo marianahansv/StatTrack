@@ -1,25 +1,38 @@
 
 package com.example.cmpt370project;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import com.google.gson.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
+
 /**
  * The GoalModel holds all the Goals data in the application. It handles the CRUD operations, and
- * serialization (storage) of Goals.
+ * serialization (storage) of Goals. It also provides filtering operations
  */
 public class GoalModel {
     private static final String FILE_NAME = System.getProperty("user.home") + "/GoalApplication/goals.json";
-    private HashMap<String, Goal> goals;
+
+    private HashMap<String, Goal> goals = new HashMap<>();
     private static final DateTimeFormatter format = DateTimeFormatter.ISO_LOCAL_DATE; //YYYY-MM-DD
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
             context.serialize(src.format(format))).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
@@ -28,11 +41,12 @@ public class GoalModel {
      * The subscriber list (i.e. the view), which will update when the view changes.
      */
     private List<Subscriber> subscribers;
-
     private String currentFilter = "All"; // Stores the currently selected difficulty filter
+    private UserHistoryDataModel userHistoryDataModel;
 
-    public GoalModel(){
-        goals = new HashMap<>();
+    public GoalModel(UserHistoryDataModel userHistoryDataModel){
+        //UserHistoryDataModel historyModel = new UserHistoryDataModel();
+        this.userHistoryDataModel = userHistoryDataModel;
         subscribers = new ArrayList<Subscriber>();
         load_goals_from_file();
     }
@@ -52,6 +66,15 @@ public class GoalModel {
         notifySubscribers();
     }
 
+    /*
+     * Sets the User History Data Model
+     * @param userHistoryDataModel the data model for a the system to track
+     */
+    public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
+        this.userHistoryDataModel = userHistoryDataModel;
+    }
+    
+
     /**
      * Create a new goal and add it to the dictionary.
      * Note: This method handles the creation of the goal
@@ -61,8 +84,8 @@ public class GoalModel {
      * @param startDate start date of goal
      * @param endDate end date of goal
      */
-    public void addGoal(String title, String section, String difficulty, LocalDate startDate, LocalDate endDate){
-        Goal newGoal = new Goal(title,section,difficulty,startDate,endDate);
+    public void addGoal(String title, String section, String difficulty, LocalDate startDate, LocalDate endDate, boolean completed){
+        Goal newGoal = new Goal(title,section,difficulty,startDate,endDate,completed);
         goals.put(newGoal.getTitle(),newGoal);
         save_goals_to_file();
         notifySubscribers();
@@ -98,12 +121,21 @@ public class GoalModel {
      */
     public boolean updateGoal(String title, Goal updatedGoal) {
         if (goals.containsKey(title)) {
-            goals.put(title, updatedGoal);
+            System.out.println("Updating goal: " + title);
+            // If the title has been changed in updatedGoal, update the map key accordingly.
+            if (!title.equals(updatedGoal.getTitle())) {
+                goals.remove(title);
+                goals.put(updatedGoal.getTitle(), updatedGoal);
+            } else {
+                goals.put(title, updatedGoal);
+            }
             save_goals_to_file();
             return true;
         }
+        System.out.println("Goal not found for update: " + title);
         return false;
     }
+    
     /**
      * Delete a goal by its title. (I'm just thinking of what would be easier but we can always change it as we need)
      * @param title of goal to delete.
@@ -121,6 +153,7 @@ public class GoalModel {
      * @return list of all goals. (I'm thinking of future sorting/filtering operations for which we'll need a list)
      */
     public List<Goal> getGoals(){
+        if (goals.values().isEmpty()) return new ArrayList<Goal>();
         return new ArrayList<>(goals.values());
     }
 
@@ -131,7 +164,28 @@ public class GoalModel {
     public int getGoalCount() {
         return goals.size();
     }
-
+      /**
+     * Complete a goal;
+     * @param goal The goal to complete.
+     */
+    public void completeGoal(Goal goal) {
+        goal.setCompleted(true);
+        //System.out.println(1111111);
+        // notifySubscribers(); // Make sure the view refreshes
+        updateGoal(goal.getTitle(), goal);
+        /*userHistoryDataModel = new UserHistoryDataModel(); //instantiates UH
+        System.out.println(userHistoryDataModel.getDailyCompletedGoals());
+        userHistoryDataModel.completeGoal(LocalDate.now()); //UH is updated
+        System.out.println(userHistoryDataModel.getDailyCompletedGoals());
+        userHistoryDataModel.notifySubscribers(); */
+        userHistoryDataModel.completeGoal(LocalDate.now());
+        userHistoryDataModel.saveDataToFile();
+        userHistoryDataModel.notifySubscribers();
+        notifySubscribers();
+        //save_goals_to_file();
+        //deleteGoal(goal.getTitle());
+        
+    }
     /**
      * Checks if file exists before reading or writing to it.
      * If it doesn't, it creates an empty file
@@ -204,6 +258,8 @@ public class GoalModel {
     /**
      * Sets the difficulty filter and notifies subscribers (View).
      * The View will update itself based on the new filter.
+     * @param difficulty the difficulty level to filter by (e.g., "Easy", "Medium", "Hard").
+     *                   If "All" is passed, it returns all goals.
      */
     public void setFilteredDifficulty(String difficulty) {
         this.currentFilter = difficulty;
@@ -229,6 +285,19 @@ public class GoalModel {
         return filteredGoals;
     }
 
+    /**
+     * Deletes all goals belonging to a specific section.
+     * Ensures goals are removed from memory and JSON file.
+     * @param section The section whose goals need to be deleted.
+     */
+    public void deleteGoalsInSection(String section) {
+        boolean removed = goals.entrySet().removeIf(entry -> entry.getValue().getSection().equalsIgnoreCase(section));
+
+        if (removed) {
+            save_goals_to_file();
+            notifySubscribers();
+        }
+    }
 
     /**
      * Notify the subscribers of this model that the data has changed.
@@ -244,11 +313,14 @@ public class GoalModel {
 
     // Unit Testing :)
     public static void main(String[] args) {
-        GoalModel model = new GoalModel();
+
+       /*  UserHistoryDataModel userHistoryDataModel;
+        this.userHistoryDataModel = userHistoryDataModel;
+        GoalModel model = new GoalModel(userHistoryDataModel);
         // Create some goals
         Goal goal1 = new Goal("Run a marathon", "Fitness", "Hard",
-                LocalDate.of(2025, 2, 1), LocalDate.of(2025, 6, 1));
-        Goal goal2 = new Goal("Read 10 books","Personal", "Medium", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 7, 31));
+                LocalDate.of(2025, 2, 1), LocalDate.of(2025, 6, 1), false);
+        Goal goal2 = new Goal("Read 10 books","Personal", "Medium", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 7, 31), false);
 
         //test addGoal
         model.addGoal(goal1);
@@ -274,11 +346,13 @@ public class GoalModel {
 
         //test save_to_file and load_from_file (saving should have happened when adding/updating goals)
         System.out.println("Goals loaded from file:");
-        GoalModel emptyModel = new GoalModel();
+        GoalModel emptyModel = new GoalModel(userHistoryDataModel);
         for (Goal goal: emptyModel.getGoals()) {
             System.out.println(goal.toString());
-        }
+        }*/
     }
+
+
 
 }
 

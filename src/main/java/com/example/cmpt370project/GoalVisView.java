@@ -27,6 +27,7 @@ public class GoalVisView extends StackPane implements Subscriber {
      * Create a new goal vis page.
      */
     public GoalVisView(GoalModel goalModel) {
+        
         VBox root = new VBox();
         root.setSpacing(20);
         root.setPadding(new Insets(20));
@@ -67,6 +68,9 @@ public class GoalVisView extends StackPane implements Subscriber {
         this.goalPlanModel = gpModel;
     }
 
+    /**
+     * Model is updated
+     */
     @Override
     public void modelUpdated() {
         drawView();

@@ -4,6 +4,8 @@ package com.example.cmpt370project;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -18,12 +20,19 @@ public class DashboardView extends BorderPane {
     private GoalProgress goalChartView;
     private GoalChartController chartController;
 
+    /**
+     * Controller for the suggestions methods
+     * **/
+    private SuggestionsController suggestionsController;
     // ************************* APPLICATION MODELS *************************
     /**
      * The model that holds the goal data of the application.
      */
     private GoalModel goalModel;
-
+    /**
+     * The model that holds the suggestions data of the application.
+     */
+    private SuggestionsModel suggestionsModel;
     /**
      * The model that holds the goal plan data of the application.
      */
@@ -82,6 +91,7 @@ public class DashboardView extends BorderPane {
 
     //private GoalProgress goalChartView;
 
+
     /**
      *  The user progress historical visualization page of the application
      */
@@ -122,6 +132,11 @@ public class DashboardView extends BorderPane {
     private Button historicalChartButton;
 
     /**
+     * ScrollPane for adding vertical scrolling to all views.
+     */
+    private ScrollPane scrollPane;
+
+    /**
      * Construct the dashboard view and MVC structure of the application.
      */
     public DashboardView() {
@@ -131,16 +146,19 @@ public class DashboardView extends BorderPane {
         // ********* 1. Create all the MVC components *********
 
         // MODElS
-        goalModel = new GoalModel();
+
         goalPlanModel = new GoalPlanModel();
-        historicalChartModel = new UserProgressHIstoryVisModel();
         userHistoryDataModel = new UserHistoryDataModel();
+        historicalChartModel = new UserProgressHIstoryVisModel(userHistoryDataModel);
+        goalModel = new GoalModel(userHistoryDataModel);
+        suggestionsModel = new SuggestionsModel();
 
         // CONTROLLERS
         homeController = new HomeController();
         goalPlanController = new GoalPlanController();
         chartController = new GoalChartController(goalChartView, goalModel);
         historicalChartController = new UserProgressHistoryController(historicalChartProgress, historicalChartModel);
+        suggestionsController = new SuggestionsController(goalModel,suggestionsModel);
 
         // VIEWS
         this.homePage = new HomeView();
@@ -170,7 +188,7 @@ public class DashboardView extends BorderPane {
         // ********* 3. Setup controller with each view *********
 
         // HOMEPAGE CONTROLLER
-        homePage.setupEvents(homeController);
+        homePage.setupEvents(homeController, suggestionsController);
 
         // GOAL PAGE CONTROLLER
 
@@ -194,37 +212,45 @@ public class DashboardView extends BorderPane {
         goalsPage.setGoalPlanModel(goalPlanModel);
         goalsPage.setUserHistoryDataModel(userHistoryDataModel);
 
+
         homePage.setGoalModel(goalModel);
         homePage.setUserHistoryDataModel(userHistoryDataModel);
+        homePage.setSuggestionsModel(suggestionsModel);
+
 
         goalVisPage.setGoalPlanModel(goalPlanModel);
         historicalChartView.setGoalPlanModel(historicalChartModel);
 
         // ************************* END MVC CONFIGURATION *************************
 
+        // Initialize ScrollPane for vertical scrolling
+        scrollPane = new ScrollPane();
+        scrollPane.setContent(homePage); // Default view is Home Page
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER); // Disable horizontal scrolling
+
         // Set up the UI components of the dashboard
         setupDashboardViewUI();
 
         // Set up page change interactions on button press
-        homeButton.setOnAction(e -> this.setCenter(homePage));
-        goalsButton.setOnAction(e -> this.setCenter(goalsPage));
+        homeButton.setOnAction(e -> scrollPane.setContent(homePage));
+        goalsButton.setOnAction(e -> scrollPane.setContent(goalsPage));
         goalPlanButton.setOnAction(e -> {
             goalPlanPage.setPageToSummaryView();
-            this.setCenter(goalPlanPage);
+            scrollPane.setContent(goalPlanPage);
         });
-        goalVisButton.setOnAction(e -> this.setCenter(goalVisPage));
-
-
+        goalVisButton.setOnAction(e -> scrollPane.setContent(goalVisPage));
         // ************************* POPULATE DUMMY DATA *************************
         // Here is where we can manually set data to show for testing/demo purposes!!
 
         // Set completed goals to test on GoalPlan page
-        userHistoryDataModel.setDailyCompletedGoals(12);
+        /* userHistoryDataModel.setDailyCompletedGoals(12);
         userHistoryDataModel.setWeeklyCompletedGoals(2);
 
         // Set username to test on the HomeView page
-        userHistoryDataModel.setUserName("HasAPlanFran");
-        historicalChartButton.setOnAction(e -> this.setCenter(historicalChartView));
+        userHistoryDataModel.setUserName("HasAPlanFran");*/
+        historicalChartButton.setOnAction(e -> scrollPane.setContent(historicalChartView));
     }
 
     /**
@@ -246,22 +272,14 @@ public class DashboardView extends BorderPane {
         goalsButton = new Button("My Goals");
         goalPlanButton = new Button("Goal Plan");
         goalVisButton = new Button("Goal Visuals");
+        historicalChartButton = new Button("Goal History");
 
-        // Set the same preferred width for each button
-        homeButton.setMaxWidth(Double.MAX_VALUE);
-        goalsButton.setMaxWidth(Double.MAX_VALUE);
-        goalPlanButton.setMaxWidth(Double.MAX_VALUE);
-        goalVisButton.setMaxWidth(Double.MAX_VALUE);
-
-        sidebar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;");
-        goalVisButton = new Button("Goal Vis");
-        historicalChartButton = new Button("Goal His");
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
         sidebar.setStyle("-fx-background-color: lightblue; -fx-padding: 10px;");
         this.setLeft(sidebar);
 
         // --- center ---
-        this.setCenter(homePage);
+        this.setCenter(scrollPane);
 
         // --- footer ---
         HBox footer = new HBox();

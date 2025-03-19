@@ -9,7 +9,8 @@ public class UserProgressHIstoryVisModel extends GoalModel{
     private Integer goalsCompletedforDay;
     public UserHistoryDataModel dataHistoricalModel;
 
-    public UserProgressHIstoryVisModel(){
+    public UserProgressHIstoryVisModel(UserHistoryDataModel UH){
+        super(UH);
         goals = new HashMap<>();
         subscribers = new ArrayList<>();
         userName = null; //default

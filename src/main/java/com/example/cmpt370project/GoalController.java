@@ -21,4 +21,13 @@ public class GoalController {
     public void filterGoals(String difficulty) {
         goalModel.setFilteredDifficulty(difficulty); // updates the model
     }
+    /**
+     * Compeletes goal and updates the Suggestions Model
+     */
+    public void completeGoal(Goal goal) {
+        goalModel.completeGoal(goal);
+        //suggestionsModel.onGoalCompletedUpdate(goal);
+        //System.out.println(55555);
+    }
+    
 }

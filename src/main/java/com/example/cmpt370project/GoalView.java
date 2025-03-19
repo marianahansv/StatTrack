@@ -1,14 +1,24 @@
 package com.example.cmpt370project;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import java.util.List;
 
 /**
  * View to handle organization of UI elements and page(s) related to viewing Goals.
@@ -23,6 +33,11 @@ public class GoalView extends StackPane implements Subscriber {
     private GoalModel goalModel;
 
     /**
+     * The goal Controller
+     */
+    private GoalController goalController; // Controller need to display button
+
+    /**
      * The goal plan model that this view gets goal data from.
      */
     private GoalPlanModel goalPlanModel;
@@ -30,7 +45,7 @@ public class GoalView extends StackPane implements Subscriber {
     /**
      * The user data model that this view gets goals completed data.
      */
-    private UserHistoryDataModel userHistoryDataModel;
+    private UserHistoryDataModel historyModel;
 
     /**
      * The root of this view.
@@ -39,30 +54,43 @@ public class GoalView extends StackPane implements Subscriber {
 
     // ********* Add other ui elements as attributes here if needed (i.e. if they need to change in drawView()) *********
 
-    private ListView<String> goalListView;
-
+    private ListView<Goal> goalListView;
     private Label progressFeedback;
     private Label welcomeLabel;
-
     private ComboBox<String> difficultyComboBox;
+    private Button completeGoalButton;
+    private Button editGoalButton;
+
+    
+    
 
     /**
      * Create a new goal view page.
      */
     public GoalView() {
+        // Create the main container
         root = new VBox();
         root.setSpacing(20);
         root.setPadding(new Insets(20));
 
+        // Label for the goals list
         Label goalsLabel = new Label("My Goals:");
+
+        // Initialize the list view for goals
         goalListView = new ListView<>();
+
+        // Add the goals label and list view to the root container
         root.getChildren().addAll(goalsLabel, goalListView);
 
-        // Add the root UI element to this view
+        // Add the root container to the main view (StackPane)
         this.getChildren().add(root);
 
-        // Initialize all other UI elements
+        // Initialize the feedback label (will be updated in drawView)
         progressFeedback = new Label();
+    }
+
+    public void setGoalController(GoalController controller) {
+        this.goalController = controller;
     }
 
     /**
@@ -72,12 +100,37 @@ public class GoalView extends StackPane implements Subscriber {
         if (goalModel == null) return;
 
         goalListView.getItems().clear();
+
         for (Goal goal : goalModel.getGoals()) {
-            goalListView.getItems().add(goal.toString());
+            goalListView.getItems().add(goal);
         }
+    
+        // Yo Cell Factories are poggers
+    goalListView.setCellFactory(lv -> new ListCell<Goal>() {  
+    protected void updateItem(Goal goal, boolean empty) {
+        super.updateItem(goal, empty);
+        if (empty || goal == null) {
+            setText(null);
+            setStyle("");
+        } else {
+            setText(goal.toString());
+            if (goal.isCompleted()) {
+                // Change the text color to green if the goal is complete
+                setStyle("-fx-text-fill: green;");
+            } else if (!goal.isCompleted() && goal.getEndDate().isBefore(LocalDate.now())) {
+                // Change the text color to red if the goal is incomplete and past due
+                setStyle("-fx-text-fill: red;");
+            } else {
+                // Otherwise, use the default text color
+                setStyle("-fx-text-fill: black;");
+            }
+        }
+        }
+        });
 
         root.getChildren().clear();
 
+        // Welcome label for dashboard
         welcomeLabel = new Label("Here's Your Current Goals:");
         welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -96,11 +149,12 @@ public class GoalView extends StackPane implements Subscriber {
             switch(goalPlanModel.getGoalPlanTimeline()) {
                 case DAILY -> {
                     planTimelineString = "DAY";
-                    timelineCompleted = userHistoryDataModel.getDailyCompletedGoals();
+                    timelineCompleted = historyModel.getDailyCompletedGoals();
                 }
                 case WEEKLY -> {
                     planTimelineString = "WEEK";
-                    timelineCompleted = userHistoryDataModel.getWeeklyCompletedGoals();
+                    timelineCompleted = historyModel.getWeeklyCompletedGoals();
+
                 }
             }
 
@@ -133,16 +187,154 @@ public class GoalView extends StackPane implements Subscriber {
         difficultyComboBox.setValue("Filter"); // default
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
+        
+        // ********* Action Buttons *********
+        completeGoalButton = new Button("Complete");
+        editGoalButton = new Button("Edit Goal");
 
+        // Container for dashboard controls (list view, feedback, filtering, buttons)
         VBox dashboardControls = new VBox();
         dashboardControls.setAlignment(Pos.TOP_CENTER);
         dashboardControls.setSpacing(5);
+        dashboardControls.getChildren().addAll(
+                goalListView,
+                goalProgressModule,
+                difficultyComboBox,
+                completeGoalButton,
+                editGoalButton
+        );
 
-        dashboardControls.getChildren().addAll(goalListView, goalProgressModule, difficultyComboBox);
+        goalListView.getItems();
+        
+        //On Complete button pressed complete the goal
+        completeGoalButton.setOnAction(e -> {
+            
+             Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
 
-        // Add all UI elements to this UI view
+             goalModel.completeGoal(selectedGoal);
+
+        });
+        
+        // On edit button pressed take to editing page
+        editGoalButton.setOnAction(e -> {
+            
+            Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
+
+            selectedGoal.setEndDate(selectedGoal.getEndDate().plusDays(1));
+            goalModel.updateGoal(selectedGoal.getTitle(), selectedGoal);
+            goalModel.notifySubscribers();
+            drawEditGoalView(selectedGoal);
+       });
+
         root.getChildren().addAll(welcomeLabel, dashboardControls);
+        goalModel.addSubscriber(this);
     }
+      /**
+     * Draws the edit view for a selected goal.
+     * Provides form fields to modify the goal details and save or cancel changes.
+     * @param goal the goal to be edited.
+     */
+    private void drawEditGoalView(Goal goal) {
+        // Clear current view
+        this.getChildren().clear();
+
+        // Create a new container for the edit form
+        VBox editRoot = new VBox(20);
+        editRoot.setAlignment(Pos.TOP_LEFT);
+        editRoot.setPadding(new Insets(20));
+
+        // Text field for editing the goal title (pre-populated with current title)
+        TextField titleField = new TextField(goal.getTitle());
+
+        // ComboBox for selecting the difficulty (pre-populated with current difficulty)
+        ComboBox<String> editDifficultyComboBox = new ComboBox<>();
+        editDifficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
+        editDifficultyComboBox.setValue(goal.getDifficulty());
+
+        // DatePickers for editing start and end dates
+        DatePicker editStartDatePicker = new DatePicker(goal.getStartDate());
+        DatePicker editEndDatePicker = new DatePicker(goal.getEndDate());
+
+        // Create section selection buttons using ToggleGroup
+        HBox editSectionButtons = new HBox(10);
+        ToggleGroup editSectionToggleGroup = new ToggleGroup();
+
+        // Retrieve available sections from SectionModel and create ToggleButtons
+        SectionModel sectionModel = new SectionModel();
+        List<String> sections = new ArrayList<>(sectionModel.getSections());
+        for (String section : sections) {
+            ToggleButton sectionButton = new ToggleButton(section);
+            sectionButton.setToggleGroup(editSectionToggleGroup);
+            if (section.equals(goal.getSection())) {
+                sectionButton.setSelected(true);
+            }
+            editSectionButtons.getChildren().add(sectionButton);
+        }
+
+        // Buttons to submit or cancel the edit
+        Button submitEditButton = new Button("Save Changes");
+        Button cancelEditButton = new Button("Cancel");
+
+        // Event handler for saving changes
+        submitEditButton.setOnAction(e -> {
+            String originalTitle = goal.getTitle();
+            String newTitle = titleField.getText();
+            String newDifficulty = editDifficultyComboBox.getValue();
+            Toggle selectedToggle = editSectionToggleGroup.getSelectedToggle();
+            if (selectedToggle == null) {
+                // If no section is selected, exit the handler (could show an error dialog)
+                return;
+            }
+            String newSection = ((ToggleButton) selectedToggle).getText();
+            LocalDate newStartDate = editStartDatePicker.getValue();
+            LocalDate newEndDate = editEndDatePicker.getValue();
+
+            // Update the goal with new values
+            goal.setTitle(newTitle);
+            goal.setDifficulty(newDifficulty);
+            goal.setSection(newSection);
+            goal.setStartDate(newStartDate);
+            goal.setEndDate(newEndDate);
+
+            // Update the model and notify subscribers
+            goalModel.updateGoal(originalTitle, goal);
+            goalModel.notifySubscribers();
+
+            // Update user history data
+            historyModel.notifySubscribers();
+            historyModel.completeGoal(LocalDate.now());
+            historyModel.saveDataToFile();
+
+            // Return to the main view
+            this.getChildren().clear();
+            this.getChildren().add(root);
+            drawView();
+        });
+
+        // Event handler for canceling the edit and returning to the main view
+        cancelEditButton.setOnAction(e -> {
+            this.getChildren().clear();
+            this.getChildren().add(root);
+            drawView();
+        });
+
+        // Build the edit form view by adding all UI elements
+        editRoot.getChildren().addAll(
+                new Label("Edit Goal Title:"), titleField,
+                new Label("Difficulty:"), editDifficultyComboBox,
+                new Label("Sections:"), editSectionButtons,
+                new Label("Start Date:"), editStartDatePicker,
+                new Label("End Date:"), editEndDatePicker,
+                submitEditButton, cancelEditButton
+        );
+
+        // Display the edit form in the view
+        this.getChildren().add(editRoot);
+    }
+    
+
+
+
 
     /**
      * Set the goal model of this view.
@@ -150,8 +342,9 @@ public class GoalView extends StackPane implements Subscriber {
      */
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
+        goalModel.addSubscriber(this);
 
-        if (userHistoryDataModel != null && goalPlanModel != null) {
+        if (historyModel != null && goalPlanModel != null) {
             modelUpdated();
         }
     }
@@ -163,7 +356,7 @@ public class GoalView extends StackPane implements Subscriber {
     public void setGoalPlanModel(GoalPlanModel gpModel) {
         this.goalPlanModel = gpModel;
 
-        if (userHistoryDataModel != null && goalModel != null) {
+        if (historyModel != null && goalModel != null) {
             modelUpdated();
         }
     }
@@ -172,8 +365,8 @@ public class GoalView extends StackPane implements Subscriber {
      * Set the user data model for this view.
      * @param userHistoryDataModel the user data model for this view.
      */
-    public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
-        this.userHistoryDataModel = userHistoryDataModel;
+    public void setUserHistoryDataModel(UserHistoryDataModel historyModel) {
+        this.historyModel = historyModel;
 
         if (goalPlanModel != null && goalModel != null) {
             modelUpdated();
@@ -191,7 +384,7 @@ public class GoalView extends StackPane implements Subscriber {
 
         goalListView.getItems().clear();
         for (Goal goal : filteredGoals) {
-            goalListView.getItems().add(goal.toString());
+            goalListView.getItems().add(goal); //toString()
         }
     }
 

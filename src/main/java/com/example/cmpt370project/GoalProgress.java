@@ -1,20 +1,29 @@
 package com.example.cmpt370project;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.chart.*;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.Axis;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.Chart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.layout.VBox;
 
 /*
  * View class for visualizing the progress of goals.
  * This view displays each goal's progress using separate charts.
  */
-public class GoalProgress extends VBox {
+public class GoalProgress extends VBox implements Subscriber {
  /**
      * The goal model that provides goal data.
      */
@@ -46,9 +55,17 @@ public class GoalProgress extends VBox {
      */ 
     public GoalProgress(GoalModel goalModel) {
         this.goalModel = goalModel;
+        //this.goalModel.notifySubscribers();
+        goalModel.addSubscriber(this);
         setupChartSelector();
         setupChart();
         updateChart();  // Initialize with data
+    }
+
+    @Override
+    public void modelUpdated() {
+        // When the model changes, update the chart automatically.
+        updateChart();
     }
 
     /**
@@ -120,6 +137,7 @@ public class GoalProgress extends VBox {
      * @return a PieChart representing the goal's progress.
      */    
     private PieChart createPieChartForGoal(Goal goal) {
+        
         PieChart pieChart = new PieChart();
         pieChart.setTitle(goal.getTitle());
         // Calculate total days, days left, and days completed.
@@ -129,9 +147,32 @@ public class GoalProgress extends VBox {
         long daysCompleted = totalDays - daysLeft;
 
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList(
-            new PieChart.Data("Completed", daysCompleted),
-            new PieChart.Data("Remaining", daysLeft)
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
+        ); //intiializes data and has a default that will work
+
+        if (daysCompleted == 1 && daysLeft != 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Day)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
         );
+        }else if (daysCompleted != 1 && daysLeft == 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Day)", daysLeft)
+        );
+        }else if (daysCompleted == 1 && daysLeft == 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Day)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Day)", daysLeft)
+        );
+        }else if (daysCompleted != 1 && daysLeft != 1) {
+            data = FXCollections.observableArrayList(
+            new PieChart.Data("Completed "+"("+daysCompleted+" Days)", daysCompleted),
+            new PieChart.Data("Remaining "+"("+daysLeft+" Days)", daysLeft)
+        );
+        }
+        
         pieChart.setData(data);
         return pieChart;
     }
@@ -141,7 +182,6 @@ public class GoalProgress extends VBox {
      */
     private void updateBarChart() {
         barChart.getData().clear();
-        // lineChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Days Left");
 
@@ -164,6 +204,7 @@ private void updateLineChart() {
     lineChart.getData().clear();
     // Makes the X Axis consistent
     CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
+    Axis<Number> yAxis = (Axis<Number>) lineChart.getYAxis();
     // List to hold dates as categories (so they can overlap and not connect)
     ObservableList<String> categories = FXCollections.observableArrayList();
 
@@ -202,40 +243,54 @@ private void updateLineChart() {
     if (today.isAfter(maxDate)) {
         maxDate = today;
     }
-    // String today = LocalDate.now().toString();
-    // categories.add(LocalDate.now().toString());
 
-    // Sort categories in chronological order (That is the default thank god I would have killed myself otherwise)
-    // FXCollections.sort(categories); //Doesnt need to be sorted anymore
-    
     // Gets every date between the min and max and adds them to the categories list as they will act as their own category making the x axis even
     for (LocalDate i = minDate; !i.isAfter(maxDate); i = i.plusDays(1)) { // Potentially change the one to someothing else or make it different depending on the span of days
         categories.add(i.toString());
     }
     // Set the sorted categories on the X axis
     xAxis.setCategories(categories);
+    yAxis.setLabel("Days Left");
     
     
+    
+    Map<String, Integer> startCount = new HashMap<>();
+    Map<String, Integer> endCount = new HashMap<>();
     // Loop through each goal in the model
     for (Goal goal : goalModel.getGoals()) {
         // Create a new series for the current goal
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName(goal.getTitle()); // Set the series name to the goal's title
-        
+        series.setName(goal.getTitle());
+
+        // Format dates as strings
+        String startDateStr = goal.getStartDate().toString();
+        String endDateStr = goal.getEndDate().toString();
+
+        // Count how many times these dates have been seen
+        int startOffsetCount = startCount.getOrDefault(startDateStr, 0);
+        int endOffsetCount = endCount.getOrDefault(endDateStr, 0);
+
         // Calculate the total days from the start date to the end date
         long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
-        // Add the start point (at total days value) and the end point (0 ie the bottom of the graph)
-        series.getData().add(new XYChart.Data<>(goal.getStartDate().toString(), totalDays));
-        series.getData().add(new XYChart.Data<>(goal.getEndDate().toString(), 0));
-        
-        // Add the newly created series to the list
-        list.add(series);
+
+        // Defines a small offset value so the lines dont overlap too much
+        double offset = 0.5;
+
+        // Apply a small offset to each point based on the number of overlaps
+        double adjustedStartValue = totalDays + (startOffsetCount * offset);
+        double adjustedEndValue = 0 + (endOffsetCount * offset);
+
+        series.getData().add(new XYChart.Data<>(startDateStr, adjustedStartValue));
+        series.getData().add(new XYChart.Data<>(endDateStr, adjustedEndValue));
+
+        // Update the count maps for the next goal with the same date
+        startCount.put(startDateStr, startOffsetCount + 1);
+        endCount.put(endDateStr, endOffsetCount + 1);
+
+    list.add(series);
     }
-    list.add(todayLine);
-    // System.out.println(list);
-    
-    // Add all series to the LineChart so each goal appears as its own line
-    lineChart.getData().addAll(list);
+        list.add(todayLine);
+        lineChart.getData().addAll(list);
     }
 }
 
