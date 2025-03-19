@@ -299,19 +299,78 @@ private void updateLineChart() {
      * Indicates if a goal is past due or due today
      *  @param goal goal to be checked when its duedate is by comparision of today
      */
-    private String isDue(Goal goal) {
-        String title = null;
-        LocalDate today = LocalDate.now();
+    private static String isDue(Goal goal) {
+            String title = null;
+            LocalDate today = LocalDate.now();
+            
+            if (goal.getEndDate().isBefore(today)) {
+                title = (goal.getTitle()+ " (Past Due!)");
+            } else if (goal.getEndDate().isEqual(today)) {
+                title = (goal.getTitle()+ " (Due Today!)");
+            } else {
+                title = (goal.getTitle());
+            }
+            return title;
+            }
+    
+    
+    public static void main(String[] args) {
+     UserHistoryDataModel history = new UserHistoryDataModel() {
+        @Override
+        public void completeGoal(LocalDate date) { }
+        @Override
+        public void saveDataToFile() { }
+        @Override
+        public void notifySubscribers() { }
+    };
+    int passed = 0;
+    int failed = 0;
+    
+    
+    
+        // Test #1: Due today works
+    Goal g1 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(1), LocalDate.now());
+    g1.setTitle(isDue(g1));
         
-        if (goal.getEndDate().isBefore(today)) {
-            title = (goal.getTitle()+ " (Past Due!)");
-        } else if (goal.getEndDate().isEqual(today)) {
-            title = (goal.getTitle()+ " (Due Today!)");
-        } else {
-            title = (goal.getTitle());
-        }
-        return title;
-        }
+    if ("Learn how to cook soup (Due Today!)".equals(g1.getTitle())) {
+        passed++;
+        System.out.println("Test 1 Passed");
+    } else {
+        failed++;
+        System.out.println("Test 1 Failed");
+    }
 
+    // Test #2: Past due worjs
+
+    Goal g2 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(2), LocalDate.now().minusDays(1));
+    g2.setTitle(isDue(g2));
+        
+    if ("Learn how to cook soup (Past Due!)".equals(g2.getTitle())) {
+        passed++;
+        System.out.println("Test 2 Passed");
+    } else {
+        failed++;
+        System.out.println("Test 2 Failed");
+    }
+
+    // Test #3: Due Date within bounds works
+
+    Goal g3 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(2), LocalDate.now().minusDays(-2));
+    g3.setTitle(isDue(g3));
+        
+    if ("Learn how to cook soup".equals(g3.getTitle())) {
+        passed++;
+        System.out.println("Test 3 Passed");
+    } else {
+        failed++;
+        System.out.println("Test 3 Failed");
+    }
+
+    
+
+
+
+
+    System.out.println("Passed: "+passed+"\n"+"Failed: "+failed);
+    }
 }
-
