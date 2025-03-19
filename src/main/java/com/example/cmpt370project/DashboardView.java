@@ -220,7 +220,7 @@ public class DashboardView extends BorderPane {
 
 
         goalVisPage.setGoalPlanModel(goalPlanModel);
-        historicalChartView.setGoalPlanModel(historicalChartModel);
+        historicalChartController.setGoalPlanModel(historicalChartModel);
 
         // ************************* END MVC CONFIGURATION *************************
 

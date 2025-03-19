@@ -1,43 +1,101 @@
 package com.example.cmpt370project;
-
 import java.time.LocalDate;
 
+/**
+ * The Controller class for managing the user's historical data. The controller class is responsible for storing the
+ * setters - such as setting the model and the view of the Model-View-Controller implementation of our application. It
+ * also focuses on updating the views for all the line graph, scatter charts, pie charts and the descriptive statistics.
+ * It also helps to ensure that the model and the view are not communicating directly.
+ */
 public class UserProgressHistoryController {
+    /**
+     * The main view box creation page for the historical goal data for the user.
+     */
     private UserProgressHistoryVisView historicalChartView;
 
+    /**
+     * The view page for the historical goal data for the user.
+     */
     private UserHIstoryProgressVisuals historicalChartProgress;
 
+    /**
+     * The model for the historical goal data for the user.
+     */
     private UserProgressHIstoryVisModel historicalChartModel;
 
-    public UserProgressHistoryController(UserHIstoryProgressVisuals historicalChartProgress, UserProgressHIstoryVisModel historicalChartModel) {
+    /**
+     * The constructor for the controller which is aware of both the model and the view page.
+     * @param historicalChartProgress: The view page for "Goal History" page.
+     * @param historicalChartModel: The model page for the "Goal History" page.
+     */
+    public UserProgressHistoryController(UserHIstoryProgressVisuals historicalChartProgress,
+                                                                    UserProgressHIstoryVisModel historicalChartModel) {
         this.historicalChartProgress = historicalChartProgress;
         this.historicalChartModel = historicalChartModel;
     }
 
+    /**
+     * Allows to set the view class that is needed to go with this particular controller.
+     * @param historicalChartProgress: The view page for the "Goal History" page.
+     */
     public void setupViewClass (UserHIstoryProgressVisuals historicalChartProgress){
         this.historicalChartProgress = historicalChartProgress;
     }
 
-    public String getStartDate(){
-        return (historicalChartProgress.leftgrid_dates.get()!= null) ? historicalChartProgress.leftgrid_dates.get().getText() : "0";
+    /**
+     * Allows to set the model class that is needed to go with this particular controller.
+     * @param historicalChartModel: The model for the "Goal History" page.
+     */
+    public void setGoalPlanModel(UserProgressHIstoryVisModel historicalChartModel){
+        this.historicalChartModel = historicalChartModel;
     }
 
+    /**
+     * Gets the start date based on the user's start dates input.
+     * @return: A string that will return the date or 0 if the date selected was empty.
+     */
+    public String getStartDate(){
+        return (historicalChartProgress.leftgrid_dates.get()!= null) ?
+                                                        historicalChartProgress.leftgrid_dates.get().getText() : "0";
+    }
+
+    /**
+     * Gets the start month based on the user's start month input.
+     * @return: A string that will return the month selected from the dropdown menu.
+     */
     public String getStartMonth(){
         return (historicalChartProgress.leftmonth_grid_selector.getValue());
     }
 
+    /**
+     * Gets the start year based on the user's start year input.
+     * @return: A string that will return the year selected from the dropdown menu.
+     */
     public String getStartYear(){
         return (historicalChartProgress.yearSelector_left.getValue());
     }
 
+    /**
+     * Gets the start date based on the user's start dates input.
+     * @return: A string that will return the date or 0 if the date selected was empty.
+     */
     public String getEndDate(){
-        return (historicalChartProgress.rightgrid_dates.get() != null) ? historicalChartProgress.rightgrid_dates.get().getText() : "0";
+        return (historicalChartProgress.rightgrid_dates.get() != null) ?
+                                                        historicalChartProgress.rightgrid_dates.get().getText() : "0";
     }
 
+    /**
+     * Gets the end month based on the user's start month input.
+     * @return: A string that will return the month selected from the dropdown menu.
+     */
     public String getEndMonth(){
         return (historicalChartProgress.rightmonth_grid_selector.getValue());
     }
 
+    /**
+     * Gets the end year based on the user's start month input.
+     * @return: A string that will return the month selected from the dropdown menu.
+     */
     public String getEndYear(){
         return (historicalChartProgress.yearSelector_right.getValue());
     }
