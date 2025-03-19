@@ -8,6 +8,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
@@ -267,7 +268,7 @@ public class DashboardView extends BorderPane {
         VBox sidebar = new VBox();
         sidebar.setSpacing(10);
         sidebar.setAlignment(Pos.CENTER);
-        sidebar.setPrefWidth(100);
+        sidebar.setPrefWidth(150);
         homeButton = new Button("Home");
         goalsButton = new Button("My Goals");
         goalPlanButton = new Button("Goal Plan");
@@ -276,6 +277,7 @@ public class DashboardView extends BorderPane {
 
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
         sidebar.setStyle("-fx-background-color: lightblue; -fx-padding: 10px;");
+        VBox.setVgrow(sidebar, Priority.ALWAYS);
         this.setLeft(sidebar);
 
         // --- center ---
