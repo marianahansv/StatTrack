@@ -1,6 +1,8 @@
 package com.example.cmpt370project;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 
 import java.time.LocalDate;
@@ -56,7 +58,21 @@ public class HomeController {
      * @param actionEvent the event that happens when the button is pressed.
      */
     public void removeButtonPress(ActionEvent actionEvent) {
-        gm.clearGoals();
+
+        // Create an alert of type CONFIRMATION
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Clear Goals");
+        alert.setHeaderText("Are you sure you want to clear all your goals?");
+        alert.setContentText("This action cannot be undone.");
+
+        // Show the dialog and wait for the user's response
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                gm.clearGoals();
+            }
+        });
+
+
     }
 
     public void handleChangeName(ActionEvent actionEvent) {
