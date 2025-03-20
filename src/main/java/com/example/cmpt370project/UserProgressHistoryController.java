@@ -102,7 +102,14 @@ public class UserProgressHistoryController {
         return (historicalChartProgress.yearSelector_right.getValue());
     }
 
-    private LocalDate dateFormatting(String year, String month, String day) {
+    /**
+     * Helper function to put the desired date in a specific format yyyy-MM-dd to perform checks and fed it as an input.
+     * @param year: The desired year.
+     * @param month: The desired month.
+     * @param day: The desired day.
+     * @return: A specifically formatted yyyy-MM-dd for the specific date that was provided by the user.
+     */
+    public LocalDate dateFormatting(String year, String month, String day) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         if (Integer.parseInt(day) > 0 && Integer.parseInt(day) <= 9) {
             return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" +
@@ -111,64 +118,119 @@ public class UserProgressHistoryController {
         return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + day, format);
     }
 
+    /**
+     * Getter function to obtain the formatted start date that can be used in the view class.
+     * @return: LocalDate type with a specific format of yyyy-MM-dd.
+     */
     public LocalDate getstartFormatDate(){
         return dateFormatting(getStartYear(), getStartMonth(), getStartDate());
     }
 
+    /**
+     * Getter function to obtain the formatted end date that can be used in the view class.
+     * @return: LocalDate type with a specific format of yyyy-MM-dd.
+     */
     public LocalDate getendFormatDate(){
         return dateFormatting(getEndYear(), getEndMonth(), getEndDate());
     }
 
+    /**
+     * Getter function to filter out all the easy goals from the given start date to the given end date.
+     * @return: A list of easy goals.
+     */
     public List<Goal> getEasyGoals(){
         return historicalChartModel.filteredGoalList(historicalChartModel.easyGoals(), getstartFormatDate(),
                                                                                                     getendFormatDate());
     }
 
+    /**
+     * Getter function to filter out all the medium goals from the given start date to the given end date.
+     * @return: A list of medium goals.
+     */
     public List<Goal> getMediumGoals(){
         return historicalChartModel.filteredGoalList(historicalChartModel.mediumGoals(), getstartFormatDate(),
                                                                                                     getendFormatDate());
     }
 
+    /**
+     * Getter function to filter out all the hard goals from the given start date to the given end date.
+     * @return: A list of hard goals.
+     */
     public List<Goal> getHardGoals(){
         return historicalChartModel.filteredGoalList(historicalChartModel.hardGoals(), getstartFormatDate(),
                                                                                                     getendFormatDate());
     }
 
+    /**
+     * Getter function to filter out the goals from the given start date to the given end date.
+     * @return: A list of goals.
+     */
     public List<Goal> getfilteredGoals(){
         return historicalChartModel.filteredGoalList(historicalChartModel.getGoals(), getstartFormatDate(),
                                                                                                     getendFormatDate());
     }
 
+    /**
+     * Getter function to filter out all the personal goals from the given start date to the given end date.
+     * @return: A list of personal goals.
+     */
     public List<Goal> getPersonalGoals(){
         return historicalChartModel.filteredGoalList(historicalChartModel.personalGoals(), getstartFormatDate(),
                                                                                                     getendFormatDate());
     }
 
+    /**
+     * Getter function to filter out all the fitness goals from the given start date to the given end date.
+     * @return: A list of fitness goals.
+     */
     public List<Goal> getFitnessGoals(){
         return historicalChartModel.filteredGoalList(historicalChartModel.fitnessGoals(), getstartFormatDate(),
                 getendFormatDate());
     }
 
-
+    /**
+     * Getter function to filter out all the general goals from the given start date to the given end date.
+     * @return: A list of general goals.
+     */
     public List<Goal> getGeneralGoals(){
         return historicalChartModel.filteredGoalList(historicalChartModel.generalGoals(), getstartFormatDate(),
                 getendFormatDate());
     }
 
+    /**
+     * Getter function to obtain the total number of goals that the user currently has.
+     * @return: A number representing the goals.
+     */
     public int totalGoalCount(){
         return historicalChartModel.getGoalCount();
     }
 
+    /**
+     * Getter function to obtain all the goals without any filters.
+     * @return: A list of all unfiltered goals.
+     */
     public List<Goal> getUserGoals(){
         return historicalChartModel.getGoals();
     }
 
-
+    /**
+     * Update function for the pie chart to ensure that it is constantly being updated whenever the data updates.
+     */
     void updatePieCharts(){}
 
+    /**
+     * Update function for the line chart to ensure that it is constantly being updated whenever the data updates.
+     */
     void updateLineCharts(){}
 
+    /**
+     * Update function for the scatter chart to ensure that it is constantly being updated whenever the data updates.
+     */
     void updateScatterCharts(){}
 
+    /**
+     * Update function for the descriptive statistics to ensure that it is constantly being updated whenever the
+     * data updates.
+     */
     void updateDescriptiveStatistics(){}
 }
