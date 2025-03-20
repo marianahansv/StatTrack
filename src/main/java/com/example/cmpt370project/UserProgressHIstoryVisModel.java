@@ -3,13 +3,22 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The model class for the "Goal History" page.
+ */
 public class UserProgressHIstoryVisModel extends GoalModel{
+    /**
+     * Instance variable to store all the subscribers.
+     */
     private List<Subscriber> subscribers;
+
+    /**
+     * Instance variable to store the model where the json file of the user's historical data is located.
+     */
     public UserHistoryDataModel dataHistoricalModel;
 
     /**
-     * The model for the user progress historical data that stores the logic required
-     * for the charts to utilize.
+     * The model for the user progress historical data that stores the logic required for the charts to utilize.
      * @param UH: User history data model is used to access its
      */
     public UserProgressHIstoryVisModel(UserHistoryDataModel UH){
@@ -17,6 +26,10 @@ public class UserProgressHIstoryVisModel extends GoalModel{
         subscribers = new ArrayList<>();
     }
 
+    /**
+     * Helps to add a list of subscribers to our list
+     * @param subscriber: The subscriber
+     */
     public void addSubscriber(Subscriber subscriber) {
         subscribers.add(subscriber);
     }
@@ -27,10 +40,6 @@ public class UserProgressHIstoryVisModel extends GoalModel{
      */
     public List<Goal> getGoals(){
         return new ArrayList<>(load_goals_from_file_hashmap().values());
-    }
-
-    public int goalCount(){
-        return getGoalCount();
     }
 
     /**
@@ -46,24 +55,52 @@ public class UserProgressHIstoryVisModel extends GoalModel{
                 !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
     }
 
+    /**
+     * The method to obtain all the easy goals inside a list.
+     * @return: A list of easy goals.
+     */
     public List<Goal> easyGoals(){
         return getGoalsByDifficulty("Easy");
     }
 
+    /**
+     * The method to obtain all the medium goals inside a list.
+     * @return: A list of medium goals.
+     */
     public List<Goal> mediumGoals(){
         return getGoalsByDifficulty("Medium");
     }
 
+    /**
+     * The method to obtain all the hard goals inside a list.
+     * @return: A list of hard goals.
+     */
     public List<Goal> hardGoals(){
         return getGoalsByDifficulty("Hard");
     }
 
+    /**
+     * The method to obtain all the personal goals inside a list.
+     * @return: A list of personal goals.
+     */
     public List<Goal> personalGoals(){return getGoalsForSection("Personal");}
 
+    /**
+     * The method to obtain all the fitness goals inside a list.
+     * @return: A list of fitness goals.
+     */
     public List<Goal> fitnessGoals(){return getGoalsForSection("Fitness");}
 
+    /**
+     * The method to obtain all the general goals inside a list.
+     * @return: A list of general goals.
+     */
     public List<Goal> generalGoals(){return getGoalsForSection("General");}
 
+    /**
+     * A helper method to associate every month with two-digit numbers.
+     * @return: A String of two-digit numbers to represent the month.
+     */
     public String numericalMonth(String monthName){
         switch(monthName){
             case "January": return "01";
@@ -81,6 +118,11 @@ public class UserProgressHIstoryVisModel extends GoalModel{
             default: return null;
         }
     }
+
+    /**
+     * A helper method to associate every day with two-digit numbers.
+     * @return: A String of two-digit numbers to represent the day.
+     */
     public String numericalDay(String dayName){
         switch(dayName){
             case "1": return "01";
@@ -94,11 +136,6 @@ public class UserProgressHIstoryVisModel extends GoalModel{
             case "9": return "09";
             default: return null;
         }
-    }
-
-    /* Returns the number of goals completed for that day specifically */
-    public int completedGoals(){
-        return dataHistoricalModel.getDailyCompletedGoals();
     }
 
 }

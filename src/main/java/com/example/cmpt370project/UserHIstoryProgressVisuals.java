@@ -943,6 +943,16 @@ import java.util.stream.Collectors;
     }
 
     private void updateGenerateView(){
+        if (historicalChartController.getUserGoals().isEmpty()){
+            Alert alert_four = new Alert(Alert.AlertType.WARNING);
+            alert_four.setTitle("No treasures found for you.");
+            alert_four.setHeaderText(null);
+            alert_four.setContentText("No goals were set during this time period so no statistical analysis can be " +
+                    "performed.");
+            alert_four.showAndWait();
+            return;
+        }
+
         /* If user doesn't select anything, nothing can be generated as well. */
         if (isNoneSelected()){
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -972,18 +982,6 @@ import java.util.stream.Collectors;
             alert_two.setContentText("The date ranges you have selected are inaccurate. Please pick a start date prior " +
                                      "to the end date. ");
             alert_two.showAndWait();
-            return;
-        }
-
-        /* If the user picked a timeframe that had no goals inside the timeframe */
-
-        if (historicalChartController.getUserGoals().isEmpty()){
-            Alert alert_four = new Alert(Alert.AlertType.WARNING);
-            alert_four.setTitle("No treasures found for you.");
-            alert_four.setHeaderText(null);
-            alert_four.setContentText("No goals were set during this time period so no statistical analysis can be " +
-                                      "performed.");
-            alert_four.showAndWait();
             return;
         }
 
