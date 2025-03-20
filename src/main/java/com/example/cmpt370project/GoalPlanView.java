@@ -75,6 +75,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
         cancelEditGoalPlanButton = new Button();
         savePlanChangesButton = new Button();
         deletePlanButton = new Button();
+        deletePlanButton.getStyleClass().add("critical-button");
 
         timelineSelectBox = new ComboBox<>();
         endDatePicker = new DatePicker();
@@ -207,8 +208,11 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
         // GOAL PLAN DELETE
         deletePlanButton.setOnAction(e-> {
-            controller.handleDeleteGoalPlan();
-            changePage(GoalPlanViewPage.SUMMARY);
+            boolean changePage = controller.handleDeleteGoalPlan();
+
+            if (changePage) {
+                changePage(GoalPlanViewPage.SUMMARY);
+            }
             goalPlanModel.syncGoalPlanToNow(); // show most up-to-date goal data
         });
     }

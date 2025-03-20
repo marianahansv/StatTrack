@@ -1,7 +1,11 @@
 package com.example.cmpt370project;
 
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 import java.time.LocalDate;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Handles changing GoalPlanModel according to the users actions.
@@ -45,8 +49,23 @@ public class GoalPlanController {
     /**
      * Handle deleting the user's Goal Plan.
      */
-    public void handleDeleteGoalPlan() {
-        goalPlanModel.clearGoalPlan();
+    public boolean handleDeleteGoalPlan() {
+
+        // Create an alert of type CONFIRMATION
+        AtomicBoolean planDeleted = new AtomicBoolean(false);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Delete Goal Plan");
+        alert.setHeaderText("Are you sure you want to delete your goal plan?");
+        alert.setContentText("This action cannot be undone.");
+
+        // Show the dialog and wait for the user's response
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                goalPlanModel.clearGoalPlan();
+                planDeleted.set(true);
+            }
+        });
+        return planDeleted.get();
     }
 
 }
