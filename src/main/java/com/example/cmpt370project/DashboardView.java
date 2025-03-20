@@ -166,7 +166,7 @@ public class DashboardView extends BorderPane {
         this.goalsPage = new GoalView();
         this.goalPlanPage = new GoalPlanView();
         this.goalVisPage = new GoalVisView(goalModel);
-        this.historicalChartView = new UserProgressHistoryVisView(historicalChartModel, historicalChartController);
+        this.historicalChartView = new UserProgressHistoryVisView(historicalChartController);
 
         //goalChartView = new GoalProgress(goalModel);
 

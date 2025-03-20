@@ -20,8 +20,7 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber 
      * Create a historical visualization representation page where all the elements are then added by the
      * UserHistoryProgressVisuals.java
      */
-    public UserProgressHistoryVisView(UserProgressHIstoryVisModel historicalChartModel,
-                                      UserProgressHistoryController historicalChartController) {
+    public UserProgressHistoryVisView(UserProgressHistoryController historicalChartController) {
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
@@ -31,7 +30,7 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber 
 
         root.getChildren().add(enterlabel);
         root.setAlignment(Pos.TOP_LEFT);
-        historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartModel, historicalChartController);
+        historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartController);
         root.getChildren().add(historicalChartProgress);
         this.getChildren().add(root);
     }

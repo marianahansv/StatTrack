@@ -1,5 +1,4 @@
 package com.example.cmpt370project;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -14,10 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -25,19 +21,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
- * This class focuses on creating the pie charts, line charts and scatter charts everytime the user picks either one or
- * two of those or decides to see all of them together. It also helps to create the buttons for selection and the grid
- * panes for the month selections.
+ * The main view page that creates all the graphs and descriptive statistics for the "Goal History" page.
  */
-public class UserHIstoryProgressVisuals extends VBox {
+    public class UserHIstoryProgressVisuals extends VBox {
     /**
-     * The UserProgressHIstoryVisModel is the model that consists of the pieces of data that we need for this view.
-     */
-    private UserProgressHIstoryVisModel historicalChartModel;
-
-    /**
-     * The UserProgressHistoryController is the controller that will store some functions which will be used by the
-     * view and the model. It acts as a communication linkage between the model and the view respectively.
+     * The controller for the "Goal History" page.
      */
     private UserProgressHistoryController historicalChartController;
 
@@ -154,12 +142,6 @@ public class UserHIstoryProgressVisuals extends VBox {
     private Button reset_visualization;
 
     /**
-     * Global variable currentButton to store to keep track of each date button the user clicks. This allows
-     * only one date in the calendar to be selected at a time.
-     */
-    AtomicReference<Button> currentButton = new AtomicReference<>(null); // had to make this atomic
-
-    /**
      * Global variable to store the date button for the starting month.
      */
     AtomicReference<Button> leftgrid_dates = new AtomicReference<>();
@@ -171,10 +153,8 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     /**
      * Constuctor for the UserHIstoryProgressVisuals class that makes use of the UserProgressHIstory model
-     * @param historicalChartModel: The model that helps to function with this view
      */
-    public UserHIstoryProgressVisuals(UserProgressHIstoryVisModel historicalChartModel, UserProgressHistoryController historicalChartController) {
-        this.historicalChartModel = historicalChartModel;
+    public UserHIstoryProgressVisuals(UserProgressHistoryController historicalChartController) {
         this.historicalChartController = historicalChartController;
         this.historicalChartController.setupViewClass(this); /* Required to set up the view classes correctly */
 
@@ -283,9 +263,9 @@ public class UserHIstoryProgressVisuals extends VBox {
         checkboxScatterGraph.setSelected(false);
 
         /* Setting up listeners for each of my buttons */
-        checkboxPieChart.setOnAction(e -> updatePieCharts());
-        checkboxLineChart.setOnAction(e -> updateLineCharts());
-        checkboxScatterGraph.setOnAction(e -> updateScatterCharts());
+        checkboxPieChart.setOnAction(e -> historicalChartController.updatePieCharts());
+        checkboxLineChart.setOnAction(e -> historicalChartController.updateLineCharts());
+        checkboxScatterGraph.setOnAction(e -> historicalChartController.updateScatterCharts());
     }
 
     /**
@@ -303,8 +283,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         chooseDescriptiveStatistics.getToggles().add(notincludeDescriptiveStatistics);
 
         /* Setting up listeners for the buttons */
-        includeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
-        notincludeDescriptiveStatistics.setOnAction(e -> updateDescriptiveStatistics());
+        includeDescriptiveStatistics.setOnAction(e -> historicalChartController.updateDescriptiveStatistics());
+        notincludeDescriptiveStatistics.setOnAction(e -> historicalChartController.updateDescriptiveStatistics());
     }
 
     /**
@@ -447,7 +427,7 @@ public class UserHIstoryProgressVisuals extends VBox {
     /**
      * The pie chart created will display the information about the goals in categories of difficulty which
      * ranges from Small, Medium and Large.
-     * @return: A VBox containing the Pie Chart inside it.
+     * return:  VBox containing the Pie Chart inside it.
      */
     private VBox drawPieCharts() {
         VBox pieChart_display = new VBox(10);
@@ -459,13 +439,9 @@ public class UserHIstoryProgressVisuals extends VBox {
         pieChart.setPrefHeight(400);
 
         /* Deriving all calculations used for the charts */
-        LocalDate startFormatDate = dateFormatting(historicalChartController.getStartYear(),
-                                    historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate = dateFormatting(historicalChartController.getEndYear(),
-                                        historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> easyGoals = filteredGoalList(historicalChartModel.easyGoals(), startFormatDate, endFormatDate);
-        List<Goal> mediumGoals = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate, endFormatDate);
-        List<Goal> hardGoals = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate, endFormatDate);
+        List<Goal> easyGoals = historicalChartController.getEasyGoals();
+        List<Goal> mediumGoals = historicalChartController.getMediumGoals();
+        List<Goal> hardGoals = historicalChartController.getHardGoals();
         int easyCount = (easyGoals != null) ? easyGoals.size() : 0;
         int mediumCount = (mediumGoals != null) ? mediumGoals.size() : 0;
         int hardCount = (hardGoals != null) ? hardGoals.size() : 0;
@@ -551,13 +527,9 @@ public class UserHIstoryProgressVisuals extends VBox {
         hardGoals_LC.getData().clear();
 
         /* Deriving all the required calculations to build our line chart accurately */
-        LocalDate startFormatDate_LC = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_LC = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_easyGoals_LC= filteredGoalList(historicalChartModel.easyGoals(), startFormatDate_LC, endFormatDate_LC);
-        List<Goal> filt_mediumGoals_LC = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate_LC, endFormatDate_LC);
-        List<Goal> filt_hardGoals_LC = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate_LC, endFormatDate_LC);
+        List<Goal> filt_easyGoals_LC= historicalChartController.getEasyGoals();
+        List<Goal> filt_mediumGoals_LC = historicalChartController.getMediumGoals();
+        List<Goal> filt_hardGoals_LC = historicalChartController.getHardGoals();
 
         /* Counting each of the goals per day based on the creation dates */
         Map<LocalDate, Integer> easyGoalsCount = new TreeMap<>();
@@ -655,14 +627,9 @@ public class UserHIstoryProgressVisuals extends VBox {
         XYChart.Series<String, Number> generalGoals = new XYChart.Series<>();
         generalGoals.setName("General Goals");
 
-        LocalDate startFormatDate_SC = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_SC = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-
-        List<Goal> filt_personalGoal_SC = filteredGoalList(historicalChartModel.personalGoals(), startFormatDate_SC, endFormatDate_SC);
-        List<Goal> filt_fitnessGoal_SC = filteredGoalList(historicalChartModel.fitnessGoals(), startFormatDate_SC, endFormatDate_SC);
-        List<Goal> filt_generalGoal_SC = filteredGoalList(historicalChartModel.generalGoals(), startFormatDate_SC, endFormatDate_SC);
+        List<Goal> filt_personalGoal_SC = historicalChartController.getEasyGoals();
+        List<Goal> filt_fitnessGoal_SC = historicalChartController.getMediumGoals();
+        List<Goal> filt_generalGoal_SC = historicalChartController.getHardGoals();
 
         Map<LocalDate, Integer> personalGoalCount = new TreeMap<>();
         Map<LocalDate, Integer> fitnessGoalCount = new TreeMap<>();
@@ -794,76 +761,42 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     private HBox meanGoals(){
         HBox meanGoalvalue = new HBox(10);
-        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_easyGoals_MG= filteredGoalList(historicalChartModel.getGoals(), startFormatDate_MG, endFormatDate_MG);
-        return gethBox(meanGoalvalue, filt_easyGoals_MG);
+        List<Goal> filt_Goals_MG= historicalChartController.getfilteredGoals();
+        return gethBox(meanGoalvalue, filt_Goals_MG);
     }
     private HBox geteasyGoals(){
         HBox easyGoalvalue = new HBox(10);
-        LocalDate startFormatDate_EG = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_EG = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_easyGoals_EG= filteredGoalList(historicalChartModel.easyGoals(), startFormatDate_EG, endFormatDate_EG);
-
+        List<Goal> filt_easyGoals_EG= historicalChartController.getEasyGoals();
         return gethBox(easyGoalvalue, filt_easyGoals_EG);
     }
 
     private HBox getmediumGoals(){
         HBox mediumGoalvalue = new HBox(10);
-        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_mediumGoals_MG = filteredGoalList(historicalChartModel.mediumGoals(), startFormatDate_MG, endFormatDate_MG);
-
+        List<Goal> filt_mediumGoals_MG = historicalChartController.getMediumGoals();
         return gethBox(mediumGoalvalue, filt_mediumGoals_MG);
     }
 
     private HBox gethardGoals(){
         HBox hardGoalvalue = new HBox(10);
-        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_hardGoals_MG = filteredGoalList(historicalChartModel.hardGoals(), startFormatDate_MG, endFormatDate_MG);
-
+        List<Goal> filt_hardGoals_MG = historicalChartController.getHardGoals();
         return gethBox(hardGoalvalue, filt_hardGoals_MG);
     }
 
     private HBox getpersonalGoals(){
         HBox personalGoalvalue = new HBox(10);
-        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_personalGoals_MG = filteredGoalList(historicalChartModel.personalGoals(), startFormatDate_MG, endFormatDate_MG);
-
+        List<Goal> filt_personalGoals_MG = historicalChartController.getPersonalGoals();
         return gethBox(personalGoalvalue, filt_personalGoals_MG);
     }
 
     private HBox getFitnessGoals(){
         HBox fitnessGoalvalue = new HBox(10);
-        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_fitnessGoals_MG = filteredGoalList(historicalChartModel.fitnessGoals(), startFormatDate_MG, endFormatDate_MG);
-
+        List<Goal> filt_fitnessGoals_MG = historicalChartController.getFitnessGoals();
         return gethBox(fitnessGoalvalue, filt_fitnessGoals_MG);
     }
 
     private HBox getGeneralGoals(){
         HBox generalGoalvalue = new HBox(10);
-        LocalDate startFormatDate_MG = dateFormatting(historicalChartController.getStartYear(),
-                historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endFormatDate_MG = dateFormatting(historicalChartController.getEndYear(),
-                historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        List<Goal> filt_generalGoals_MG = filteredGoalList(historicalChartModel.generalGoals(), startFormatDate_MG, endFormatDate_MG);
-
+        List<Goal> filt_generalGoals_MG = historicalChartController.getGeneralGoals();
         return gethBox(generalGoalvalue, filt_generalGoals_MG);
     }
 
@@ -874,7 +807,7 @@ public class UserHIstoryProgressVisuals extends VBox {
             GoalsCount.put(Goals.getStartDate(), GoalsCount.getOrDefault(Goals.getStartDate(), 0) + 1);
         }
 
-        int totalGoals = historicalChartModel.getGoalCount();
+        int totalGoals = historicalChartController.totalGoalCount();
         double percentage = 0;
         if (totalGoals != 0) {
             percentage = (double) GoalsCount.size() / totalGoals * 100;
@@ -914,16 +847,6 @@ public class UserHIstoryProgressVisuals extends VBox {
 
     }
 
-    void updatePieCharts(){}
-
-    void updateLineCharts(){}
-
-    void updateScatterCharts(){}
-
-    private void updateDescriptiveStatistics(){}
-
-    private void updateColorPreferences(){}
-
     private String colorChosen(){
         if (redcolorPreference.isSelected()) return "Red";
         if (purplecolorPreference.isSelected()) return "Purple";
@@ -949,27 +872,6 @@ public class UserHIstoryProgressVisuals extends VBox {
                             "#B3CEE5", "#6699CC"};
     }
 
-    private LocalDate dateFormatting(String year, String month, String day) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        if (Integer.parseInt(day) > 0 && Integer.parseInt(day) <= 9) {
-            return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" +
-                                                                        historicalChartModel.numericalDay(day), format);
-        }
-        return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + day, format);
-    }
-
-    /**
-     * The method is used to filter out all the goals based on the starting and ending dates that the user picks. It can
-     * be used by all the graphs - Pie Chart, Line Graphs and Scatter Charts.
-     * @param goals: The list of goals in the user's computer
-     * @param startDate: The starting date of the goals we want to assess
-     * @param endDate: The ending date of the goals we want to assess
-     * @return: A list of goals that belong to a specific timeframe given the start date and the end date by the user.
-     */
-    private List<Goal> filteredGoalList(List<Goal> goals, LocalDate startDate, LocalDate endDate){
-        return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) &&
-                                                        !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
-    }
 
     /**
      * This function focuses on the arrangement and the display of the graphs. If a specific option of the graphs is
@@ -1051,10 +953,6 @@ public class UserHIstoryProgressVisuals extends VBox {
             return;
         }
 
-        LocalDate startDate = dateFormatting(yearSelector_left.getValue(), leftmonth_grid_selector.getValue(),
-                                                                                        leftgrid_dates.get().getText());
-        LocalDate endDate = dateFormatting(yearSelector_right.getValue(), rightmonth_grid_selector.getValue(),
-                                                                                        rightgrid_dates.get().getText());
         /* If user doesn't pick the accurate startDate or endDate*/
         if ((rightgrid_dates.get() == null) || (leftgrid_dates.get() == null)){
             Alert alert_three= new Alert(Alert.AlertType.WARNING);
@@ -1066,7 +964,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         }
 
         /* If the range of the dates chosen by the users are out of bound */
-        if (endDate.isBefore(startDate) || startDate.isAfter(endDate)){
+        if (historicalChartController.getendFormatDate().isBefore(historicalChartController.getstartFormatDate()) ||
+                historicalChartController.getstartFormatDate().isAfter(historicalChartController.getendFormatDate())){
             Alert alert_two = new Alert(Alert.AlertType.WARNING);
             alert_two.setTitle("Date ranges are inaccurate! ");
             alert_two.setHeaderText(null);
@@ -1077,11 +976,8 @@ public class UserHIstoryProgressVisuals extends VBox {
         }
 
         /* If the user picked a timeframe that had no goals inside the timeframe */
-        LocalDate beginDate = dateFormatting(historicalChartController.getStartYear(),
-                                    historicalChartController.getStartMonth(), historicalChartController.getStartDate());
-        LocalDate endingDate = dateFormatting(historicalChartController.getEndYear(),
-                                        historicalChartController.getEndMonth(), historicalChartController.getEndDate());
-        if (filteredGoalList(historicalChartModel.getGoals(), beginDate , endingDate).isEmpty()){
+
+        if (historicalChartController.getUserGoals().isEmpty()){
             Alert alert_four = new Alert(Alert.AlertType.WARNING);
             alert_four.setTitle("No treasures found for you.");
             alert_four.setHeaderText(null);
@@ -1211,10 +1107,6 @@ public class UserHIstoryProgressVisuals extends VBox {
         }
     }
 
-    private boolean HasButtonPressed(Button button){
-        return button.getStyle().contains("#222243");
-    }
-
     private void setButtonOutlook(Button button, boolean pressed){
         if (pressed){
             button.setStyle("-fx-background-color: #222243;" +
@@ -1238,6 +1130,8 @@ public class UserHIstoryProgressVisuals extends VBox {
             setButtonOutlook(newButton, true);
         }
     }
+
+    private void updateColorPreferences(){}
 
     private boolean isNoneSelected(){
         return ((yearSelector_left.getValue().equals("2025")) && (yearSelector_right.getValue().equals("2025")) &&

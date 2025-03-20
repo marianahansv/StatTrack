@@ -1,5 +1,7 @@
 package com.example.cmpt370project;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * The Controller class for managing the user's historical data. The controller class is responsible for storing the
@@ -100,4 +102,73 @@ public class UserProgressHistoryController {
         return (historicalChartProgress.yearSelector_right.getValue());
     }
 
+    private LocalDate dateFormatting(String year, String month, String day) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (Integer.parseInt(day) > 0 && Integer.parseInt(day) <= 9) {
+            return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" +
+                    historicalChartModel.numericalDay(day), format);
+        }
+        return LocalDate.parse(year + "-" + historicalChartModel.numericalMonth(month) + "-" + day, format);
+    }
+
+    public LocalDate getstartFormatDate(){
+        return dateFormatting(getStartYear(), getStartMonth(), getStartDate());
+    }
+
+    public LocalDate getendFormatDate(){
+        return dateFormatting(getEndYear(), getEndMonth(), getEndDate());
+    }
+
+    public List<Goal> getEasyGoals(){
+        return historicalChartModel.filteredGoalList(historicalChartModel.easyGoals(), getstartFormatDate(),
+                                                                                                    getendFormatDate());
+    }
+
+    public List<Goal> getMediumGoals(){
+        return historicalChartModel.filteredGoalList(historicalChartModel.mediumGoals(), getstartFormatDate(),
+                                                                                                    getendFormatDate());
+    }
+
+    public List<Goal> getHardGoals(){
+        return historicalChartModel.filteredGoalList(historicalChartModel.hardGoals(), getstartFormatDate(),
+                                                                                                    getendFormatDate());
+    }
+
+    public List<Goal> getfilteredGoals(){
+        return historicalChartModel.filteredGoalList(historicalChartModel.getGoals(), getstartFormatDate(),
+                                                                                                    getendFormatDate());
+    }
+
+    public List<Goal> getPersonalGoals(){
+        return historicalChartModel.filteredGoalList(historicalChartModel.personalGoals(), getstartFormatDate(),
+                                                                                                    getendFormatDate());
+    }
+
+    public List<Goal> getFitnessGoals(){
+        return historicalChartModel.filteredGoalList(historicalChartModel.fitnessGoals(), getstartFormatDate(),
+                getendFormatDate());
+    }
+
+
+    public List<Goal> getGeneralGoals(){
+        return historicalChartModel.filteredGoalList(historicalChartModel.generalGoals(), getstartFormatDate(),
+                getendFormatDate());
+    }
+
+    public int totalGoalCount(){
+        return historicalChartModel.getGoalCount();
+    }
+
+    public List<Goal> getUserGoals(){
+        return historicalChartModel.getGoals();
+    }
+
+
+    void updatePieCharts(){}
+
+    void updateLineCharts(){}
+
+    void updateScatterCharts(){}
+
+    void updateDescriptiveStatistics(){}
 }

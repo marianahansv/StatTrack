@@ -1,6 +1,7 @@
 package com.example.cmpt370project;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserProgressHIstoryVisModel extends GoalModel{
     private List<Subscriber> subscribers;
@@ -26,6 +27,23 @@ public class UserProgressHIstoryVisModel extends GoalModel{
      */
     public List<Goal> getGoals(){
         return new ArrayList<>(load_goals_from_file_hashmap().values());
+    }
+
+    public int goalCount(){
+        return getGoalCount();
+    }
+
+    /**
+     * The method is used to filter out all the goals based on the starting and ending dates that the user picks. It can
+     * be used by all the graphs - Pie Chart, Line Graphs and Scatter Charts.
+     * @param goals: The list of goals in the user's computer
+     * @param startDate: The starting date of the goals we want to assess
+     * @param endDate: The ending date of the goals we want to assess
+     * @return: A list of goals that belong to a specific timeframe given the start date and the end date by the user.
+     */
+    public List<Goal> filteredGoalList(List<Goal> goals, LocalDate startDate, LocalDate endDate){
+        return goals.stream().filter(goal -> !goal.getStartDate().isBefore(startDate) &&
+                !goal.getEndDate().isAfter(endDate)).collect(Collectors.toList());
     }
 
     public List<Goal> easyGoals(){
