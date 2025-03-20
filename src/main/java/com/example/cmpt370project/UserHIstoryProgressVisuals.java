@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * The main view page that creates all the graphs and descriptive statistics for the "Goal History" page.
@@ -157,40 +156,30 @@ import java.util.stream.Collectors;
     public UserHIstoryProgressVisuals(UserProgressHistoryController historicalChartController) {
         this.historicalChartController = historicalChartController;
         this.historicalChartController.setupViewClass(this); /* Required to set up the view classes correctly */
-
         leftmonth_grid = new GridPane();
         rightmonth_grid = new GridPane();
-        /* Select, backend prepare and update the month grid panes */
-        setmonthGridPane();//need update function to be called
 
-        /* Select, backend prepare and update the charts */
-        setChartType(); //need update function to be called
-
-        /* Select, backend prepare and update the descriptive statistics */
-        setDescriptiveStatistics(); //need update function to be called
-
-        /* Select, backend prepare and update the color preferences */
-        setColorPreferences(); //need update function to be called
-
-        /* Select, backend prepare and update the "Generate" and "Reset" button */
+        /* Setting up all the graphs and the descriptive statistics.*/
+        setmonthGridPane();
+        setChartType();
+        setDescriptiveStatistics();
+        setColorPreferences();
         set_visualization();
 
-        /* Puts all elements neatly in one container */
+        /* Arranging all the elements neatly onto the pop-up window. */
         allPreferencesarrangement();
     }
 
     /**
-     * The method that organizes both the left and the right grid pane. Focuses on putting the elements all together
-     * in one big piece.
+     * Organize the two grid panes representing the calendar view of the "Goal History" page.
      */
     private void setmonthGridPane(){
-        /* Dealing with the month selectors first */
+        /* Handling the monthly selectors */
         leftmonth_grid_selector = new ComboBox<>();
         rightmonth_grid_selector = new ComboBox<>();
         leftmonth_grid_selector.getItems().addAll("January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December");
         rightmonth_grid_selector.getItems().addAll(leftmonth_grid_selector.getItems());
-
         leftmonth_grid_selector.setValue("January");
         rightmonth_grid_selector.setValue("January");
         leftmonth_grid_selector.setStyle("-fx-background-color: #ebebeb;" +
@@ -201,14 +190,14 @@ import java.util.stream.Collectors;
                                           "-fx-alignment: center;" +
                                           "-fx-background-radius: 10px;" +
                                           "-fx-padding: 1px;");
+        leftmonth_grid_selector.setOnAction(e -> updateGridPane(leftmonth_grid,
+                                                                    leftmonth_grid_selector.getValue(),true));
+        rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid,
+                                                                    rightmonth_grid_selector.getValue(),false));
 
-        leftmonth_grid_selector.setOnAction(e -> updateGridPane(leftmonth_grid, leftmonth_grid_selector.getValue(),true));
-        rightmonth_grid_selector.setOnAction(e -> updateGridPane(rightmonth_grid, rightmonth_grid_selector.getValue(),false));
-
-        /* Dealing with the yearly selectors now */
+        /* Handling the yearly selectors */
         yearSelector_left = new ComboBox<>();
         yearSelector_right = new ComboBox<>();
-
         for (int year = 1920; year <= 2025; year++){
             yearSelector_left.getItems().add(String.valueOf(year));
         }
@@ -224,15 +213,15 @@ import java.util.stream.Collectors;
                                     "-fx-background-radius: 10px;" +
                                     "-fx-padding: 1px;");
 
-        /* Dealing with the grid panes - both left and right at the same time */
+        /* Calling the helper function to organize the dates in the grid pane */
         leftmonth_grid = grid_with_dates(true);
         rightmonth_grid = grid_with_dates(false);
 
     }
 
     /**
-     * It is a helper function to support the setmonthGridPane and it adds the dates on the calendar (grid panes).
-     * @return A grid pane with the dates added to it depending on the month
+     * Helper function to help with the spacing between the date button elements.
+     * @return A GridPane representing the calendar view with the year, month and date options as selectable.
      */
     private GridPane grid_with_dates(boolean is_left_grid){
         GridPane grid;
@@ -249,8 +238,7 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * The method supports in allowing the user to select the chart that they are willing to pick. It is the
-     * front-end part of the View page.
+     * Method to call the required function based on the user's graph preferences.
      */
     private void setChartType(){
         checkboxPieChart= new CheckBox("Pie Chart");
@@ -269,8 +257,8 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * The method supports in allowing the user to select if they would like some descriptive statistics alongside it.
-     * It is the front-end part of the View page.
+     * Method to call on the descriptive statistics to be set up based on the user's preference to include the
+     * descriptive statistics or not.
      */
     private void setDescriptiveStatistics(){
         includeDescriptiveStatistics = new RadioButton("Included");
@@ -288,8 +276,8 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * The method supports in allowing the user to select if they would like to pick a main specific color alongside it.
-     * It is the front-end part of the View page.
+     * Method to call on the colored preference functions which includes red, purple, blue or orange depending on
+     * what the user has selected as their color preference.
      */
     private void setColorPreferences(){
         redcolorPreference = new RadioButton("Red");
@@ -311,7 +299,8 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * This method is used to generate and reset the visualization preferences by the user.
+     * Method to manage the user's view depending on their final selection to "Generate", "Reset" or simply to hover
+     * between the various buttons in the grid panes.
      */
     private void set_visualization(){
         generate_visualizaton = new Button("GENERATE");
@@ -337,8 +326,7 @@ import java.util.stream.Collectors;
 
     /**
      * The function is creating a huge container element to store all the grid boxes as well as the three user
-     * preferences into one big box. This is done to ensure good spacing between all the elements on the page and
-     * to create a visually pleasing experience for the user.
+     * preferences into one big box.
      */
     private void allPreferencesarrangement(){
         VBox bigcontainer = new VBox(30);
@@ -425,8 +413,8 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * The pie chart created will display the information about the goals in categories of difficulty which
-     * ranges from Small, Medium and Large.
+     * Method to create the pie chart with the custom curated legend helper function being called. It involves
+     * designing and working with the UI part of the pie chart as well.
      * return:  VBox containing the Pie Chart inside it.
      */
     private VBox drawPieCharts() {
@@ -446,6 +434,7 @@ import java.util.stream.Collectors;
         int mediumCount = (mediumGoals != null) ? mediumGoals.size() : 0;
         int hardCount = (hardGoals != null) ? hardGoals.size() : 0;
 
+        /* To ensure that the expected outcomes are being achieved */
         System.out.println("Easy Goals: " + easyGoals);
         System.out.println("Medium Goals: " + mediumGoals);
         System.out.println("Hard Goals: " + hardGoals);
@@ -461,13 +450,16 @@ import java.util.stream.Collectors;
         pieChart_display.getChildren().addAll(pieChart, curatedLegendPieChart());
         pieChart_display.setAlignment(Pos.CENTER);
         getChildren().add(pieChart_display);
-
-        pieChart.setLegendVisible(false); // Will create our own legend from next function
-        colorPieChart(pieChart); // To color our pie chart with the accurate shade color
-
+        pieChart.setLegendVisible(false); // default legend hidden
+        colorPieChart(pieChart); // custom legend enabled - helper function
         return pieChart_display;
     }
 
+    /**
+     * Method to color the pie chart accurately based on the user's preference for the color by utilizing the
+     * colorpreferenceShades() helper function.
+     * @param pieChart: The piechart that needs to be colored prior to being displayed to the user.
+     */
     private void colorPieChart(PieChart pieChart) {
         String colorChosen = colorChosen();
         String[] shadesofColor = colorpreferenceShades(colorChosen);
@@ -480,12 +472,15 @@ import java.util.stream.Collectors;
         }
     }
 
+    /**
+     * Method to create a custom legend for the pie chart which involves picking the correct color shades and
+     * ensuring the difficulty levels are being read for the user's json files.
+     * @return: HBox that includes the legend for the pie chart horizontally for a better UI.
+     */
     private HBox curatedLegendPieChart(){
         String colorChosen = colorChosen();
         String[] shadesofColor = colorpreferenceShades(colorChosen);
-        /* Working on the legend box of pie chart to make sure that the color alignment matches well */
-        /* Working with the default one is tricky - we will hide the default one and only show our created */
-        /* legend box instead to the user. */
+
         HBox curatedLegend = new HBox(10);
         int current_index_again = 0;
         for (PieChart.Data data: pieChart.getData()){
@@ -500,10 +495,9 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * The line chart displays the number of goals that are created on a day during the specific timeframe that has been
-     * set.
-     * @return: A VBox where the line chart is drawn and will be used to be added into the display page when the
-     * generate button is clicked.
+     * Method to create the line chart with the custom curated legend helper function being called. It involves
+     * designing and working with the UI part of the line chart as well.
+     * return:  VBox containing the Line Chart inside it.
      */
     private VBox drawLineCharts() {
         VBox lineChart_display = new VBox(10);
@@ -537,13 +531,16 @@ import java.util.stream.Collectors;
         Map<LocalDate, Integer> hardGoalsCount = new TreeMap<>();
 
         for (Goal easyGoals: filt_easyGoals_LC){
-            easyGoalsCount.put(easyGoals.getStartDate(), easyGoalsCount.getOrDefault(easyGoals.getStartDate(), 0) + 1);
+            easyGoalsCount.put(easyGoals.getStartDate(),
+                                                easyGoalsCount.getOrDefault(easyGoals.getStartDate(), 0) + 1);
         }
         for (Goal mediumGoals: filt_mediumGoals_LC){
-            mediumGoalsCount.put(mediumGoals.getStartDate(), mediumGoalsCount.getOrDefault(mediumGoals.getStartDate(), 0) + 1);
+            mediumGoalsCount.put(mediumGoals.getStartDate(),
+                                            mediumGoalsCount.getOrDefault(mediumGoals.getStartDate(), 0) + 1);
         }
         for (Goal hardGoals: filt_hardGoals_LC){
-            hardGoalsCount.put(hardGoals.getStartDate(), hardGoalsCount.getOrDefault(hardGoals.getStartDate(), 0) + 1);
+            hardGoalsCount.put(hardGoals.getStartDate(),
+                                                hardGoalsCount.getOrDefault(hardGoals.getStartDate(), 0) + 1);
         }
 
         /* Adding the data into our chart */
@@ -556,19 +553,21 @@ import java.util.stream.Collectors;
         for (Map.Entry<LocalDate, Integer> entry: hardGoalsCount.entrySet()){
             hardGoals_LC.getData().add(new XYChart.Data<>(entry.getKey().toString(), entry.getValue()));
         }
-
         lineChart.getData().addAll(easyGoals_LC, mediumGoals_LC, hardGoals_LC);
 
-        /* Adding all the elements into the VBox */
         lineChart_display.getChildren().addAll(lineChart, curatedLegendLineChart());
         lineChart_display.setAlignment(Pos.CENTER);
         getChildren().add(lineChart_display);
-
         colorLineChart(lineChart);
         lineChart.setLegendVisible(false);
         return lineChart_display;
     }
 
+    /**
+     * Method to color the line chart accurately based on the user's preference for the color by utilizing the
+     * colorpreferenceShades() helper function.
+     * @param lineChart: The line chart that needs to be colored prior to being displayed to the user.
+     */
     private void colorLineChart(LineChart lineChart) {
         String colorChosen_LC = colorChosen();
         String[] shadesofColor_LC = colorpreferenceShades(colorChosen_LC);
@@ -587,6 +586,11 @@ import java.util.stream.Collectors;
         }
     }
 
+    /**
+     * Method to create a custom legend for the line chart which involves picking the correct color shades and
+     * ensuring the difficulty levels are being read for the user's json files.
+     * @return: HBox that includes the legend for the line chart horizontally for a better UI.
+     */
     private HBox curatedLegendLineChart(){
         String colorChosen_LC = colorChosen();
         String[] shadesofColor_LC = colorpreferenceShades(colorChosen_LC);
@@ -606,8 +610,9 @@ import java.util.stream.Collectors;
     }
 
     /**
-     * The scatter graph displays the number of goals in each categorical level - "Personal", "Fitness", "General"
-     * @return: The scatter graph inside a VBox which is then added onto the display page for the user.
+     * Method to create the scatter chart with the custom curated legend helper function being called. It involves
+     * designing and working with the UI part of the scatter chart as well.
+     * return:  VBox containing the Scatter Chart inside it.
      */
     private VBox drawScatterCharts(){
         VBox scatterChart_display = new VBox(10);
@@ -636,13 +641,16 @@ import java.util.stream.Collectors;
         Map<LocalDate, Integer> generalGoalCount = new TreeMap<>();
 
         for (Goal goal: filt_personalGoal_SC){
-            personalGoalCount.put(goal.getStartDate(), personalGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
+            personalGoalCount.put(goal.getStartDate(),
+                                                personalGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
         }
         for (Goal goal: filt_fitnessGoal_SC){
-            fitnessGoalCount.put(goal.getStartDate(), fitnessGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
+            fitnessGoalCount.put(goal.getStartDate(),
+                                                fitnessGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
         }
         for (Goal goal: filt_generalGoal_SC){
-            generalGoalCount.put(goal.getStartDate(), generalGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
+            generalGoalCount.put(goal.getStartDate(),
+                                                generalGoalCount.getOrDefault(goal.getStartDate(), 0) + 1);
         }
 
         for (Map.Entry<LocalDate, Integer> entry: personalGoalCount.entrySet()){
@@ -663,6 +671,11 @@ import java.util.stream.Collectors;
         return scatterChart_display;
     }
 
+    /**
+     * Method to create a custom legend for the scatter chart which involves picking the correct color shades and
+     * ensuring the section levels are being read for the user's json files.
+     * @return: HBox that includes the legend for the scatter chart horizontally for a better UI.
+     */
     private HBox curatedLegendScatterChart(){
         String colorChosen_SC = colorChosen();
         String[] shadesofColor_SC = colorpreferenceShades(colorChosen_SC);
@@ -681,6 +694,11 @@ import java.util.stream.Collectors;
         return curatedLegend_SC;
     }
 
+    /**
+     * Method to color the scatter chart accurately based on the user's preference for the color by utilizing the
+     * colorpreferenceShades() helper function.
+     * @param scatterChart: The scatter chart that needs to be colored prior to being displayed to the user.
+     */
     private void colorScatterChart(ScatterChart scatterChart) {
         String colorChosen_SC = colorChosen();
         String[] shadesofColor_SC = colorpreferenceShades(colorChosen_SC);
@@ -696,6 +714,11 @@ import java.util.stream.Collectors;
         }
     }
 
+    /**
+     * Method to generate the view for the descriptive statistics and calling all the helper functions that are
+     * required to be able to calculate the needed calculations.
+     * @return: A VBox that contains the labels, elements, HBox to store all the descriptive statistics information.
+     */
     private VBox generateDescriptiveStatistics(){
         descriptiveStatisticsTable = new VBox(10);
 
@@ -743,9 +766,10 @@ import java.util.stream.Collectors;
 
         HBox[] all_HB = new HBox[]{introductionHB, easyGoalsHB,mediumGoalsHB, hardGoalsHB, generalGoalsHB,
                                     fitnessGoalsHB, personalGoalsHB, meanDailyGoalsHB};
-        for (HBox oneHB: all_HB){
+        for (HBox oneHB: all_HB) {
             oneHB.setStyle("-fx-alignment: center;");
         }
+
         /* Putting all the elements together into the main descriptive statistics table */
         descriptiveStatisticsTable.getChildren().addAll(introductionHB, easyGoalsHB, mediumGoalsHB,
                                                         hardGoalsHB, generalGoalsHB, fitnessGoalsHB, personalGoalsHB,
@@ -759,47 +783,83 @@ import java.util.stream.Collectors;
         return descriptiveStatisticsTable;
     }
 
+    /**
+     * Method to create the HBox for the filtered goals over a timeframe and a list of those goals.
+     * @return: A function that utilizes both the HBox initialized and the list of filtered goals.
+     */
     private HBox meanGoals(){
         HBox meanGoalvalue = new HBox(10);
         List<Goal> filt_Goals_MG= historicalChartController.getfilteredGoals();
         return gethBox(meanGoalvalue, filt_Goals_MG);
     }
+
+    /**
+     * Method to create the HBox for the easy goals over a timeframe and a list of those goals.
+     * @return: A function that utilizes both the HBox initialized and the list of easy goals.
+     */
     private HBox geteasyGoals(){
         HBox easyGoalvalue = new HBox(10);
         List<Goal> filt_easyGoals_EG= historicalChartController.getEasyGoals();
         return gethBox(easyGoalvalue, filt_easyGoals_EG);
     }
 
+    /**
+     * Method to create the HBox for the medium goals over a timeframe and a list of those goals.
+     * @return: A function that utilizes both the HBox initialized and the list of medium goals.
+     */
     private HBox getmediumGoals(){
         HBox mediumGoalvalue = new HBox(10);
         List<Goal> filt_mediumGoals_MG = historicalChartController.getMediumGoals();
         return gethBox(mediumGoalvalue, filt_mediumGoals_MG);
     }
 
+    /**
+     * Method to create the HBox for the hard goals over a timeframe and a list of those goals.
+     * @return: A function that utilizes both the HBox initialized and the list of hard goals.
+     */
     private HBox gethardGoals(){
         HBox hardGoalvalue = new HBox(10);
         List<Goal> filt_hardGoals_MG = historicalChartController.getHardGoals();
         return gethBox(hardGoalvalue, filt_hardGoals_MG);
     }
 
+    /**
+     * Method to create the HBox for the personal goals over a timeframe and a list of those goals.
+     * @return: A function that utilizes both the HBox initialized and the list of personal goals.
+     */
     private HBox getpersonalGoals(){
         HBox personalGoalvalue = new HBox(10);
         List<Goal> filt_personalGoals_MG = historicalChartController.getPersonalGoals();
         return gethBox(personalGoalvalue, filt_personalGoals_MG);
     }
 
+    /**
+     * Method to create the HBox for the fitness goals over a timeframe and a list of those goals.
+     * @return: A function that utilizes both the HBox initialized and the list of fitness goals.
+     */
     private HBox getFitnessGoals(){
         HBox fitnessGoalvalue = new HBox(10);
         List<Goal> filt_fitnessGoals_MG = historicalChartController.getFitnessGoals();
         return gethBox(fitnessGoalvalue, filt_fitnessGoals_MG);
     }
 
+    /**
+     * Method to create the HBox for the general goals over a timeframe and a list of those goals.
+     * @return: A function that utilizes both the HBox initialized and the list of general goals.
+     */
     private HBox getGeneralGoals(){
         HBox generalGoalvalue = new HBox(10);
         List<Goal> filt_generalGoals_MG = historicalChartController.getGeneralGoals();
         return gethBox(generalGoalvalue, filt_generalGoals_MG);
     }
 
+    /**
+     * The helper function that is used to perform the calculation and neatly store all the information into a
+     * HBox so that it can be returned to the generateDescriptiveStatistics() function.
+     * @param Goalvalue: The HBox where the calculated value will be stored.
+     * @param filt_Goals_MG: The targeted list that we need to perform the calculations on.
+     * @return: The HBox that was added as an input now includes the calculated value inside it.
+     */
     private HBox gethBox(HBox Goalvalue, List<Goal> filt_Goals_MG) {
         Map<LocalDate, Integer> GoalsCount = new TreeMap<>();
 
@@ -820,12 +880,25 @@ import java.util.stream.Collectors;
         return Goalvalue;
     }
 
+    /**
+     * Method to color the descriptive statistics accurately based on the user's preference for the color by
+     * utilizing the colorpreferenceShades() helper function.
+     * @param descriptiveStatisticsTable: The descriptive statistics table that has to be colored based on the user
+     *                                    preference.
+     */
     private void colorDescriptiveStatistics(VBox descriptiveStatisticsTable){
         String colorChosen_DS = colorChosen();
         String[] shadesofColorDS = colorpreferenceShades(colorChosen_DS);
-        descriptiveStatisticsTable.setStyle("-fx-background-color: " + shadesofColorDS[0] + ";" + "-fx-background-radius: 10px;");
+        descriptiveStatisticsTable.setStyle("-fx-background-color: " + shadesofColorDS[0]
+                                                                                + ";" + "-fx-background-radius: 10px;");
     }
 
+    /**
+     * Method to color the descriptive statistics HBox accurately based on the user's preference for the color by
+     * utilizing the colorpreferenceShades() helper function. This is the big container that will store a lot of labels
+     * and their respective calculations.
+     * @param descriptiveStatisticsHB: The descriptive statistics HBox that has all the labels.
+     */
     private void colorDescriptiveStatisticsHB(HBox descriptiveStatisticsHB){
         String colorChosen_HB = colorChosen();
         String[] shadesofColorDS_HB = colorpreferenceShades(colorChosen_HB);
@@ -834,6 +907,11 @@ import java.util.stream.Collectors;
                 "-fx-font-weight: bold;");
     }
 
+    /**
+     * Method to color the descriptive statistics labels accurately based on the user's preference for the color by
+     * utilizing the colorpreferenceShades() helper function. These are the labels were the text will be stored.
+     * @param descriptiveStatisticsL: The descriptive statistics labels that has all the text data.
+     */
     private void colorDescriptiveStatisticsL(Label descriptiveStatisticsL){
         String colorChosen_DS_L = colorChosen();
         String[] shadesofColorDS_L = colorpreferenceShades(colorChosen_DS_L);
@@ -841,12 +919,16 @@ import java.util.stream.Collectors;
         descriptiveStatisticsL.setFont(Font.font("Sans-serif"));
         descriptiveStatisticsL.setPrefWidth(Control.USE_COMPUTED_SIZE); // the HBox will only surrond the label now
         descriptiveStatisticsL.setStyle("-fx-background-color: " + shadesofColorDS_L[1] + ";" + "-fx-padding: 5px;" +
-                                         "-fx-text-fill: white;" + "-fx-font-size: 14px;" + "-fx-background-radius: 5px;" +
-                                         "-fx-font-weight: bold;");
+                                         "-fx-text-fill: white;" + "-fx-font-size: 14px;"
+                                        + "-fx-background-radius: 5px;" + "-fx-font-weight: bold;");
         descriptiveStatisticsL.setAlignment(Pos.CENTER);
 
     }
 
+    /**
+     * Method to return what the user has selected for their color preference.
+     * return: A string to indicate the color - options would be either red, purple, orange or blue.
+     */
     private String colorChosen(){
         if (redcolorPreference.isSelected()) return "Red";
         if (purplecolorPreference.isSelected()) return "Purple";
@@ -854,6 +936,11 @@ import java.util.stream.Collectors;
         else return "Blue";
     }
 
+    /**
+     * Method to return the list of shades based on the color preference selected by the user.
+     * @param colorChosen: The String version of color that the user has chosen.
+     * @return: The array of shades that the user selected.
+     */
     private String[] colorpreferenceShades(String colorChosen){
         if (colorChosen.equals("Red")){
             return new String[]{"#FFB3B3","#a32821", "#FF7F7F", "#FF9999","#FFCCCC", "#FFA0A0", "#F4C1C1", "#FDAAAA",
@@ -874,8 +961,8 @@ import java.util.stream.Collectors;
 
 
     /**
-     * This function focuses on the arrangement and the display of the graphs. If a specific option of the graphs is
-     * selected by the user, only those graphs will be displayed by the user. ALl the other graphs will not be displayed
+     * This method focuses on the arrangement and the display of the graphs. If a specific option of the graphs is
+     * selected by the user, only those graphs will be displayed by the user. All the other graphs will not be displayed
      * and will be marked as a No-Show.
      */
     private void resultsPageView(){
@@ -894,8 +981,9 @@ import java.util.stream.Collectors;
                             "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;" );
         noPieChart.setAlignment(Pos.CENTER);
         HBox noDescriptiveStatistics = new HBox(new Label("No Descriptive Statistics was selected by the user! "));
-        noDescriptiveStatistics.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: #a3a2a2;" +
-                                         "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
+        noDescriptiveStatistics.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" +
+                                        "-fx-background-color: #a3a2a2;" + "-fx-padding: 10px;" +
+                                        "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
         noDescriptiveStatistics.setAlignment(Pos.CENTER);
 
         /* Assessing cases to figure out what can be displayed to the user based on the parameters selected */
@@ -934,7 +1022,6 @@ import java.util.stream.Collectors;
         }
         wholeDisplay.setAlignment(Pos.CENTER);
         getChildren().add(wholeDisplay);
-
         Dialog<Void> popupDialog = new Dialog<>();
         popupDialog.setTitle("Your Charts and Descriptive Statistics!");
         popupDialog.getDialogPane().setContent(wholeDisplay);
@@ -942,6 +1029,10 @@ import java.util.stream.Collectors;
         popupDialog.showAndWait();
     }
 
+    /**
+     * The method that validates the user's choices and then decides if an invalid behavior is detected. If so, an
+     * alert message is popped up for the user.
+     */
     private void updateGenerateView(){
         if (historicalChartController.getUserGoals().isEmpty()){
             Alert alert_four = new Alert(Alert.AlertType.WARNING);
@@ -988,12 +1079,14 @@ import java.util.stream.Collectors;
         /* If the user forgets to pick a graph choice, color preference or inclusion of descriptive statistics, they
         * will be asked to select either one. */
         if ((!checkboxPieChart.isSelected() && !checkboxLineChart.isSelected() && !checkboxScatterGraph.isSelected()) ||
-                (!redcolorPreference.isSelected() && !purplecolorPreference.isSelected() && !orangecolorPreference.isSelected() && !bluecolorPreference.isSelected()) ||
-                (!includeDescriptiveStatistics.isSelected() && !notincludeDescriptiveStatistics.isSelected())) {
+                (!redcolorPreference.isSelected() && !purplecolorPreference.isSelected() &&
+                        !orangecolorPreference.isSelected() && !bluecolorPreference.isSelected()) ||
+                        (!includeDescriptiveStatistics.isSelected() && !notincludeDescriptiveStatistics.isSelected())) {
             Alert alert_five = new Alert(Alert.AlertType.WARNING);
             alert_five.setTitle("Missed either of the parameters! ");
             alert_five.setHeaderText(null);
-            alert_five.setContentText("Please set all of the parameters carefully to allow the generation of the graph accurately! ");
+            alert_five.setContentText("Please set all of the parameters carefully to allow the generation of the " +
+                                      "graph accurately! ");
             alert_five.showAndWait();
             return;
         }
@@ -1105,6 +1198,13 @@ import java.util.stream.Collectors;
         }
     }
 
+    /**
+     * The method that focuses specifically on the UI design of the buttons. This includes the background color, the
+     * shape of the button, as well as the font inside the button. These will be based on if the button was pressed or
+     * not.
+     * @param button: The button that needs a change in their UI.
+     * @param pressed: Boolean value to indicate if the button was pressed or not.
+     */
     private void setButtonOutlook(Button button, boolean pressed){
         if (pressed){
             button.setStyle("-fx-background-color: #222243;" +
@@ -1116,6 +1216,11 @@ import java.util.stream.Collectors;
         }
     }
 
+    /**
+     * The method that uses the setButtonOutlook helper function.
+     * @param currentButton: The current button.
+     * @param newButton: The instance of the button we want to obtain.
+     */
     private void changeChosenButton(AtomicReference<Button> currentButton, Button newButton){
         if (currentButton.get() != newButton){
             if (currentButton.get() != null){
@@ -1129,14 +1234,24 @@ import java.util.stream.Collectors;
         }
     }
 
+    /**
+     * The function to update all the user's color preferences.
+     */
     private void updateColorPreferences(){}
 
+    /**
+     * A method to assess if none of the parameters were set by the user and returns a boolean value depending on the
+     * situation.
+     * @return: a boolean value to indicate if the parameters have been set or not.
+     */
     private boolean isNoneSelected(){
         return ((yearSelector_left.getValue().equals("2025")) && (yearSelector_right.getValue().equals("2025")) &&
-                ((rightmonth_grid_selector.getValue().equals("January"))) && ((leftmonth_grid_selector.getValue().equals("January")))
+                ((rightmonth_grid_selector.getValue().equals("January"))) &&
+                ((leftmonth_grid_selector.getValue().equals("January")))
                 && (leftgrid_dates.get() == null) && (rightgrid_dates.get() == null) && !checkboxPieChart.isSelected()
-                && !checkboxScatterGraph.isSelected() && !checkboxLineChart.isSelected() && !redcolorPreference.isSelected()
-                && !orangecolorPreference.isSelected() && !bluecolorPreference.isSelected() && !purplecolorPreference.isSelected()
+                && !checkboxScatterGraph.isSelected() && !checkboxLineChart.isSelected()
+                && !redcolorPreference.isSelected()  && !orangecolorPreference.isSelected()
+                && !bluecolorPreference.isSelected() && !purplecolorPreference.isSelected()
                 && !includeDescriptiveStatistics.isSelected() && !notincludeDescriptiveStatistics.isSelected());
     }
 }
