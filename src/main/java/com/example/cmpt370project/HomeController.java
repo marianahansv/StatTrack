@@ -71,8 +71,6 @@ public class HomeController {
 
         if (result.isPresent() && !result.get().isBlank()) {
             userHistoryDataModel.setUserName(result.get().trim());
-        } else {
-            userHistoryDataModel.setUserName("User");
         }
     }
 
