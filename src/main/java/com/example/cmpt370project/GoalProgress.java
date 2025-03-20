@@ -300,37 +300,40 @@ private void updateLineChart() {
      *  @param goal goal to be checked when its duedate is by comparision of today
      */
     private static String isDue(Goal goal) {
-            String title = null;
-            LocalDate today = LocalDate.now();
+                String title = null;
+                LocalDate today = LocalDate.now();
+                
+                if (goal.getEndDate().isBefore(today)) {
+                    title = (goal.getTitle()+ " (Past Due!)");
+                } else if (goal.getEndDate().isEqual(today)) {
+                    title = (goal.getTitle()+ " (Due Today!)");
+                } else {
+                    title = (goal.getTitle());
+                }
+                return title;
+                }
+        
+        
+        public static void main(String[] args) {
+         UserHistoryDataModel history = new UserHistoryDataModel() {
+            @Override
+            public void completeGoal(LocalDate date) { }
+            @Override
+            public void saveDataToFile() { }
+            @Override
+            public void notifySubscribers() { }
             
-            if (goal.getEndDate().isBefore(today)) {
-                title = (goal.getTitle()+ " (Past Due!)");
-            } else if (goal.getEndDate().isEqual(today)) {
-                title = (goal.getTitle()+ " (Due Today!)");
-            } else {
-                title = (goal.getTitle());
-            }
-            return title;
-            }
+        };
     
-    
-    public static void main(String[] args) {
-     UserHistoryDataModel history = new UserHistoryDataModel() {
-        @Override
-        public void completeGoal(LocalDate date) { }
-        @Override
-        public void saveDataToFile() { }
-        @Override
-        public void notifySubscribers() { }
-    };
-    int passed = 0;
-    int failed = 0;
-    
-    
-    
-        // Test #1: Due today works
-    Goal g1 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(1), LocalDate.now());
-    g1.setTitle(isDue(g1));
+        
+        int passed = 0;
+        int failed = 0;
+        
+        
+        
+            // Test #1: Due today works
+        Goal g1 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(1), LocalDate.now());
+        g1.setTitle(isDue(g1));
         
     if ("Learn how to cook soup (Due Today!)".equals(g1.getTitle())) {
         passed++;
@@ -365,11 +368,6 @@ private void updateLineChart() {
         failed++;
         System.out.println("Test 3 Failed");
     }
-
-    
-
-
-
 
     System.out.println("Passed: "+passed+"\n"+"Failed: "+failed);
     }

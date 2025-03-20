@@ -234,11 +234,7 @@ public class UserHistoryDataModel {
 
         if (currWeek.equals(dataWeek)) {
             weeklyCompletedGoals += 1;
-            //System.out.println(3);
         }
-        //System.out.println(4);
-        //updateCompletedValues(currentDate);
-
         notifySubscribers();
         saveDataToFile();
     }

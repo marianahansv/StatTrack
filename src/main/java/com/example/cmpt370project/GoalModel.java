@@ -170,21 +170,11 @@ public class GoalModel {
      */
     public void completeGoal(Goal goal) {
         goal.setCompleted(true);
-        //System.out.println(1111111);
-        // notifySubscribers(); // Make sure the view refreshes
         updateGoal(goal.getTitle(), goal);
-        /*userHistoryDataModel = new UserHistoryDataModel(); //instantiates UH
-        System.out.println(userHistoryDataModel.getDailyCompletedGoals());
-        userHistoryDataModel.completeGoal(LocalDate.now()); //UH is updated
-        System.out.println(userHistoryDataModel.getDailyCompletedGoals());
-        userHistoryDataModel.notifySubscribers(); */
         userHistoryDataModel.completeGoal(LocalDate.now());
         userHistoryDataModel.saveDataToFile();
         userHistoryDataModel.notifySubscribers();
         notifySubscribers();
-        //save_goals_to_file();
-        //deleteGoal(goal.getTitle());
-        
     }
     /**
      * Checks if file exists before reading or writing to it.

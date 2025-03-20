@@ -75,16 +75,4 @@ public class GoalVisView extends StackPane implements Subscriber {
     public void modelUpdated() {
         drawView();
     }
-
-    /**
-     * Set up interaction with a controller for this view.
-     * @param c the controller that will handle changing model data for user interactions on this page.
-     */
-   // public void setupEvents(Controller c) {
-
-        // See HomeView class for what to put here.
-        // i.e. when ready to change data in interface based on user interactions, make a new controller class
-        // and pass the button handler methods (and other interactive ui elements) of the buttons in this view to the controller
-
-    //}
 }
