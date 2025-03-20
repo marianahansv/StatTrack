@@ -52,6 +52,10 @@
     -fx-background-color: #548cc4;
 }
 
+.button:selected {
+    -fx-background-color: #2868a8;
+}
+
 .my-sections-container {
     /*-fx-border-color: #4A90E2;*/
     /*-fx-border-width: 2px;*/
