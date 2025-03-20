@@ -280,25 +280,41 @@ public class DashboardView extends BorderPane {
      * Configures the basic UI components for the dashboard.
      */
     private void setupDashboardViewUI() {
+        this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
+
         // --- header ---
         HBox header = new HBox(new Label("Goal Tracker Dashboard"));
         header.setAlignment(Pos.CENTER);
-        header.setStyle("-fx-background-color: lightblue; -fx-padding: 5px;");
+        header.setStyle("-fx-background-color: lightgray; -fx-padding: 5px;");
         this.setTop(header);
 
         // --- sidebar ---
         VBox sidebar = new VBox();
         sidebar.setSpacing(10);
         sidebar.setAlignment(Pos.CENTER);
-        sidebar.setPrefWidth(150);
+        sidebar.setPrefWidth(180);
         homeButton = new Button("Home");
         goalsButton = new Button("My Goals");
         goalPlanButton = new Button("Goal Plan");
         goalVisButton = new Button("Goal Visuals");
         historicalChartButton = new Button("Goal History");
 
+        // Set each button to take up the full width
+        homeButton.setMaxWidth(Double.MAX_VALUE);
+        goalsButton.setMaxWidth(Double.MAX_VALUE);
+        goalPlanButton.setMaxWidth(Double.MAX_VALUE);
+        goalVisButton.setMaxWidth(Double.MAX_VALUE);
+        historicalChartButton.setMaxWidth(Double.MAX_VALUE);
+
+        //
+        homeButton.getStyleClass().add("button");
+        goalsButton.getStyleClass().add("button");
+        goalPlanButton.getStyleClass().add("button");
+        goalVisButton.getStyleClass().add("button");
+        historicalChartButton.getStyleClass().add("button");
+
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
-        sidebar.setStyle("-fx-background-color: lightblue; -fx-padding: 10px;");
+        sidebar.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
         VBox.setVgrow(sidebar, Priority.ALWAYS);
         this.setLeft(sidebar);
 

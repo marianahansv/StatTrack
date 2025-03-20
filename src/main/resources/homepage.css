@@ -8,7 +8,7 @@
 .welcome-label {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
-    -fx-text-fill: #4A90E2;
+    -fx-text-fill: black;
 }
 
 .motivation-module {
@@ -21,14 +21,19 @@
     -fx-spacing: 10px;
 }
 
-.motivation-label {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
+.motivation-label, .section-title {
+    -fx-font-size: 14px;
     -fx-text-fill: black;
 }
 
 .user-greeting {
-    -fx-font-size: 20px;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+}
+
+.heading-level-2 {
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
     -fx-text-fill: black;
 }
@@ -37,21 +42,26 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: #FFFFFF;
+    -fx-background-color: #4A90E2;
     -fx-background-radius: 15px;
     -fx-padding: 10px 20px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
 }
 
+.button:hover {
+    -fx-background-color: #548cc4;
+}
+
 .my-sections-container {
-    -fx-border-color: #4A90E2;
-    -fx-border-width: 2px;
-    -fx-border-radius: 10px;
-    -fx-background-color: #E3F2FD;
-    -fx-background-radius: 10px;
-    -fx-padding: 15px;
-    -fx-spacing: 10px;
-    -fx-alignment: center;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);
+    /*-fx-border-color: #4A90E2;*/
+    /*-fx-border-width: 2px;*/
+    /*-fx-border-radius: 10px;*/
+    /*-fx-background-color: #E3F2FD;*/
+    /*-fx-background-radius: 10px;*/
+    /*-fx-padding: 15px;*/
+    /*-fx-spacing: 10px;*/
+    /*-fx-alignment: center;*/
+    /*-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);*/
 }
 
 .add-goal-button {
@@ -70,11 +80,11 @@
     -fx-background-color: #66BB6A;
 }
 
-.clear-goals-button {
+.critical-button {
     -fx-background-color: #F44336;
 }
 
-.clear-goals-button:hover {
+.critical-button:hover {
     -fx-background-color: #EF5350;
 }
 
@@ -86,13 +96,6 @@
     -fx-background-radius: 15px;
     -fx-padding: 10px 20px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
-}
-
-.section-title {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: linear-gradient(to right, #4A90E2, #6FA8DC);
-    -fx-padding: 10px 0;
 }
 
 .section-button:hover {
