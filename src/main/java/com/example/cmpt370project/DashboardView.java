@@ -307,11 +307,11 @@ public class DashboardView extends BorderPane {
         historicalChartButton.setMaxWidth(Double.MAX_VALUE);
 
         //
-        homeButton.getStyleClass().add("button");
-        goalsButton.getStyleClass().add("button");
-        goalPlanButton.getStyleClass().add("button");
-        goalVisButton.getStyleClass().add("button");
-        historicalChartButton.getStyleClass().add("button");
+        homeButton.getStyleClass().add("cbutton");
+        goalsButton.getStyleClass().add("cbutton");
+        goalPlanButton.getStyleClass().add("cbutton");
+        goalVisButton.getStyleClass().add("cbutton");
+        historicalChartButton.getStyleClass().add("cbutton");
 
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
         sidebar.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");

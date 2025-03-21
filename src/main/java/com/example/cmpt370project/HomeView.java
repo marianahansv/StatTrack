@@ -135,7 +135,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         // Home page elements
         addGoalButton = new Button("Add Goal");
-        addGoalButton.getStyleClass().add("button");
+        addGoalButton.getStyleClass().add("cbutton");
 //        addGoalButton.getStyleClass().add("add-goal-button");
 
         welcomeLabel = new Label("Welcome to Your Personal Goal Tracker!");
@@ -147,13 +147,13 @@ public class HomeView extends StackPane implements Subscriber {
         quickActionsHeading.getStyleClass().add("heading-level-2");
 
         clearGoalsButton = new Button("Clear Goals");
-        clearGoalsButton.getStyleClass().add("button");
+        clearGoalsButton.getStyleClass().add("cbutton");
         clearGoalsButton.getStyleClass().add("critical-button");
 
 //        clearGoalsButton.getStyleClass().add("clear-goals-button");
 
         changeNameButton = new Button("Change Name");
-        changeNameButton.getStyleClass().add("button");
+        changeNameButton.getStyleClass().add("cbutton");
 //        changeNameButton.getStyleClass().add("change-name-button");
 
         // Motivational Message module
@@ -183,11 +183,13 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         submitGoalButton = new Button("Add Goal");
+        submitGoalButton.getStyleClass().add("cbutton");
         giveMeSuggestionsButton = new Button("Give me suggestions");
+        giveMeSuggestionsButton.getStyleClass().add("cbutton");
 
         titleInput = new TextField();
         cancelAddGoalButton = new Button("Cancel");
-        cancelAddGoalButton.getStyleClass().add("button");
+        cancelAddGoalButton.getStyleClass().add("cbutton");
 
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
@@ -219,7 +221,7 @@ public class HomeView extends StackPane implements Subscriber {
         for (String section : sectionsList) {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
-            sectionButton.getStyleClass().add("button");
+            sectionButton.getStyleClass().add("cbutton");
 //            sectionButton.getStyleClass().add("section-button");
             sectionButton.setOnAction(e -> {
                 currentSelectedSection = section; // update the currently selected section
@@ -234,7 +236,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         // "Create New Section" feature
         createSectionButton = new Button("Create New Section");
-        createSectionButton.getStyleClass().add("button");
+        createSectionButton.getStyleClass().add("cbutton");
 //        createSectionButton.getStyleClass().add("create-section-button");
 
         createSectionButton.setOnAction(e -> {
@@ -258,7 +260,7 @@ public class HomeView extends StackPane implements Subscriber {
                     sectionsList.add(newSection);
                     ToggleButton sectionButton = new ToggleButton(newSection);
                     sectionButton.setToggleGroup(sectionToggleGroup);
-                    sectionButton.getStyleClass().add("button");
+                    sectionButton.getStyleClass().add("cbutton");
                     sectionButton.getStyleClass().add("section-button");
                     sectionButton.setOnAction(ev -> {
                         currentSelectedSection = newSection;
@@ -272,7 +274,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         // "Delete Section" feature
         deleteSectionButton = new Button("Delete Section");
-        deleteSectionButton.getStyleClass().add("button");
+        deleteSectionButton.getStyleClass().add("cbutton");
         deleteSectionButton.getStyleClass().add("critical-button");
 //        deleteSectionButton.getStyleClass().add("delete-section-button");
 
@@ -471,7 +473,7 @@ public class HomeView extends StackPane implements Subscriber {
         for (String section : sectionsList) {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
-            sectionButton.getStyleClass().add("button");
+            sectionButton.getStyleClass().add("cbutton");
             sectionButton.getStyleClass().add("section-button");
 
             sectionButton.setOnAction(e -> {

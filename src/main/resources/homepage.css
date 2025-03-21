@@ -38,7 +38,7 @@
     -fx-text-fill: black;
 }
 
-.button {
+.cbutton {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: #FFFFFF;
@@ -48,11 +48,11 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
 }
 
-.button:hover {
+.cbutton:hover {
     -fx-background-color: #548cc4;
 }
 
-.button:selected {
+.cbutton:selected {
     -fx-background-color: #2868a8;
 }
 
