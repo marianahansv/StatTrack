@@ -6,12 +6,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
@@ -199,7 +201,7 @@ public class DashboardView extends BorderPane {
         // ********* 4. Set models of each Controller *********
 
         // SET HOME PAGE CONTROLLER MODEL
-        homeController.setModel(goalModel);
+        homeController.setModel(goalModel, userHistoryDataModel);
 
         // SET GOAL PLAN PAGE CONTROLLER MODEL
         goalPlanController.setModel(goalPlanModel);
@@ -242,6 +244,26 @@ public class DashboardView extends BorderPane {
             scrollPane.setContent(goalPlanPage);
         });
         goalVisButton.setOnAction(e -> scrollPane.setContent(goalVisPage));
+
+        // If first time running the app, get the users name
+        // Do this here in this class, because not specific to any view
+        if (userHistoryDataModel.isFirstOpen()) {
+            // Create a TextInputDialog
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Welcome to your Goal Planning Application!");
+            dialog.setHeaderText("Please enter your name:");
+            dialog.setContentText("Name:");
+
+            // Show the dialog and capture the input
+            Optional<String> result = dialog.showAndWait();
+
+            if (result.isPresent() && !result.get().isBlank()) {
+                userHistoryDataModel.setUserName(result.get().trim());
+            } else {
+                userHistoryDataModel.setUserName("User");
+            }
+        }
+
         // ************************* POPULATE DUMMY DATA *************************
         // Here is where we can manually set data to show for testing/demo purposes!!
 
@@ -258,25 +280,41 @@ public class DashboardView extends BorderPane {
      * Configures the basic UI components for the dashboard.
      */
     private void setupDashboardViewUI() {
+        this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
+
         // --- header ---
         HBox header = new HBox(new Label("Goal Tracker Dashboard"));
         header.setAlignment(Pos.CENTER);
-        header.setStyle("-fx-background-color: lightblue; -fx-padding: 5px;");
+        header.setStyle("-fx-background-color: lightgray; -fx-padding: 5px;");
         this.setTop(header);
 
         // --- sidebar ---
         VBox sidebar = new VBox();
         sidebar.setSpacing(10);
         sidebar.setAlignment(Pos.CENTER);
-        sidebar.setPrefWidth(150);
+        sidebar.setPrefWidth(180);
         homeButton = new Button("Home");
         goalsButton = new Button("My Goals");
         goalPlanButton = new Button("Goal Plan");
         goalVisButton = new Button("Goal Visuals");
         historicalChartButton = new Button("Goal History");
 
+        // Set each button to take up the full width
+        homeButton.setMaxWidth(Double.MAX_VALUE);
+        goalsButton.setMaxWidth(Double.MAX_VALUE);
+        goalPlanButton.setMaxWidth(Double.MAX_VALUE);
+        goalVisButton.setMaxWidth(Double.MAX_VALUE);
+        historicalChartButton.setMaxWidth(Double.MAX_VALUE);
+
+        //
+        homeButton.getStyleClass().add("cbutton");
+        goalsButton.getStyleClass().add("cbutton");
+        goalPlanButton.getStyleClass().add("cbutton");
+        goalVisButton.getStyleClass().add("cbutton");
+        historicalChartButton.getStyleClass().add("cbutton");
+
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
-        sidebar.setStyle("-fx-background-color: lightblue; -fx-padding: 10px;");
+        sidebar.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
         VBox.setVgrow(sidebar, Priority.ALWAYS);
         this.setLeft(sidebar);
 

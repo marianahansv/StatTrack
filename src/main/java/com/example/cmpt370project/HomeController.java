@@ -1,9 +1,13 @@
 package com.example.cmpt370project;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 
 import java.time.LocalDate;
 import java.util.InputMismatchException;
+import java.util.Optional;
 
 /**
  * Handles changing model according to the users actions. Only calls model using its public API!
@@ -11,14 +15,16 @@ import java.util.InputMismatchException;
  */
 public class HomeController {
     private GoalModel gm;
+    private UserHistoryDataModel userHistoryDataModel;
 
     // Could consider adding states for a state machine if that comes up later, depending on what our application requires...
     // (i.e. if there are different interaction states for a single view...)
 
     public HomeController() {}
 
-    public void setModel(GoalModel goalModel) {
+    public void setModel(GoalModel goalModel, UserHistoryDataModel userHistoryDataModel) {
         this.gm = goalModel;
+        this.userHistoryDataModel = userHistoryDataModel;
     }
 
     /**
@@ -52,7 +58,38 @@ public class HomeController {
      * @param actionEvent the event that happens when the button is pressed.
      */
     public void removeButtonPress(ActionEvent actionEvent) {
-        gm.clearGoals();
+
+        // Create an alert of type CONFIRMATION
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Clear Goals");
+        alert.setHeaderText("Are you sure you want to clear all your goals?");
+        alert.setContentText("This action cannot be undone.");
+
+        // Show the dialog and wait for the user's response
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                gm.clearGoals();
+            }
+        });
+
+
+    }
+
+    public void handleChangeName(ActionEvent actionEvent) {
+        // Create a TextInputDialog
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change your name.");
+        dialog.setHeaderText("Please enter your new user name:");
+        dialog.setContentText("Name:");
+
+        // Show the dialog and capture the input
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent() && !result.get().isBlank()) {
+            userHistoryDataModel.setUserName(result.get().trim());
+        } else if (result.get().isBlank()) {
+            userHistoryDataModel.setUserName("User");
+        }
     }
 
 }
