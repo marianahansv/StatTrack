@@ -104,7 +104,7 @@ public class HomeView extends StackPane implements Subscriber {
     private final TextField titleInput;
     private final Button cancelAddGoalButton;
     private final Button submitGoalButton;
-    private final Button changeNameButton;
+    final Button changeNameButton;
     private final ComboBox<String> difficultyComboBox;
     private FlowPane sectionButtons;
     private HBox addGoalFormRow1;

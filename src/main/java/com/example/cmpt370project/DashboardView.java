@@ -49,7 +49,7 @@ public class DashboardView extends BorderPane {
     /**
      * The model that holds the user's name and current/past goal trend/behaviour data of the application.
      */
-    private UserHistoryDataModel userHistoryDataModel;
+    UserHistoryDataModel userHistoryDataModel;
 
     // ************************* APPLICATION CONTROLLERS *************************
 
@@ -75,7 +75,7 @@ public class DashboardView extends BorderPane {
     /**
      * The homepage of the application.
      */
-    private HomeView homePage;
+    HomeView homePage;
 
     /**
      * The goals page of the application.
