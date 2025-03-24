@@ -39,7 +39,7 @@ public class DashboardView extends BorderPane {
     /**
      * The model that holds the goal plan data of the application.
      */
-    private GoalPlanModel goalPlanModel;
+    GoalPlanModel goalPlanModel;
 
     /**
      * The model that holds the historical data of each user and their goals
@@ -85,7 +85,7 @@ public class DashboardView extends BorderPane {
     /**
      * The goal plan page of the application.
      */
-    private GoalPlanView goalPlanPage;
+    GoalPlanView goalPlanPage;
 
     /**
      * The goal plan page of the application.
@@ -112,7 +112,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button for going to the homepage.
      */
-    private Button homeButton;
+    Button homeButton;
 
     /**
      * The button for going to the goals page.
@@ -122,7 +122,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button for going to the goal plan page.
      */
-    private Button goalPlanButton;
+    Button goalPlanButton;
 
     /**
      * The button for going to the goal plan page.

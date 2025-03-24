@@ -40,21 +40,21 @@ public class GoalPlanView extends StackPane implements Subscriber {
     // ****************** INTERACTIVE UI ELEMENTS ******************
 
     // ********* SUMMARY PAGE ELEMENTS *********
-    private Button goCreateEditGoalPlanButton;
+    Button goCreateEditGoalPlanButton;
 
     // ********* EDIT/CREATE PAGE ELEMENTS *********
     private ToggleGroup planStyleSelect;
-    private RadioButton maintainPlan;
+    RadioButton maintainPlan;
     private RadioButton increasePlan;
 
-    private Spinner<Integer> endGoalNumberInput;
+    Spinner<Integer> endGoalNumberInput;
     private Spinner<Integer> startGoalNumberInput;
 
     private Button cancelEditGoalPlanButton;
-    private Button savePlanChangesButton;
+    Button savePlanChangesButton;
     private Button deletePlanButton;
 
-    private ComboBox<String> timelineSelectBox;
+    ComboBox<String> timelineSelectBox;
     private DatePicker endDatePicker;
 
     private Label errorLabel;
