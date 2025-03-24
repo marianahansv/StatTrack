@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Integration (UI) tests for the goal plan feature functionality.
+ */
 public class GoalPlanIntegrationTests extends AppIntegrationTest {
 
     @Override
@@ -23,6 +26,7 @@ public class GoalPlanIntegrationTests extends AppIntegrationTest {
         clickOn(root.goalPlanButton);
         clickOn(root.goalPlanPage.goCreateEditGoalPlanButton);
 
+        // Make a plan
         clickOn(root.goalPlanPage.maintainPlan);
         clickOn(root.goalPlanPage.endGoalNumberInput);
         for (int i = 0; i < 4; i++) {
@@ -32,6 +36,7 @@ public class GoalPlanIntegrationTests extends AppIntegrationTest {
         clickOn(root.goalPlanPage.timelineSelectBox);
         clickOn("DAILY Basis");
 
+        // Save plan
         clickOn(root.goalPlanPage.savePlanChangesButton);
 
         // Verify that the goal plan has been updated

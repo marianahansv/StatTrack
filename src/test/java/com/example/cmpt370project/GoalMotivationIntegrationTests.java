@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Integration (UI) tests for the goal motivation feature functionality.
+ */
 public class GoalMotivationIntegrationTests extends AppIntegrationTest {
 
     @Override

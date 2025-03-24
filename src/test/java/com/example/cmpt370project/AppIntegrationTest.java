@@ -10,7 +10,7 @@ import org.testfx.framework.junit5.ApplicationTest;
 import java.util.Objects;
 
 /**
- * Parent class for all integration tests; sets up the application.
+ * Parent class for all integration tests; sets up the application for running UI tests with TestFX.
  */
 public class AppIntegrationTest extends ApplicationTest {
 
