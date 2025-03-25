@@ -530,7 +530,8 @@ public class HomeView extends StackPane implements Subscriber {
         Region homeSpacer2 = new Region();
         homeSpacer2.setPrefWidth(homeViewSpaceSize);
 
-        root.getChildren().addAll(welcomeLabel, motivationModule, homeSpacer1, quickActionsHeading, quickActionsGroup, homeSpacer2, sectionHeading, sectionsAndGoalsBox);
+        root.getChildren().addAll(welcomeLabel, motivationModule, homeSpacer1, quickActionsHeading, quickActionsGroup,
+                homeSpacer2, upcomingGoalsModule, sectionHeading, sectionsAndGoalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.
