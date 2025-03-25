@@ -222,4 +222,148 @@ public class SuggestionsModel {
         return Math.sqrt(sumOfSquares / (data.size() - 1));
     }
 
+    /**
+    * Helper method to create past goals to test this class
+    * */
+    private static List<Goal> createPastGoals(String difficulty, int count, int avgDurationDays, int durationVariationDays, boolean completed) {
+        List<Goal> goals = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            int duration = avgDurationDays + (int) (Math.random() * 2 * durationVariationDays - durationVariationDays);
+            if (duration <= 0) duration = 1;
+            LocalDate startDate = LocalDate.now().minusDays(30 + i * 5L);
+            LocalDate endDate = startDate.plusDays(duration);
+            Goal goal = new Goal("Past " + difficulty + " Goal " + i, "History", difficulty, startDate, endDate, completed);
+            if (completed) {
+                goal.setCompletionDate(endDate.plusDays((int) (Math.random() * 3 - 1))); //this is to simulate some variation in completion
+            }
+            goals.add(goal);
+        }
+        return goals;
+    }
+
+    public static void main(String[] args) {
+        // Create a sample list of past goals
+
+        // Task Breakdown Test Cases
+        System.out.println("--- Task Breakdown Suggestions ---");
+        // Case 1: New "hard" goal significantly longer than average
+        List<Goal> pastGoals = new ArrayList<>(createPastGoals("hard", 12, 15, 3, true)); // Average around 15 days
+        Goal newGoalBreakdown1 = new Goal("Major Project", "Work", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(40), false);
+        SuggestionsModel modelBreakdown1 = new SuggestionsModel();
+        modelBreakdown1.initializeSuggestionsModel(pastGoals);
+        System.out.println("Breakdown Suggestion 1: " + modelBreakdown1.getTaskBreakdownSuggestion(newGoalBreakdown1));
+
+        // Case 2: New "easy" goal significantly shorter than average (with enough data)
+        pastGoals.clear();
+        pastGoals.addAll(createPastGoals("easy", 10, 5, 1, true)); // Average around 5 days
+        Goal newGoalBreakdown2 = new Goal("Quick Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), false);
+        SuggestionsModel modelBreakdown2 = new SuggestionsModel();
+        modelBreakdown2.initializeSuggestionsModel(pastGoals);
+        System.out.println("Breakdown Suggestion 2: " + modelBreakdown2.getTaskBreakdownSuggestion(newGoalBreakdown2));
+
+        // Case 3: New "medium" goal within the typical range
+        pastGoals.clear();
+        pastGoals.addAll(createPastGoals("medium", 7, 10, 2, true)); // Average around 10 days
+        Goal newGoalBreakdown3 = new Goal("Standard Task", "General", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(11), false);
+        SuggestionsModel modelBreakdown3 = new SuggestionsModel();
+        modelBreakdown3.initializeSuggestionsModel(pastGoals);
+        System.out.println("Breakdown Suggestion 3: " + modelBreakdown3.getTaskBreakdownSuggestion(newGoalBreakdown3));
+
+        // Timeline Suggestion Test Cases
+        System.out.println("\n--- Timeline Suggestions ---");
+        pastGoals.clear();
+        // Case 1: User tends to finish "medium" goals late
+        List<Goal> lateMediumGoals = createPastGoals("medium", 5, 7, 1, true);
+        for (Goal goal : lateMediumGoals) {
+            goal.setCompletionDate(goal.getEndDate().plusDays(2)); // Simulate finishing late
+        }
+        pastGoals.addAll(lateMediumGoals);
+        Goal newGoalTimeline1 = new Goal("Medium Project", "Work", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(10), false);
+        SuggestionsModel modelTimeline1 = new SuggestionsModel();
+        modelTimeline1.initializeSuggestionsModel(pastGoals);
+        System.out.println("Timeline Suggestion 1: " + modelTimeline1.getTimelineSuggestion(newGoalTimeline1));
+
+        pastGoals.clear();
+        // Case 2: User tends to finish "easy" goals early
+        List<Goal> earlyEasyGoals = createPastGoals("easy", 8, 5, 1, true);
+        for (Goal goal : earlyEasyGoals) {
+            goal.setCompletionDate(goal.getEndDate().minusDays(1)); // Simulate finishing early
+        }
+        pastGoals.addAll(earlyEasyGoals);
+        Goal newGoalTimeline2 = new Goal("Easy Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(4), false);
+        SuggestionsModel modelTimeline2 = new SuggestionsModel();
+        modelTimeline2.initializeSuggestionsModel(pastGoals);
+        System.out.println("Timeline Suggestion 2: " + modelTimeline2.getTimelineSuggestion(newGoalTimeline2));
+
+        pastGoals.clear();
+        // Case 3: User finishes "hard" goals roughly on time
+        pastGoals.addAll(createPastGoals("hard", 6, 14, 2, true));
+        Goal newGoalTimeline3 = new Goal("Hard Project", "General", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(21), false);
+        SuggestionsModel modelTimeline3 = new SuggestionsModel();
+        modelTimeline3.initializeSuggestionsModel(pastGoals);
+        System.out.println("Timeline Suggestion 3: " + modelTimeline3.getTimelineSuggestion(newGoalTimeline3));
+
+        // Unrealistic Deadline Check Test Cases
+        System.out.println("\n--- Unrealistic Deadline Checks ---");
+        pastGoals.clear();
+        // Case 1: Too many incomplete goals
+        for (int i = 0; i < 8; i++) {
+            pastGoals.add(new Goal("Incomplete Goal " + i, "Work", "medium", LocalDate.now().minusDays(10), LocalDate.now().plusDays(5), false));
+        }
+        Goal newGoalUnrealistic1 = new Goal("New Urgent Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), false);
+        SuggestionsModel modelUnrealistic1 = new SuggestionsModel();
+        modelUnrealistic1.initializeSuggestionsModel(pastGoals);
+        System.out.println("Unrealistic Deadline Check 1: " + modelUnrealistic1.checkUnrealisticDeadline(newGoalUnrealistic1));
+
+        pastGoals.clear();
+        // Case 2: High density of overlapping deadlines
+        pastGoals.add(new Goal("Ongoing Task A", "a","medium", LocalDate.now().minusDays(5), LocalDate.now().plusDays(7),false));
+        pastGoals.add(new Goal("Ongoing Task B", "a", "medium", LocalDate.now().minusDays(3), LocalDate.now().plusDays(8), false));
+        Goal newGoalUnrealistic2 = new Goal("Another Task", "a", "easy", LocalDate.now().plusDays(2), LocalDate.now().plusDays(9), false);
+        SuggestionsModel modelUnrealistic2 = new SuggestionsModel();
+        modelUnrealistic2.initializeSuggestionsModel(pastGoals);
+        System.out.println("Unrealistic Deadline Check 2: " + modelUnrealistic2.checkUnrealisticDeadline(newGoalUnrealistic2));
+
+        pastGoals.clear();
+        // Case 3: Ambitious deadline based on past lateness
+        List<Goal> consistentlyLateGoals = createPastGoals("medium", 5, 7, 1, true);
+        for (Goal goal : consistentlyLateGoals) {
+            goal.setCompletionDate(goal.getEndDate().plusDays(3));
+        }
+        pastGoals.addAll(consistentlyLateGoals);
+        Goal newGoalUnrealistic3 = new Goal("Quick Medium Task", "General", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(4), false);
+        SuggestionsModel modelUnrealistic3 = new SuggestionsModel();
+        modelUnrealistic3.initializeSuggestionsModel(pastGoals);
+        System.out.println("Unrealistic Deadline Check 3: " + modelUnrealistic3.checkUnrealisticDeadline(newGoalUnrealistic3));
+
+        // Goal Difficulty Suggestion Test Cases
+        System.out.println("\n--- Goal Difficulty Suggestions ---");
+        pastGoals.clear();
+        // Case 1: Higher success rate with "medium" than "hard"
+        pastGoals.addAll(createPastGoals("easy", 5, 7, 1, true));
+        pastGoals.addAll(createPastGoals("medium", 7, 10, 2, true));
+        pastGoals.addAll(createPastGoals("hard", 3, 15, 5, true)); // Lower success rate for hard
+        SuggestionsModel modelDifficulty1 = new SuggestionsModel();
+        modelDifficulty1.initializeSuggestionsModel(pastGoals);
+        Goal newGoalDifficulty1 = new Goal("Tough Challenge", "Work", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(20), false);
+        System.out.println("Difficulty Suggestion 1: " + modelDifficulty1.getDifficultySuggestion(newGoalDifficulty1));
+
+        pastGoals.clear();
+        // Case 2: Successful with "easy" and good with "medium"
+        pastGoals.addAll(createPastGoals("easy", 10, 5, 1, true));
+        pastGoals.addAll(createPastGoals("medium", 8, 12, 2, true));
+        SuggestionsModel modelDifficulty2 = new SuggestionsModel();
+        modelDifficulty2.initializeSuggestionsModel(pastGoals);
+        Goal newGoalDifficulty2 = new Goal("Simple Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), false);
+        System.out.println("Difficulty Suggestion 2: " + modelDifficulty2.getDifficultySuggestion(newGoalDifficulty2));
+
+        pastGoals.clear();
+        // Case 3: Limited history
+        pastGoals.add(new Goal("First Goal", "General", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(10), true));
+        SuggestionsModel modelDifficulty3 = new SuggestionsModel();
+        modelDifficulty3.initializeSuggestionsModel(pastGoals);
+        Goal newGoalDifficulty3 = new Goal("Another Goal", "Learning", "medium", LocalDate.now().plusDays(15), LocalDate.now().plusDays(25), false);
+        System.out.println("Difficulty Suggestion 3: " + modelDifficulty3.getDifficultySuggestion(newGoalDifficulty3));
+    }
+
 }
