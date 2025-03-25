@@ -42,6 +42,11 @@ public class UserHistoryDataModel {
     private String userName;
 
     /**
+     * Is this the first time of opening the app?
+     */
+    private boolean firstOpen;
+
+    /**
      * The number of completed goals for the current day, and week.
      */
     private int dailyCompletedGoals, weeklyCompletedGoals;
@@ -68,6 +73,7 @@ public class UserHistoryDataModel {
         dataDay = LocalDate.now();
         dataWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
         userName = "User";
+        firstOpen = false;
 
         loadDataFromFile();
     }
@@ -152,6 +158,14 @@ public class UserHistoryDataModel {
      */
     public LocalDate getDataWeek() {
         return dataWeek;
+    }
+
+    /**
+     * Is this the first time opening the app?
+     * @return true if first app open, false otherwise.
+     */
+    public boolean isFirstOpen() {
+        return firstOpen;
     }
 
     /**
@@ -343,6 +357,9 @@ public class UserHistoryDataModel {
             } catch (IOException e) {
                 System.err.println("Error loading data from file: " + e.getMessage());
             }
+        } else {
+            // if file is empty, the username should be set.
+            firstOpen = true;
         }
     }
 

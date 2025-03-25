@@ -12,10 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -231,6 +228,14 @@ public class GoalModel {
     }
 
     /**
+     * Load goals from file into a hashmap - supporting function for UserProgressHistoryVisModel
+     */
+    public Map<String, Goal> load_goals_from_file_hashmap(){
+        load_goals_from_file();
+        return new HashMap<>(goals);
+    }
+
+    /**
      * Returns a list of goals that belong to the given section.
      * @param section the section name
      * @return list of goals in that section
@@ -269,6 +274,24 @@ public class GoalModel {
         List<Goal> filteredGoals = new ArrayList<>();
         for (Goal goal : goals.values()) {
             if (goal.getDifficulty() != null && goal.getDifficulty().equalsIgnoreCase(difficulty)) {
+                filteredGoals.add(goal);
+            }
+        }
+        return filteredGoals;
+    }
+
+    /**
+     * Returns a list of goals filtered by completion status.
+     * @param completed true for completed goals, false for uncompleted, null for all goals
+     * @return list of goals that match the given completion status
+     */
+    public List<Goal> getGoalsByCompletionStatus(Boolean completed) {
+        if (completed == null) {
+            return getGoals();
+        }
+        List<Goal> filteredGoals = new ArrayList<>();
+        for (Goal goal : goals.values()) {
+            if (goal.isCompleted() == completed) {
                 filteredGoals.add(goal);
             }
         }

@@ -58,6 +58,7 @@ public class GoalView extends StackPane implements Subscriber {
     private Label progressFeedback;
     private Label welcomeLabel;
     private ComboBox<String> difficultyComboBox;
+    private ComboBox<String> completionStatusComboBox;
     private Button completeGoalButton;
     private Button editGoalButton;
 
@@ -184,13 +185,31 @@ public class GoalView extends StackPane implements Subscriber {
         // instantiate and configure the ComboBox for filtering difficulties
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("All", "Easy", "Medium", "Hard");
-        difficultyComboBox.setValue("Filter"); // default
+        difficultyComboBox.setValue("Difficulty"); // default
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
-        
+
+        // 🔥 Goal completion status filtering button 🔥
+        completionStatusComboBox = new ComboBox<>();
+        completionStatusComboBox.getItems().addAll("All", "Completed", "Uncompleted");
+        completionStatusComboBox.setValue("All"); // default
+        completionStatusComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
+        difficultyComboBox.getStyleClass().add("filter-combo");
+        completionStatusComboBox.getStyleClass().add("filter-combo");
+
+        // Container for filters
+        HBox filtersContainer = new HBox(10);
+        filtersContainer.setAlignment(Pos.CENTER);
+        filtersContainer.getChildren().addAll(
+                difficultyComboBox,
+                completionStatusComboBox
+        );
+
         // ********* Action Buttons *********
         completeGoalButton = new Button("Complete");
+        completeGoalButton.getStyleClass().add("cbutton");
         editGoalButton = new Button("Edit Goal");
+        editGoalButton.getStyleClass().add("cbutton");
 
         // Container for dashboard controls (list view, feedback, filtering, buttons)
         VBox dashboardControls = new VBox();
@@ -200,6 +219,7 @@ public class GoalView extends StackPane implements Subscriber {
                 goalListView,
                 goalProgressModule,
                 difficultyComboBox,
+                filtersContainer,
                 completeGoalButton,
                 editGoalButton
         );
@@ -363,7 +383,7 @@ public class GoalView extends StackPane implements Subscriber {
 
     /**
      * Set the user data model for this view.
-     * @param userHistoryDataModel the user data model for this view.
+     * @param historyModel the user data model for this view.
      */
     public void setUserHistoryDataModel(UserHistoryDataModel historyModel) {
         this.historyModel = historyModel;
@@ -380,11 +400,25 @@ public class GoalView extends StackPane implements Subscriber {
         if (goalModel == null) return;
 
         String selectedDifficulty = difficultyComboBox.getValue();
+        String selectedCompletionStatus = completionStatusComboBox.getValue();
+
         List<Goal> filteredGoals = goalModel.getGoalsByDifficulty(selectedDifficulty);
 
+        if (!"All".equals(selectedCompletionStatus)) {
+            boolean completedFilter = "Completed".equals(selectedCompletionStatus);
+            filteredGoals = goalModel.getGoalsByCompletionStatus(completedFilter);
+            List<Goal> intersection = new ArrayList<>();
+            List<Goal> completionFiltered = goalModel.getGoalsByCompletionStatus(completedFilter);
+            for (Goal goal : filteredGoals) {
+                if (completionFiltered.contains(goal)) {
+                    intersection.add(goal);
+                }
+            }
+            filteredGoals = intersection;
+        }
         goalListView.getItems().clear();
         for (Goal goal : filteredGoals) {
-            goalListView.getItems().add(goal); //toString()
+            goalListView.getItems().add(goal);
         }
     }
 

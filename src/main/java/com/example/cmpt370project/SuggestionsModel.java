@@ -1,15 +1,25 @@
 package com.example.cmpt370project;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SuggestionsModel {
     private List<Goal> goals = new ArrayList<>();
-    private static final double OUTLIER_THRESHOLD_MULTIPLIER = 1.5; // Adjust as needed
+
+    /*Stats constants used in score calculations for the suggestions*/
+    private static final double OUTLIER_THRESHOLD_MULTIPLIER = 1.5;
+    private static final double SIGNIFICANTLY_LONGER_STD_DEV = 1.5;
+    private static final double SIGNIFICANTLY_SHORTER_STD_DEV = -1.5;
+    private static final double LATE_COMPLETION_THRESHOLD_PERCENTAGE = 10.0;
+    private static final double EARLY_COMPLETION_THRESHOLD_PERCENTAGE = -10.0;
+    private static final int MIN_GOALS_FOR_STATS = 3;
+    private static final double HIGH_INCOMPLETE_GOAL_RATIO = 0.5;
+    private static final int HIGH_INCOMPLETE_GOAL_COUNT = 5;
 
     public SuggestionsModel() {
     }
@@ -22,205 +32,147 @@ public class SuggestionsModel {
         this.goals = goals;
     }
 
+
+
     /**
-     * Generates a suggestion based on the user's historical completion trends for goals of different difficulties,
-     * excluding outliers in completion time.
+     * Generates a task breakdown suggestion based on historical goal completion data.
+     */
+    public String getTaskBreakdownSuggestion(Goal newGoal) {
+        String difficulty = newGoal.getDifficulty();
+        List<Goal> completedGoalsOfDifficulty = goals.stream()
+                .filter(Goal::isCompleted)
+                .filter(g -> g.getDifficulty().equals(difficulty))
+                .toList();
+        if (completedGoalsOfDifficulty.size() < MIN_GOALS_FOR_STATS) {
+            return "I don't have enough data to suggest a goal breakdown!";
+        }
+        List<Long> durations = completedGoalsOfDifficulty.stream()
+                .map(g -> ChronoUnit.DAYS.between(g.getStartDate(), g.getEndDate()))
+                .collect(Collectors.toList());
+        List<Long> nonOutlierDurations = excludeOutliers(durations);
+        if (nonOutlierDurations.isEmpty()) {
+            return "I don't have enough reliable data suggest a goal breakdown!";
+        }
+        double averageDuration = nonOutlierDurations.stream().mapToLong(Long::longValue).average().orElse(0);
+        double stdDev = calculateStandardDeviation(nonOutlierDurations, averageDuration);
+        long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
+        double stdDevsAway = (newGoalDuration - averageDuration) / stdDev;
+
+        if (stdDev > 0 && stdDevsAway > SIGNIFICANTLY_LONGER_STD_DEV) {
+            long suggestedTasks = Math.max(2, Math.round((double) newGoalDuration / averageDuration));
+            return "This goal is significantly longer than your typical " + difficulty + " goals. Consider breaking it down into " + suggestedTasks + " smaller goals.";
+        } else if (stdDev > 0 && stdDevsAway < SIGNIFICANTLY_SHORTER_STD_DEV && completedGoalsOfDifficulty.size() > MIN_GOALS_FOR_STATS * 2) {
+            return "This goal is significantly shorter than your typical " + difficulty + " goals. You might consider combining it with another goal if possible.";
+        } else {
+            return "The size of this goal seems to align with your typical " + difficulty + " completed goals.";
+        }
+    }
+
+    /**
+     * Generates a timeline suggestion for a new goal based on historical goal completion data.
+     */
+    public String getTimelineSuggestion(Goal newGoal) {
+        String difficulty = newGoal.getDifficulty();
+        List<Goal> completedGoalsOfDifficulty = goals.stream()
+                .filter(Goal::isCompleted)
+                .filter(g -> g.getDifficulty().equals(difficulty))
+                .toList();
+        if (completedGoalsOfDifficulty.size() < MIN_GOALS_FOR_STATS) {
+            return "I don't have enough data for timeline suggestions! Let's complete some goals :D";
+        }
+        List<Double> completionDifferencePercentages = completedGoalsOfDifficulty.stream()
+                .map(goal -> {
+                    long duration = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
+                    long timeTaken = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getCompletionDate());
+                    return duration == 0 ? 0 : ((double) timeTaken - duration) / duration * 100;
+                })
+                .collect(Collectors.toList());
+        List<Double> nonOutlierPercentages = excludeOutlierDouble(completionDifferencePercentages);
+        if (nonOutlierPercentages.isEmpty()) {
+            return "Your behaviour is still unpredictable for me...let's finish more goals!";
+        }
+
+        double averagePercentage = nonOutlierPercentages.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+        long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
+        long suggestedAdjustmentDays = Math.round(newGoalDuration * (averagePercentage*0.8 / 100.0));
+        LocalDate suggestedDeadline = newGoal.getEndDate().plusDays(suggestedAdjustmentDays);
+
+        if (averagePercentage > LATE_COMPLETION_THRESHOLD_PERCENTAGE) {
+            return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", averagePercentage) + "% late. Consider setting your deadline to " + suggestedDeadline.toString() + " (add " + suggestedAdjustmentDays + " days).";
+        } else if (averagePercentage < EARLY_COMPLETION_THRESHOLD_PERCENTAGE) {
+            return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", Math.abs(averagePercentage)) + "% early. You might be able to set your deadline to " + suggestedDeadline.toString() + " (minus " + Math.abs(suggestedAdjustmentDays) + " days).";
+        } else {
+            return "Based on your past behaviour, your initial deadline it's perfect!";
+        }
+    }
+
+    /**
+     * Checks if the deadline for a new goal is unrealistic.
+     */
+    public String checkUnrealisticDeadline(Goal newGoal) {
+        long incompleteGoalsCount = goals.stream().filter(goal -> !goal.isCompleted()).count();
+        if (incompleteGoalsCount > goals.size() * HIGH_INCOMPLETE_GOAL_RATIO || incompleteGoalsCount > HIGH_INCOMPLETE_GOAL_COUNT) {
+            return "Warning: You have a significant number of incomplete goals (" + incompleteGoalsCount + "). Consider finishing some before adding more!";
+        }
+        // Simple check based on overall lateness
+        double overallAverageLateness = goals.stream()
+                .filter(Goal::isCompleted)
+                .mapToLong(goal -> ChronoUnit.DAYS.between(goal.getEndDate(), goal.getCompletionDate()))
+                .average()
+                .orElse(0);
+        long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
+        if (overallAverageLateness > 2 && newGoalDuration < overallAverageLateness) {
+            return "Warning: You typically finish goals a few days late. This deadline might be a bit too ambitious :0";
+        }
+        return "You've been doing a great job at keeping up with your goals! You're a star :)";
+    }
+
+    /**
+     * Generates a difficulty suggestion based on the user's data for similar goals
      */
     public String getDifficultySuggestion(Goal newGoal) {
-        var difficultyCounters = goals.stream()
+        Map<String, Long> completedCounts = goals.stream()
                 .filter(Goal::isCompleted)
                 .collect(Collectors.groupingBy(Goal::getDifficulty, Collectors.counting()));
 
-        long easyGoalsCompleted = difficultyCounters.getOrDefault("easy", 0L);
-        long mediumGoalsCompleted = difficultyCounters.getOrDefault("medium", 0L);
-        long hardGoalsCompleted = difficultyCounters.getOrDefault("hard", 0L);
+        Map<String, Long> totalCounts = goals.stream()
+                .collect(Collectors.groupingBy(Goal::getDifficulty, Collectors.counting()));
 
-        var completionStatusCounts = goals.stream()
-                .filter(Goal::isCompleted)
-                .collect(Collectors.groupingBy(this::getCompletionStatus, Collectors.counting()));
+        //working with rations for more accurate and sensible suggestions :)
+        Map<String, Double> successRates = new HashMap<>();
+        totalCounts.forEach((difficulty, total) -> {
+            long completed = completedCounts.getOrDefault(difficulty, 0L);
+            successRates.put(difficulty, total == 0 ? 0 : (double) completed / total);
+        });
 
-        long earlyCompletions = completionStatusCounts.getOrDefault("early", 0L);
-        long onTimeCompletions = completionStatusCounts.getOrDefault("on_time", 0L);
-        long lateCompletions = completionStatusCounts.getOrDefault("late", 0L);
-
-        String mostCommonCompletionStatus = getMostCommonStatus(earlyCompletions, onTimeCompletions, lateCompletions);
         String newGoalDifficulty = newGoal.getDifficulty();
-        String mostCommonDifficulty = getMostCommonDifficulty(easyGoalsCompleted, mediumGoalsCompleted, hardGoalsCompleted);
-
-        if (newGoalDifficulty.equals(mostCommonDifficulty)) {
-            return "Based on your history, this goal difficulty aligns with what you typically complete. Keep going!";
-        }
-
-        if (mostCommonCompletionStatus.equals("late")) {
-            return handleLateCompletions(easyGoalsCompleted, mediumGoalsCompleted, hardGoalsCompleted);
-        } else if (mostCommonCompletionStatus.equals("early")) {
-            return handleEarlyCompletions(easyGoalsCompleted, mediumGoalsCompleted, hardGoalsCompleted);
-        }
-
-        return "Your goal difficulty is different from your usual. Observe your progress to refine your strategy.";
-    }
-
-    private String getCompletionStatus(Goal goal) {
-        long difference = ChronoUnit.DAYS.between(goal.getEndDate(), goal.getCompletionDate());
-        if (difference < 0) return "early";
-        else if (difference == 0) return "on_time";
-        else return "late";
-    }
-
-    private String getMostCommonStatus(long early, long onTime, long late) {
-        if (early >= onTime && early >= late) return "early";
-        else if (onTime >= early && onTime >= late) return "on_time";
-        else return "late";
-    }
-
-    private String getMostCommonDifficulty(long easy, long medium, long hard) {
-        if (easy >= medium && easy >= hard) return "easy";
-        else if (medium >= easy && medium >= hard) return "medium";
-        else return "hard";
-    }
-
-    private String handleLateCompletions(long easy, long medium, long hard) {
-        if (easy > medium && easy > hard) {
-            return "You often finish easy goals late. Consider grouping similar easy tasks.";
-        } else if (medium > easy && medium > hard) {
-            return "You often finish medium goals late. Breaking them down might help.";
-        } else {
-            return "You often finish hard goals late. Try breaking them into smaller, more manageable steps.";
-        }
-    }
-
-    private String handleEarlyCompletions(long easy, long medium, long hard) {
-        if (easy > medium && easy > hard) {
-            return "You tend to complete easy goals quickly. Consider taking on slightly more challenging tasks.";
-        } else if (medium > easy && medium > hard) {
-            return "You complete medium goals early. You might be ready for harder goals.";
-        } else {
-            return "You complete hard goals early. Consider making them more complex or ambitious.";
-        }
-    }
-
-    /**
-     * Generates a suggestion for adjusting the deadline of a new goal based on historical completion times,
-     * excluding outlier completion times.
-     */
-    public String getTimelineSuggestion(Goal newGoal) {
-        long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
-        long durationTolerance = Math.max(1, Math.round(newGoalDuration * 0.3));
-        double maxAdjustmentFactor = 0.5;
-
-        List<Long> completionDifferences = goals.stream()
-                .filter(Goal::isCompleted)
-                .filter(goal -> {
-                    long pastGoalDuration = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
-                    return Math.abs(pastGoalDuration - newGoalDuration) <= durationTolerance;
-                })
-                .map(goal -> ChronoUnit.DAYS.between(goal.getEndDate(), goal.getCompletionDate()))
-                .collect(Collectors.toList());
-
-        if (completionDifferences.isEmpty()) {
-            return "No past completed goals with a similar planned duration found for deadline suggestions.";}
-
-        List<Long> nonOutlierDifferences = excludeOutliers(completionDifferences);
-
-        if (nonOutlierDifferences.isEmpty()) {
-            return "Insufficient reliable past completion data for deadline suggestions on similar length goals after excluding outliers.";}
-
-        double averageDifference = nonOutlierDifferences.stream().mapToLong(Long::longValue).average().orElse(0);
-        long suggestedAdjustment = Math.round(averageDifference);
-
-        // Limit the suggested adjustment
-        long maxAbsoluteAdjustment = Math.round(newGoalDuration * maxAdjustmentFactor);
-        if (Math.abs(suggestedAdjustment) > maxAbsoluteAdjustment) {
-            suggestedAdjustment = (suggestedAdjustment > 0) ? maxAbsoluteAdjustment : -maxAbsoluteAdjustment;}
-
-        LocalDate suggestedDeadline = newGoal.getEndDate().plusDays(suggestedAdjustment);
-
-        // Prevent suggesting a deadline before the start date
-        if (suggestedDeadline.isBefore(newGoal.getStartDate())) {
-            suggestedDeadline = newGoal.getStartDate();
-            suggestedAdjustment = ChronoUnit.DAYS.between(newGoal.getEndDate(), suggestedDeadline);
-            return "Based on your past completion times, you tend to finish similar goals early. However, a drastic change isn't suggested. Consider setting your deadline closer to your start date.";
-        }
-
-        if (suggestedAdjustment > 2) {
-            return "Based on your typical completion times for similar length goals, consider setting your deadline to " + suggestedDeadline.toString() + " (add " + suggestedAdjustment + " days).";
-        } else if (suggestedAdjustment < -2) {
-            return "Based on your typical completion times for similar length goals, you might be able to set your deadline to " + suggestedDeadline.toString() + " (minus " + Math.abs(suggestedAdjustment) + " days).";
-        } else {
-            return "Based on your typical completion times for similar length goals, your initial deadline seems reasonable.";
-        }
-    }
-    /**
-     * Checks if the deadline for a new goal might be unrealistic based on the number of currently incomplete goals
-     * and the user's past completion times (excluding outliers).
-     */
-    public String checkUnrealisticDeadline(Goal newGoal) {
-        long incompleteGoals = goals.stream().filter(goal -> !goal.isCompleted()).count();
-
-        List<Long> completionDifferences = goals.stream()
-                .filter(Goal::isCompleted)
-                .map(goal -> ChronoUnit.DAYS.between(goal.getEndDate(), goal.getCompletionDate()))
-                .collect(Collectors.toList());
-
-        List<Long> nonOutlierDifferences = excludeOutliers(completionDifferences);
-
-        if (incompleteGoals > goals.size()*0.75  && !nonOutlierDifferences.isEmpty()) {
-            double averageDifference = nonOutlierDifferences.stream().mapToLong(Long::longValue).average().orElse(0);
-            LocalDate expectedCompletion = newGoal.getEndDate().plusDays(Math.round(averageDifference));
-            if (expectedCompletion.isBefore(LocalDate.now())) {
-                return "Warning: You have " + incompleteGoals + " goals in progress. Your new deadline seems very ambitious based on your typical completion times.";
+        double newGoalSuccessRate = successRates.getOrDefault(newGoalDifficulty, 0.0);
+        String bestDifficulty = null;
+        double bestSuccessRate = -1.0;
+        for (Map.Entry<String, Double> entry : successRates.entrySet()) {
+            if (!entry.getKey().equals(newGoalDifficulty) && entry.getValue() > bestSuccessRate) {
+                bestSuccessRate = entry.getValue();
+                bestDifficulty = entry.getKey();
             }
-        } else if (incompleteGoals > 4) {
-            return "Warning: You currently have a large number of incomplete goals (" + incompleteGoals + "). Consider finishing some before adding more.";
         }
-        return null;
+
+        if (bestDifficulty != null && bestSuccessRate > newGoalSuccessRate + 0.2 && totalCounts.getOrDefault(newGoalDifficulty, 0L) >= MIN_GOALS_FOR_STATS) {
+            return "You've had a higher success rate with '" + bestDifficulty + "' goals. Consider if that might be a better fit for this goal!";
+        } else if (newGoalDifficulty.equals("easy") && successRates.getOrDefault("medium", 0.0) > 0.7 && totalCounts.getOrDefault("medium", 0L) >= MIN_GOALS_FOR_STATS) {
+            return "You've been very successful with easy goals, and also have a good track record with medium ones. Consider challenging yourself with a hard goal next time!";
+        }
+        return "You've been killing it! Your chosen difficulty aligns with your past behaviour.";
     }
 
     /**
-     * Generates a suggestion on whether to break down a goal based on the user's history of completing goals
-     * of different durations, excluding outliers in duration.
-     */
-    public String getTaskBreakdownSuggestion(Goal newGoal) {
-        long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
-        long durationTolerance = Math.max(1, Math.round(newGoalDuration * 0.3)); // Adjust tolerance as needed
-
-        List<Long> similarCompletedGoalDurations = goals.stream()
-                .filter(Goal::isCompleted)
-                .filter(goal -> {
-                    long pastGoalDuration = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
-                    return Math.abs(pastGoalDuration - newGoalDuration) <= durationTolerance;
-                })
-                .map(goal -> ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate()))
-                .collect(Collectors.toList());
-
-        if (similarCompletedGoalDurations.isEmpty()) {
-            return "No past completed goals with a similar planned duration found for task breakdown suggestions.";}
-
-        List<Long> nonOutlierDurations = excludeOutliers(similarCompletedGoalDurations);
-
-        if (nonOutlierDurations.isEmpty()) {
-            return "Insufficient reliable past goal duration data for similar length goals after excluding outliers.";}
-
-        double averageSimilarCompletedDuration = nonOutlierDurations.stream().mapToLong(Long::longValue).average().orElse(0);
-        if (newGoalDuration > averageSimilarCompletedDuration * OUTLIER_THRESHOLD_MULTIPLIER) {
-            long suggestedTasks = Math.max(2, Math.round((double) newGoalDuration / averageSimilarCompletedDuration));
-            return "This goal is significantly longer than your typical similar length completed goals. Consider breaking it down into approximately " + suggestedTasks + " smaller tasks.";
-        } else if (newGoalDuration < averageSimilarCompletedDuration / OUTLIER_THRESHOLD_MULTIPLIER && nonOutlierDurations.size() > 3) {
-            return "This goal is significantly shorter than your typical similar length completed goals. You might consider combining it with another related goal if possible.";
-        } else {
-            return "The size of this goal seems to align with your typical similar length completed goals.";
-        }
-    }
-
-    /**
-     * Helper method to exclude outliers from a list of numerical values using the IQR method.
+     * Helper method to exclude outliers from a list of numerical values using the IQR method. (STATS245<3)
      *
      * @param data The list of numerical values.
      * @return A new list containing the values with outliers removed.
      */
     private List<Long> excludeOutliers(List<Long> data) {
         if (data.size() < 3) {
-            return new ArrayList<>(data); // Not enough data to reliably identify outliers
+            return new ArrayList<>(data);
         }
         List<Long> sortedData = new ArrayList<>(data);
         Collections.sort(sortedData);
@@ -239,45 +191,180 @@ public class SuggestionsModel {
                 .collect(Collectors.toList());
     }
 
-    public static void main(String[] args) {
-        List<Goal> pastGoals = new ArrayList<>();
-        Goal goal1 = new Goal("1", "Learn Python Basics", "easy", LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 7), true);
-        goal1.setCompletionDate(LocalDate.of(2025, 1, 5));
-        pastGoals.add(goal1);
-        Goal goal2 = new Goal("2", "Read a Novel", "medium", LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 31), true);
-        goal2.setCompletionDate(LocalDate.of(2025, 2, 5)); // Outlier (late)
-        pastGoals.add(goal2);
-        Goal goal3 = new Goal("3", "Plan a Trip", "hard", LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 28), false);
-        pastGoals.add(goal3);
-        Goal goal4 = new Goal("4", "Exercise 3 times", "easy", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 7), true);
-        goal4.setCompletionDate(LocalDate.of(2025, 3, 3)); // Outlier (early)
-        pastGoals.add(goal4);
-        Goal goal5 = new Goal("5", "Write a Blog Post", "medium", LocalDate.of(2025, 3, 10), LocalDate.of(2025, 3, 17), true);
-        goal5.setCompletionDate(LocalDate.of(2025, 3, 18));
-        pastGoals.add(goal5);
-        Goal goal6 = new Goal("6", "Small Task 1", "easy", LocalDate.of(2025, 4, 1), LocalDate.of(2025, 4, 2), true);
-        goal6.setCompletionDate(LocalDate.of(2025, 4, 2));
-        pastGoals.add(goal6);
-        Goal goal7 = new Goal("7", "Small Task 2", "easy", LocalDate.of(2025, 4, 3), LocalDate.of(2025, 4, 4), true);
-        goal7.setCompletionDate(LocalDate.of(2025, 4, 3)); // Outlier (very early completion relative to goal 2)
-        pastGoals.add(goal7);
-        Goal goal8 = new Goal("8", "Very Long Project", "hard", LocalDate.of(2025, 5, 1), LocalDate.of(2025, 6, 30), false);
-        pastGoals.add(goal8);
-
-        SuggestionsModel model = new SuggestionsModel();
-        model.initializeSuggestionsModel(pastGoals);
-
-        Goal newGoalTimeline = new Goal("9", "Learn a new library", "medium", LocalDate.of(2025, 3, 25), LocalDate.of(2025, 4, 1), false);
-        System.out.println("Timeline Suggestion: " + model.getTimelineSuggestion(newGoalTimeline));
-        String unrealisticWarning = model.checkUnrealisticDeadline(newGoalTimeline);
-        if (unrealisticWarning != null) {
-            System.out.println(unrealisticWarning);
+    private List<Double> excludeOutlierDouble(List<Double> data) {
+        if (data.size() < 3) {
+            return new ArrayList<>(data);
         }
+        List<Double> sortedData = new ArrayList<>(data);
+        Collections.sort(sortedData);
 
-        Goal newGoalBreakdown = new Goal("10", "Build a complete application", "hard", LocalDate.of(2025, 4, 5), LocalDate.of(2025, 5, 30), false);
-        System.out.println("Task Breakdown Suggestion: " + model.getTaskBreakdownSuggestion(newGoalBreakdown));
+        int q1Index = sortedData.size() / 4;
+        int q3Index = sortedData.size() * 3 / 4;
+        double q1 = sortedData.get(q1Index);
+        double q3 = sortedData.get(q3Index);
+        double iqr = q3 - q1;
 
-        Goal newGoalDifficulty = new Goal("11", "Do laundry", "easy", LocalDate.of(2025, 3, 25), LocalDate.of(2025, 3, 26), false);
-        System.out.println("Difficulty Suggestion: " + model.getDifficultySuggestion(newGoalDifficulty));
+        double lowerBound = q1 - (iqr * OUTLIER_THRESHOLD_MULTIPLIER);
+        double upperBound = q3 + (iqr * OUTLIER_THRESHOLD_MULTIPLIER);
+
+        return sortedData.stream()
+                .filter(value -> value >= lowerBound && value <= upperBound)
+                .collect(Collectors.toList());
     }
+
+    private double calculateStandardDeviation(List<Long> data, double mean) {
+        if (data.size() < 2) {
+            return 0;
+        }
+        double sumOfSquares = 0;
+        for (long val : data) {
+            sumOfSquares += Math.pow(val - mean, 2);
+        }
+        return Math.sqrt(sumOfSquares / (data.size() - 1));
+    }
+
+    /**
+    * Helper method to create past goals to test this class
+    * */
+    private static List<Goal> createPastGoals(String difficulty, int count, int avgDurationDays, int durationVariationDays, boolean completed) {
+        List<Goal> goals = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            int duration = avgDurationDays + (int) (Math.random() * 2 * durationVariationDays - durationVariationDays);
+            if (duration <= 0) duration = 1;
+            LocalDate startDate = LocalDate.now().minusDays(30 + i * 5L);
+            LocalDate endDate = startDate.plusDays(duration);
+            Goal goal = new Goal("Past " + difficulty + " Goal " + i, "History", difficulty, startDate, endDate, completed);
+            if (completed) {
+                goal.setCompletionDate(endDate.plusDays((int) (Math.random() * 3 - 1))); //this is to simulate some variation in completion
+            }
+            goals.add(goal);
+        }
+        return goals;
+    }
+
+    public static void main(String[] args) {
+        // Create a sample list of past goals
+
+        // Task Breakdown Test Cases
+        System.out.println("--- Task Breakdown Suggestions ---");
+        // Case 1: New "hard" goal significantly longer than average
+        List<Goal> pastGoals = new ArrayList<>(createPastGoals("hard", 12, 15, 3, true)); // Average around 15 days
+        Goal newGoalBreakdown1 = new Goal("Major Project", "Work", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(40), false);
+        SuggestionsModel modelBreakdown1 = new SuggestionsModel();
+        modelBreakdown1.initializeSuggestionsModel(pastGoals);
+        System.out.println("Breakdown Suggestion 1: " + modelBreakdown1.getTaskBreakdownSuggestion(newGoalBreakdown1));
+
+        // Case 2: New "easy" goal significantly shorter than average (with enough data)
+        pastGoals.clear();
+        pastGoals.addAll(createPastGoals("easy", 10, 5, 1, true)); // Average around 5 days
+        Goal newGoalBreakdown2 = new Goal("Quick Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), false);
+        SuggestionsModel modelBreakdown2 = new SuggestionsModel();
+        modelBreakdown2.initializeSuggestionsModel(pastGoals);
+        System.out.println("Breakdown Suggestion 2: " + modelBreakdown2.getTaskBreakdownSuggestion(newGoalBreakdown2));
+
+        // Case 3: New "medium" goal within the typical range
+        pastGoals.clear();
+        pastGoals.addAll(createPastGoals("medium", 7, 10, 2, true)); // Average around 10 days
+        Goal newGoalBreakdown3 = new Goal("Standard Task", "General", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(11), false);
+        SuggestionsModel modelBreakdown3 = new SuggestionsModel();
+        modelBreakdown3.initializeSuggestionsModel(pastGoals);
+        System.out.println("Breakdown Suggestion 3: " + modelBreakdown3.getTaskBreakdownSuggestion(newGoalBreakdown3));
+
+        // Timeline Suggestion Test Cases
+        System.out.println("\n--- Timeline Suggestions ---");
+        pastGoals.clear();
+        // Case 1: User tends to finish "medium" goals late
+        List<Goal> lateMediumGoals = createPastGoals("medium", 5, 7, 1, true);
+        for (Goal goal : lateMediumGoals) {
+            goal.setCompletionDate(goal.getEndDate().plusDays(2)); // Simulate finishing late
+        }
+        pastGoals.addAll(lateMediumGoals);
+        Goal newGoalTimeline1 = new Goal("Medium Project", "Work", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(10), false);
+        SuggestionsModel modelTimeline1 = new SuggestionsModel();
+        modelTimeline1.initializeSuggestionsModel(pastGoals);
+        System.out.println("Timeline Suggestion 1: " + modelTimeline1.getTimelineSuggestion(newGoalTimeline1));
+
+        pastGoals.clear();
+        // Case 2: User tends to finish "easy" goals early
+        List<Goal> earlyEasyGoals = createPastGoals("easy", 8, 5, 1, true);
+        for (Goal goal : earlyEasyGoals) {
+            goal.setCompletionDate(goal.getEndDate().minusDays(1)); // Simulate finishing early
+        }
+        pastGoals.addAll(earlyEasyGoals);
+        Goal newGoalTimeline2 = new Goal("Easy Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(4), false);
+        SuggestionsModel modelTimeline2 = new SuggestionsModel();
+        modelTimeline2.initializeSuggestionsModel(pastGoals);
+        System.out.println("Timeline Suggestion 2: " + modelTimeline2.getTimelineSuggestion(newGoalTimeline2));
+
+        pastGoals.clear();
+        // Case 3: User finishes "hard" goals roughly on time
+        pastGoals.addAll(createPastGoals("hard", 6, 14, 2, true));
+        Goal newGoalTimeline3 = new Goal("Hard Project", "General", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(21), false);
+        SuggestionsModel modelTimeline3 = new SuggestionsModel();
+        modelTimeline3.initializeSuggestionsModel(pastGoals);
+        System.out.println("Timeline Suggestion 3: " + modelTimeline3.getTimelineSuggestion(newGoalTimeline3));
+
+        // Unrealistic Deadline Check Test Cases
+        System.out.println("\n--- Unrealistic Deadline Checks ---");
+        pastGoals.clear();
+        // Case 1: Too many incomplete goals
+        for (int i = 0; i < 8; i++) {
+            pastGoals.add(new Goal("Incomplete Goal " + i, "Work", "medium", LocalDate.now().minusDays(10), LocalDate.now().plusDays(5), false));
+        }
+        Goal newGoalUnrealistic1 = new Goal("New Urgent Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), false);
+        SuggestionsModel modelUnrealistic1 = new SuggestionsModel();
+        modelUnrealistic1.initializeSuggestionsModel(pastGoals);
+        System.out.println("Unrealistic Deadline Check 1: " + modelUnrealistic1.checkUnrealisticDeadline(newGoalUnrealistic1));
+
+        pastGoals.clear();
+        // Case 2: High density of overlapping deadlines
+        pastGoals.add(new Goal("Ongoing Task A", "a","medium", LocalDate.now().minusDays(5), LocalDate.now().plusDays(7),false));
+        pastGoals.add(new Goal("Ongoing Task B", "a", "medium", LocalDate.now().minusDays(3), LocalDate.now().plusDays(8), false));
+        Goal newGoalUnrealistic2 = new Goal("Another Task", "a", "easy", LocalDate.now().plusDays(2), LocalDate.now().plusDays(9), false);
+        SuggestionsModel modelUnrealistic2 = new SuggestionsModel();
+        modelUnrealistic2.initializeSuggestionsModel(pastGoals);
+        System.out.println("Unrealistic Deadline Check 2: " + modelUnrealistic2.checkUnrealisticDeadline(newGoalUnrealistic2));
+
+        pastGoals.clear();
+        // Case 3: Ambitious deadline based on past lateness
+        List<Goal> consistentlyLateGoals = createPastGoals("medium", 5, 7, 1, true);
+        for (Goal goal : consistentlyLateGoals) {
+            goal.setCompletionDate(goal.getEndDate().plusDays(3));
+        }
+        pastGoals.addAll(consistentlyLateGoals);
+        Goal newGoalUnrealistic3 = new Goal("Quick Medium Task", "General", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(4), false);
+        SuggestionsModel modelUnrealistic3 = new SuggestionsModel();
+        modelUnrealistic3.initializeSuggestionsModel(pastGoals);
+        System.out.println("Unrealistic Deadline Check 3: " + modelUnrealistic3.checkUnrealisticDeadline(newGoalUnrealistic3));
+
+        // Goal Difficulty Suggestion Test Cases
+        System.out.println("\n--- Goal Difficulty Suggestions ---");
+        pastGoals.clear();
+        // Case 1: Higher success rate with "medium" than "hard"
+        pastGoals.addAll(createPastGoals("easy", 5, 7, 1, true));
+        pastGoals.addAll(createPastGoals("medium", 7, 10, 2, true));
+        pastGoals.addAll(createPastGoals("hard", 3, 15, 5, true)); // Lower success rate for hard
+        SuggestionsModel modelDifficulty1 = new SuggestionsModel();
+        modelDifficulty1.initializeSuggestionsModel(pastGoals);
+        Goal newGoalDifficulty1 = new Goal("Tough Challenge", "Work", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(20), false);
+        System.out.println("Difficulty Suggestion 1: " + modelDifficulty1.getDifficultySuggestion(newGoalDifficulty1));
+
+        pastGoals.clear();
+        // Case 2: Successful with "easy" and good with "medium"
+        pastGoals.addAll(createPastGoals("easy", 10, 5, 1, true));
+        pastGoals.addAll(createPastGoals("medium", 8, 12, 2, true));
+        SuggestionsModel modelDifficulty2 = new SuggestionsModel();
+        modelDifficulty2.initializeSuggestionsModel(pastGoals);
+        Goal newGoalDifficulty2 = new Goal("Simple Task", "Personal", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), false);
+        System.out.println("Difficulty Suggestion 2: " + modelDifficulty2.getDifficultySuggestion(newGoalDifficulty2));
+
+        pastGoals.clear();
+        // Case 3: Limited history
+        pastGoals.add(new Goal("First Goal", "General", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(10), true));
+        SuggestionsModel modelDifficulty3 = new SuggestionsModel();
+        modelDifficulty3.initializeSuggestionsModel(pastGoals);
+        Goal newGoalDifficulty3 = new Goal("Another Goal", "Learning", "medium", LocalDate.now().plusDays(15), LocalDate.now().plusDays(25), false);
+        System.out.println("Difficulty Suggestion 3: " + modelDifficulty3.getDifficultySuggestion(newGoalDifficulty3));
+    }
+
 }
