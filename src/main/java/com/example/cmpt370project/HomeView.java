@@ -540,6 +540,13 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalFormRow3.getChildren().clear();
         addGoalForm.getChildren().clear();
 
+        submitGoalButton.getStyleClass().add("button");
+        submitGoalButton.getStyleClass().add("add-goal-button");
+        giveMeSuggestionsButton.getStyleClass().add("button");
+        giveMeSuggestionsButton.getStyleClass().add("suggestions-button");
+        cancelAddGoalButton.getStyleClass().add("button");
+        cancelAddGoalButton.getStyleClass().add("cancel-button");
+
         //organize UI elements
         addGoalFormRow1.getChildren().addAll(new Label("Goal Title:"), titleInput, new Label("Sections:"), sectionButtons);
         addGoalFormRow2.getChildren().addAll(new Label("Difficulty:"), difficultyComboBox,
@@ -549,6 +556,10 @@ public class HomeView extends StackPane implements Subscriber {
 
         addGoalForm.getChildren().addAll(addGoalFormRow1,addGoalFormRow2,addGoalFormRow3);
         titleInput.setPrefWidth(275);
+
+        if (sectionToggleGroup.getSelectedToggle() == null && !sectionToggleGroup.getToggles().isEmpty()) {
+            sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().get(0));
+        }
 
         //box for suggestions!
         Label sectionLabel = new Label("Your Suggestions, Dani:");
