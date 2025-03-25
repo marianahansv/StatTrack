@@ -97,7 +97,7 @@ public class HomeView extends StackPane implements Subscriber {
     private String currentGreeting;
     private VBox upcomingGoalsModule;
     private ScrollPane upcomingGoalsScroll;
-    private Label upcomingGoalsTitle;
+    private Label upcomingGoalsHeading;
 
     // ********* ADD GOAL PAGE ELEMENTS *********
     private final Label addGoalTitleLabel;
@@ -143,8 +143,11 @@ public class HomeView extends StackPane implements Subscriber {
 
         sectionHeading = new Label("Goal Sections");
         quickActionsHeading = new Label("Quick Actions");
+        upcomingGoalsHeading = new Label("Upcoming Goals");
+
         sectionHeading.getStyleClass().add("heading-level-2");
         quickActionsHeading.getStyleClass().add("heading-level-2");
+        upcomingGoalsHeading.getStyleClass().add("heading-level-2");
 
         clearGoalsButton = new Button("Clear Goals");
         clearGoalsButton.getStyleClass().add("cbutton");
@@ -211,14 +214,12 @@ public class HomeView extends StackPane implements Subscriber {
         upcomingGoalsModule = new VBox(10);
         upcomingGoalsModule.setAlignment(Pos.TOP_LEFT);
         upcomingGoalsModule.getStyleClass().add("upcoming-goals-module");
-        upcomingGoalsTitle = new Label("Upcoming Goals");
-        upcomingGoalsTitle.getStyleClass().add("upcoming-goals-title");
         upcomingGoalsScroll = new ScrollPane();
         upcomingGoalsScroll.setFitToWidth(true);
         upcomingGoalsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         upcomingGoalsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         upcomingGoalsScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
-        upcomingGoalsModule.getChildren().addAll(upcomingGoalsTitle, upcomingGoalsScroll);
+        upcomingGoalsModule.getChildren().add(upcomingGoalsScroll);
 
         // Initialize SectionModel and load sections from file
         sectionModel = new SectionModel();
@@ -369,6 +370,7 @@ public class HomeView extends StackPane implements Subscriber {
 
     /**
      * Set the suggestions model of this view.
+     *
      * @param suggestionsModel the suggestion model that this view will pull data from.
      */
     public void setSuggestionsModel(SuggestionsModel suggestionsModel) {
@@ -401,8 +403,10 @@ public class HomeView extends StackPane implements Subscriber {
             updateUpcomingGoals();
         }
     }
+
     /**
      * Set up interaction with a controller for this view.
+     *
      * @param c the controller that will handle changing model data for user interactions on this page.
      */
     public void setupEvents(HomeController c, SuggestionsController s) {
@@ -419,7 +423,7 @@ public class HomeView extends StackPane implements Subscriber {
 
     /**
      * Helper method that handles getting goal from user input to pass it to the controller
-    **/
+     **/
     private Goal getGoalFromInput() {
         String difficulty = difficultyComboBox.getValue();
         Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
@@ -431,29 +435,31 @@ public class HomeView extends StackPane implements Subscriber {
 
     /**
      * Method to encapsulate logic to give user input data to the home controller
-    */
-    private void handleGoalSubmission(HomeController c){
+     */
+    private void handleGoalSubmission(HomeController c) {
         try {
             Goal newGoal = getGoalFromInput();
-            c.handleButtonPressValidateInput(null, newGoal.getTitle(),newGoal.getSection(),newGoal.getDifficulty(),newGoal.getStartDate(),newGoal.getEndDate(),newGoal.isCompleted());
-            c.handleGoalSubmissionButton(newGoal.getTitle(),newGoal.getSection(),newGoal.getDifficulty(),newGoal.getStartDate(),newGoal.getEndDate(),newGoal.isCompleted());
+            c.handleButtonPressValidateInput(null, newGoal.getTitle(), newGoal.getSection(), newGoal.getDifficulty(), newGoal.getStartDate(), newGoal.getEndDate(), newGoal.isCompleted());
+            c.handleGoalSubmissionButton(newGoal.getTitle(), newGoal.getSection(), newGoal.getDifficulty(), newGoal.getStartDate(), newGoal.getEndDate(), newGoal.isCompleted());
             changePage(HomeViewPage.HOME);
             resetAddGoalPage();
-        } catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             showErrorAlert(e.getMessage());
         }
     }
+
     /**
      * Method to encapsulate logic to give user input data to the suggestions controller
      */
-    private void handleSuggestions(SuggestionsController s){
+    private void handleSuggestions(SuggestionsController s) {
         Goal newGoal = getGoalFromInput();
         String suggestionsInText = s.handleButtonPress(newGoal);
         suggestionsContentLabel.setText(suggestionsInText);
     }
-     /**
+
+    /**
      * Helper method to handle the creation of the error alert message
-     * */
+     */
     private void showErrorAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Oops!");
@@ -461,7 +467,8 @@ public class HomeView extends StackPane implements Subscriber {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    private void resetAddGoalPage(){
+
+    private void resetAddGoalPage() {
         titleInput.clear();
         difficultyComboBox.setValue("Medium");
         sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().getFirst());
@@ -530,7 +537,11 @@ public class HomeView extends StackPane implements Subscriber {
         Region homeSpacer2 = new Region();
         homeSpacer2.setPrefWidth(homeViewSpaceSize);
 
-        root.getChildren().addAll(welcomeLabel, motivationModule, homeSpacer1, quickActionsHeading, quickActionsGroup, homeSpacer2, sectionHeading, sectionsAndGoalsBox);
+        Region homeSpacer3 = new Region();
+        homeSpacer3.setPrefWidth(homeViewSpaceSize);
+
+        root.getChildren().addAll(welcomeLabel, motivationModule, homeSpacer1, quickActionsHeading, quickActionsGroup, homeSpacer2,
+                upcomingGoalsHeading, upcomingGoalsModule, homeSpacer3, sectionHeading, sectionsAndGoalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.
@@ -578,7 +589,7 @@ public class HomeView extends StackPane implements Subscriber {
                 new Label("End Date:"), endDatePicker);
         addGoalFormRow3.getChildren().addAll(giveMeSuggestionsButton, submitGoalButton, cancelAddGoalButton);
 
-        addGoalForm.getChildren().addAll(addGoalFormRow1,addGoalFormRow2,addGoalFormRow3);
+        addGoalForm.getChildren().addAll(addGoalFormRow1, addGoalFormRow2, addGoalFormRow3);
         titleInput.setPrefWidth(275);
 
         if (sectionToggleGroup.getSelectedToggle() == null && !sectionToggleGroup.getToggles().isEmpty()) {
@@ -721,9 +732,10 @@ public class HomeView extends StackPane implements Subscriber {
 
         upcomingGoalsScroll = new ScrollPane();
         upcomingGoalsScroll.setContent(scrollContent);
-        upcomingGoalsScroll.setFitToWidth(true);
-        upcomingGoalsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        upcomingGoalsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        upcomingGoalsScroll.setFitToHeight(true);
+        upcomingGoalsScroll.setFitToWidth(false);
+        upcomingGoalsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        upcomingGoalsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         upcomingGoalsScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
         // set fixed height to show exactly 4 goals
@@ -744,36 +756,29 @@ public class HomeView extends StackPane implements Subscriber {
             noGoalsLabel.getStyleClass().add("upcoming-goals-label");
             scrollContent.getChildren().add(noGoalsLabel);
         } else {
-            GridPane goalsGrid = new GridPane();
-            goalsGrid.setHgap(20);
-            goalsGrid.setVgap(15);
-            goalsGrid.setPadding(new Insets(5));
+            HBox goalsRow = new HBox(15);
+            goalsRow.setPadding(new Insets(10));
+            goalsRow.setAlignment(Pos.TOP_LEFT);
+            goalsRow.setFillHeight(true);
 
-            // add goals to the grid (maximum 4 visible, 2 per column)
-            int maxVisibleGoals = 4;
-            int goalsToShow = Math.min(upcomingGoals.size(), maxVisibleGoals);
-
-            for (int i = 0; i < goalsToShow; i++) {
-                Goal goal = upcomingGoals.get(i);
+            for (Goal goal : upcomingGoals) {
                 VBox goalCard = createGoalCard(goal, today);
-
-                int column = i % 2;
-                int row = i / 2;
-                goalsGrid.add(goalCard, column, row);
+                goalsRow.getChildren().add(goalCard);
             }
 
-            scrollContent.getChildren().add(goalsGrid);
+            scrollContent.getChildren().add(goalsRow);
 
-            // show "more goals" indicator if there are additional goals
+            int maxVisibleGoals = 4;
             if (upcomingGoals.size() > maxVisibleGoals) {
-                int remainingGoals = upcomingGoals.size() - maxVisibleGoals;
-                String moreText = remainingGoals == 1 ? "1 more goal" : remainingGoals + " more goals";
+                int remaining = upcomingGoals.size() - maxVisibleGoals;
+                String moreText = remaining == 1 ? "1 more goal" : remaining + " more goals";
                 Label moreLabel = new Label(moreText);
                 moreLabel.getStyleClass().add("upcoming-goals-more-label");
                 scrollContent.getChildren().add(moreLabel);
             }
         }
 
-        upcomingGoalsModule.getChildren().set(1, upcomingGoalsScroll);
+        upcomingGoalsModule.getChildren().clear();
+        upcomingGoalsModule.getChildren().add(upcomingGoalsScroll);
     }
 }
