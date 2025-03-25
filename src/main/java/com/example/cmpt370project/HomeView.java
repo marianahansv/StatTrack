@@ -510,7 +510,6 @@ public class HomeView extends StackPane implements Subscriber {
         }
 
         VBox mySectionsBox = new VBox(15);
-        mySectionsBox.getStyleClass().add("my-sections-container");
         mySectionsBox.setAlignment(Pos.CENTER);
         mySectionsBox.getChildren().addAll(titleAndButtons, sectionButtonsBox);
 

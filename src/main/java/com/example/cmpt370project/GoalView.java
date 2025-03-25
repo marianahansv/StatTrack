@@ -194,6 +194,8 @@ public class GoalView extends StackPane implements Subscriber {
         completionStatusComboBox.getItems().addAll("All", "Completed", "Uncompleted");
         completionStatusComboBox.setValue("All"); // default
         completionStatusComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
+        difficultyComboBox.getStyleClass().add("filter-combo");
+        completionStatusComboBox.getStyleClass().add("filter-combo");
 
         // Container for filters
         HBox filtersContainer = new HBox(10);
@@ -202,7 +204,7 @@ public class GoalView extends StackPane implements Subscriber {
                 difficultyComboBox,
                 completionStatusComboBox
         );
-        
+
         // ********* Action Buttons *********
         completeGoalButton = new Button("Complete");
         completeGoalButton.getStyleClass().add("cbutton");
