@@ -205,7 +205,9 @@ public class GoalView extends StackPane implements Subscriber {
         
         // ********* Action Buttons *********
         completeGoalButton = new Button("Complete");
+        completeGoalButton.getStyleClass().add("cbutton");
         editGoalButton = new Button("Edit Goal");
+        editGoalButton.getStyleClass().add("cbutton");
 
         // Container for dashboard controls (list view, feedback, filtering, buttons)
         VBox dashboardControls = new VBox();
@@ -379,7 +381,7 @@ public class GoalView extends StackPane implements Subscriber {
 
     /**
      * Set the user data model for this view.
-     * @param userHistoryDataModel the user data model for this view.
+     * @param historyModel the user data model for this view.
      */
     public void setUserHistoryDataModel(UserHistoryDataModel historyModel) {
         this.historyModel = historyModel;
