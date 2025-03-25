@@ -94,7 +94,7 @@ public class SuggestionsModel {
 
         double averagePercentage = nonOutlierPercentages.stream().mapToDouble(Double::doubleValue).average().orElse(0);
         long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
-        long suggestedAdjustmentDays = Math.round(newGoalDuration * (averagePercentage / 100.0));
+        long suggestedAdjustmentDays = Math.round(newGoalDuration * (averagePercentage*0.8 / 100.0));
         LocalDate suggestedDeadline = newGoal.getEndDate().plusDays(suggestedAdjustmentDays);
 
         if (averagePercentage > LATE_COMPLETION_THRESHOLD_PERCENTAGE) {
