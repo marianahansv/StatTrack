@@ -21,11 +21,6 @@
     -fx-spacing: 10px;
 }
 
-.motivation-label, .section-title {
-    -fx-font-size: 14px;
-    -fx-text-fill: black;
-}
-
 .user-greeting {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
@@ -38,6 +33,7 @@
     -fx-text-fill: black;
 }
 
+/* goal view buttons */
 .cbutton {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
@@ -56,17 +52,45 @@
     -fx-background-color: #2868a8;
 }
 
-.my-sections-container {
-    /*-fx-border-color: #4A90E2;*/
-    /*-fx-border-width: 2px;*/
-    /*-fx-border-radius: 10px;*/
-    /*-fx-background-color: #E3F2FD;*/
-    /*-fx-background-radius: 10px;*/
-    /*-fx-padding: 15px;*/
-    /*-fx-spacing: 10px;*/
-    /*-fx-alignment: center;*/
-    /*-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);*/
+.combo-box.filter-combo {
+    -fx-background-color: #4A90E2;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-padding: 8 16;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 5, 0, 0, 4);
 }
+
+.combo-box.filter-combo .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.combo-box.filter-combo .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box.filter-combo .arrow-button .arrow {
+    -fx-background-color: white;
+}
+
+.combo-box.filter-combo .combo-box-popup .list-view {
+    -fx-background-color: white;
+}
+
+.combo-box.filter-combo .combo-box-popup .list-view .list-cell {
+    -fx-text-fill: black;
+    -fx-background-color: white;
+}
+
+.combo-box.filter-combo .combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #1976d2;
+    -fx-font-weight: bold;
+}
+
 
 .add-goal-button {
     -fx-background-color: #4CAF50;
