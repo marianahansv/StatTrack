@@ -2,12 +2,9 @@ package com.example.cmpt370project;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -98,6 +95,9 @@ public class HomeView extends StackPane implements Subscriber {
             "Hiya"
     };
     private String currentGreeting;
+    private VBox upcomingGoalsModule;
+    private ScrollPane upcomingGoalsScroll;
+    private Label upcomingGoalsTitle;
 
     // ********* ADD GOAL PAGE ELEMENTS *********
     private final Label addGoalTitleLabel;
@@ -206,6 +206,19 @@ public class HomeView extends StackPane implements Subscriber {
         root.setSpacing(10);
         root.setPadding(new Insets(10));
         root.getChildren().addAll(welcomeLabel, motivationModule, addGoalButton);
+
+        // upcoming goal
+        upcomingGoalsModule = new VBox(10);
+        upcomingGoalsModule.setAlignment(Pos.TOP_LEFT);
+        upcomingGoalsModule.getStyleClass().add("upcoming-goals-module");
+        upcomingGoalsTitle = new Label("Upcoming Goals");
+        upcomingGoalsTitle.getStyleClass().add("upcoming-goals-title");
+        upcomingGoalsScroll = new ScrollPane();
+        upcomingGoalsScroll.setFitToWidth(true);
+        upcomingGoalsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        upcomingGoalsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        upcomingGoalsScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        upcomingGoalsModule.getChildren().addAll(upcomingGoalsTitle, upcomingGoalsScroll);
 
         // Initialize SectionModel and load sections from file
         sectionModel = new SectionModel();
@@ -346,7 +359,9 @@ public class HomeView extends StackPane implements Subscriber {
 
     public void setGoalModel(GoalModel goalModel) {
         this.goalModel = goalModel;
-
+        if (goalModel != null) {
+            updateUpcomingGoals();
+        }
         if (userHistoryDataModel != null) {
             modelUpdated();
         }
@@ -381,6 +396,9 @@ public class HomeView extends StackPane implements Subscriber {
             updateGoalsDisplay(selectedSection);
         } else {
             drawView();
+        }
+        if (goalModel != null) {
+            updateUpcomingGoals();
         }
     }
     /**
@@ -546,6 +564,13 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalFormRow3.getChildren().clear();
         addGoalForm.getChildren().clear();
 
+        submitGoalButton.getStyleClass().add("button");
+        submitGoalButton.getStyleClass().add("add-goal-button");
+        giveMeSuggestionsButton.getStyleClass().add("button");
+        giveMeSuggestionsButton.getStyleClass().add("suggestions-button");
+        cancelAddGoalButton.getStyleClass().add("button");
+        cancelAddGoalButton.getStyleClass().add("cancel-button");
+
         //organize UI elements
         addGoalFormRow1.getChildren().addAll(new Label("Goal Title:"), titleInput, new Label("Sections:"), sectionButtons);
         addGoalFormRow2.getChildren().addAll(new Label("Difficulty:"), difficultyComboBox,
@@ -555,6 +580,10 @@ public class HomeView extends StackPane implements Subscriber {
 
         addGoalForm.getChildren().addAll(addGoalFormRow1,addGoalFormRow2,addGoalFormRow3);
         titleInput.setPrefWidth(275);
+
+        if (sectionToggleGroup.getSelectedToggle() == null && !sectionToggleGroup.getToggles().isEmpty()) {
+            sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().get(0));
+        }
 
         //box for suggestions!
         Label sectionLabel = new Label("Your Suggestions, Dani:");
@@ -638,5 +667,113 @@ public class HomeView extends StackPane implements Subscriber {
                 goalsBox.getChildren().add(goalCard);
             }
         }
+    }
+
+    private VBox createGoalCard(Goal goal, LocalDate today) {
+        VBox goalCard = new VBox(5);
+        goalCard.setPadding(new Insets(10));
+        goalCard.getStyleClass().add("upcoming-goal-card");
+
+        //calculate days remaining until due date
+        long daysRemaining = ChronoUnit.DAYS.between(today, goal.getEndDate());
+        double progress = 1.0 - (Math.min(7.0, Math.max(0.0, daysRemaining)) / 7.0);
+
+        // title and due date
+        Label titleLabel = new Label(goal.getTitle());
+        titleLabel.getStyleClass().add("upcoming-goal-title");
+
+        Label dateLabel = new Label("Due: " +
+                goal.getEndDate().format(DateTimeFormatter.ofPattern("MMM d")));
+        dateLabel.getStyleClass().add("upcoming-goal-date");
+
+        // progress bar
+        ProgressBar progressBar = new ProgressBar(progress);
+        progressBar.setPrefWidth(200);
+        progressBar.getStyleClass().add("upcoming-goals-progress");
+
+        // days remaining
+        String daysText = daysRemaining == 1 ? "day" : "days";
+        Label daysLabel = new Label(String.format("%d %s left", daysRemaining, daysText));
+        daysLabel.getStyleClass().add("upcoming-goals-days-label");
+
+        // difficulty
+        Label difficultyLabel = new Label("Difficulty: " + goal.getDifficulty());
+        difficultyLabel.getStyleClass().add("upcoming-goal-difficulty");
+
+        goalCard.getChildren().addAll(
+                titleLabel,
+                dateLabel,
+                progressBar,
+                daysLabel,
+                difficultyLabel
+        );
+
+        return goalCard;
+    }
+
+    private void updateUpcomingGoals() {
+        if (goalModel == null) {
+            return;
+        }
+
+        VBox scrollContent = new VBox();
+        scrollContent.setPadding(new Insets(5));
+
+        upcomingGoalsScroll = new ScrollPane();
+        upcomingGoalsScroll.setContent(scrollContent);
+        upcomingGoalsScroll.setFitToWidth(true);
+        upcomingGoalsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        upcomingGoalsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        upcomingGoalsScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+
+        // set fixed height to show exactly 4 goals
+        upcomingGoalsScroll.setPrefHeight(220);
+
+        // get goals due in the next 7 days
+        LocalDate today = LocalDate.now();
+        LocalDate nextWeek = today.plusDays(7);
+
+        List<Goal> upcomingGoals = goalModel.getGoals().stream()
+                .filter(goal -> !goal.isCompleted())
+                .filter(goal -> goal.getEndDate().isAfter(today) && goal.getEndDate().isBefore(nextWeek))
+                .sorted(Comparator.comparing(Goal::getEndDate))
+                .collect(Collectors.toList());
+
+        if (upcomingGoals.isEmpty()) {
+            Label noGoalsLabel = new Label("No goals due in the next 7 days!");
+            noGoalsLabel.getStyleClass().add("upcoming-goals-label");
+            scrollContent.getChildren().add(noGoalsLabel);
+        } else {
+            GridPane goalsGrid = new GridPane();
+            goalsGrid.setHgap(20);
+            goalsGrid.setVgap(15);
+            goalsGrid.setPadding(new Insets(5));
+
+            // add goals to the grid (maximum 4 visible, 2 per column)
+            int maxVisibleGoals = 4;
+            int goalsToShow = Math.min(upcomingGoals.size(), maxVisibleGoals);
+
+            for (int i = 0; i < goalsToShow; i++) {
+                Goal goal = upcomingGoals.get(i);
+                VBox goalCard = createGoalCard(goal, today);
+
+                int column = i % 2;
+                int row = i / 2;
+                goalsGrid.add(goalCard, column, row);
+            }
+
+            scrollContent.getChildren().add(goalsGrid);
+
+            // show "more goals" indicator if there are additional goals
+            if (upcomingGoals.size() > maxVisibleGoals) {
+                int remainingGoals = upcomingGoals.size() - maxVisibleGoals;
+                String moreText = remainingGoals == 1 ? "1 more goal" : remainingGoals + " more goals";
+                Label moreLabel = new Label(moreText);
+                moreLabel.getStyleClass().add("upcoming-goals-more-label");
+                scrollContent.getChildren().add(moreLabel);
+            }
+        }
+
+        upcomingGoalsModule.getChildren().set(1, upcomingGoalsScroll);
     }
 }

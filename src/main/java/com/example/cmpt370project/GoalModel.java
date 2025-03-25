@@ -291,6 +291,24 @@ public class GoalModel {
     }
 
     /**
+     * Returns a list of goals filtered by completion status.
+     * @param completed true for completed goals, false for uncompleted, null for all goals
+     * @return list of goals that match the given completion status
+     */
+    public List<Goal> getGoalsByCompletionStatus(Boolean completed) {
+        if (completed == null) {
+            return getGoals();
+        }
+        List<Goal> filteredGoals = new ArrayList<>();
+        for (Goal goal : goals.values()) {
+            if (goal.isCompleted() == completed) {
+                filteredGoals.add(goal);
+            }
+        }
+        return filteredGoals;
+    }
+
+    /**
      * Deletes all goals belonging to a specific section.
      * Ensures goals are removed from memory and JSON file.
      * @param section The section whose goals need to be deleted.
