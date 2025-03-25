@@ -415,7 +415,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         // ********* ADD GOAL PAGE EVENTS *********
         //pulling data from input fields
-        submitGoalButton.setOnAction(e -> handleGoalSubmission(c));
+        submitGoalButton.setOnAction(e -> handleGoalSubmission(c,s));
         giveMeSuggestionsButton.setOnAction(e -> handleSuggestions(s));
         clearGoalsButton.setOnAction(c::removeButtonPress);
         changeNameButton.setOnAction(c::handleChangeName);
@@ -425,6 +425,7 @@ public class HomeView extends StackPane implements Subscriber {
      * Helper method that handles getting goal from user input to pass it to the controller
      **/
     private Goal getGoalFromInput() {
+
         String difficulty = difficultyComboBox.getValue();
         Toggle selectedToggle = sectionToggleGroup.getSelectedToggle();
         String section = selectedToggle != null ? ((ToggleButton) selectedToggle).getText() : "Uncategorized";
@@ -436,11 +437,12 @@ public class HomeView extends StackPane implements Subscriber {
     /**
      * Method to encapsulate logic to give user input data to the home controller
      */
-    private void handleGoalSubmission(HomeController c) {
+    private void handleGoalSubmission(HomeController c, SuggestionsController s) {
         try {
             Goal newGoal = getGoalFromInput();
             c.handleButtonPressValidateInput(null, newGoal.getTitle(), newGoal.getSection(), newGoal.getDifficulty(), newGoal.getStartDate(), newGoal.getEndDate(), newGoal.isCompleted());
             c.handleGoalSubmissionButton(newGoal.getTitle(), newGoal.getSection(), newGoal.getDifficulty(), newGoal.getStartDate(), newGoal.getEndDate(), newGoal.isCompleted());
+            s.updateModel();
             changePage(HomeViewPage.HOME);
             resetAddGoalPage();
         } catch (InputMismatchException e) {
@@ -452,9 +454,14 @@ public class HomeView extends StackPane implements Subscriber {
      * Method to encapsulate logic to give user input data to the suggestions controller
      */
     private void handleSuggestions(SuggestionsController s) {
-        Goal newGoal = getGoalFromInput();
-        String suggestionsInText = s.handleButtonPress(newGoal);
-        suggestionsContentLabel.setText(suggestionsInText);
+        try {
+            Goal newGoal = getGoalFromInput();
+            s.validateInput(newGoal);
+            String suggestionsInText = s.handleButtonPress(newGoal);
+            suggestionsContentLabel.setText(suggestionsInText);
+        } catch (InputMismatchException e) {
+            showErrorAlert(e.getMessage());
+        }
     }
 
     /**
