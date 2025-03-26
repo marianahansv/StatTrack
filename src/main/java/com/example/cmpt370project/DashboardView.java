@@ -117,7 +117,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button for going to the goals page.
      */
-    private Button goalsButton;
+    Button goalsButton;
 
     /**
      * The button for going to the goal plan page.
