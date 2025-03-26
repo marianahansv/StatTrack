@@ -1,6 +1,8 @@
 package com.example.cmpt370project;
 
 
+import java.util.Optional;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,9 +13,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
@@ -90,7 +89,7 @@ public class DashboardView extends BorderPane {
     /**
      * The goal plan page of the application.
      */
-    private GoalVisView goalVisPage;
+    GoalVisView goalVisPage;
 
     //private GoalProgress goalChartView;
 
@@ -127,7 +126,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button for going to the goal plan page.
      */
-    private Button goalVisButton;
+    Button goalVisButton;
 
     /**
      * The button to go the historical data visualization page.
@@ -295,8 +294,10 @@ public class DashboardView extends BorderPane {
         sidebar.setPrefWidth(180);
         homeButton = new Button("Home");
         goalsButton = new Button("My Goals");
+        goalsButton.setId("goalsButton");
         goalPlanButton = new Button("Goal Plan");
         goalVisButton = new Button("Goal Visuals");
+        goalVisButton.setId("goalVisButton");
         historicalChartButton = new Button("Goal History");
 
         // Set each button to take up the full width

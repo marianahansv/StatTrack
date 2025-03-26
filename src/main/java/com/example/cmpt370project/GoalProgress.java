@@ -24,6 +24,11 @@ import javafx.scene.layout.VBox;
  * This view displays each goal's progress using separate charts.
  */
 public class GoalProgress extends VBox implements Subscriber {
+    enum chart {
+        Pie,
+        Bar,
+        Line
+    }
  /**
      * The goal model that provides goal data.
      */

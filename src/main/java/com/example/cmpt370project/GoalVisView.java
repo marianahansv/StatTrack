@@ -56,7 +56,6 @@ public class GoalVisView extends StackPane implements Subscriber {
      * Update the UI elements of this page when the model changes.
      */
     private void drawView() {
-        // Add here later...
         goalChartView.updateChart();
     }
 
