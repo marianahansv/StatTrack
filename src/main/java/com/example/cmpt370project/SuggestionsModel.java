@@ -233,8 +233,8 @@ public class SuggestionsModel {
             if (duration <= 0) duration = 1;
             LocalDate startDate = LocalDate.now().minusDays(30 + i * 5L);
             LocalDate endDate = startDate.plusDays(duration);
-            Goal goal = new Goal("Past " + difficulty + " Goal " + i, "History", difficulty, startDate, endDate, completed);
-            if (completed) {
+            Goal goal = new Goal("Past " + difficulty + " Goal " + i, "History", difficulty, startDate, endDate, true);
+            if (true) {
                 goal.setCompletionDate(endDate.plusDays((int) (Math.random() * 3 - 1))); //this is to simulate some variation in completion
             }
             goals.add(goal);
