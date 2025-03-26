@@ -1288,6 +1288,7 @@ class Main{
             /******************************** Missing the Scatter Graph checkbox ********************************/
             visuals.checkboxScatterGraph.setSelected(false);
             /******************************** Missing the Line Graph checkbox ********************************/
+            visuals.checkboxLineChart.setSelected(false);
 
             /******************************** Missing the Pie Graph checkbox ********************************/
 
