@@ -1,0 +1,9 @@
+module com.example.cmpt370project {
+    requires javafx.controls;
+    requires javafx.fxml;
+    requires com.google.gson;
+
+
+    opens com.example.cmpt370project to javafx.fxml, com.google.gson;
+    exports com.example.cmpt370project;
+}
