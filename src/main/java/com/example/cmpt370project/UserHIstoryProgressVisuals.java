@@ -1291,6 +1291,7 @@ class Main{
             visuals.checkboxLineChart.setSelected(false);
 
             /******************************** Missing the Pie Graph checkbox ********************************/
+            visuals.checkboxPieChart.setSelected(false);
 
             /******************************** Missing the Red Preference checkbox ********************************/
 
