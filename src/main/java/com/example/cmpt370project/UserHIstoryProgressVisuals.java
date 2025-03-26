@@ -1286,7 +1286,7 @@ class Main{
             // Test Case 3
             System.out.println("Test Case 3: Missing one of the parameter option.");
             /******************************** Missing the Scatter Graph checkbox ********************************/
-
+            visuals.checkboxScatterGraph.setSelected(false);
             /******************************** Missing the Line Graph checkbox ********************************/
 
             /******************************** Missing the Pie Graph checkbox ********************************/
