@@ -55,7 +55,7 @@ public class GoalView extends StackPane implements Subscriber {
     // ********* Add other ui elements as attributes here if needed (i.e. if they need to change in drawView()) *********
 
     private ListView<Goal> goalListView;
-    private Label progressFeedback;
+    Label progressFeedback;
     private Label welcomeLabel;
     private ComboBox<String> difficultyComboBox;
     private ComboBox<String> completionStatusComboBox;
