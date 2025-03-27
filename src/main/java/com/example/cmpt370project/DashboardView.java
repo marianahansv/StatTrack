@@ -31,7 +31,7 @@ public class DashboardView extends BorderPane {
     /**
      * The model that holds the goal data of the application.
      */
-    private GoalModel goalModel;
+    GoalModel goalModel;
     /**
      * The model that holds the suggestions data of the application.
      */
