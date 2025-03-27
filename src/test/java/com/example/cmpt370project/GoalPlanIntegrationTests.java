@@ -55,7 +55,6 @@ public class GoalPlanIntegrationTests extends AppIntegrationTest {
     @Test
     public void P5_US1_TC02() {
         root.goalPlanModel.clearGoalPlan();
-        root.goalPlanModel.syncGoalPlanToDate(LocalDate.of(2031, 04, 07));
 
         // Go to edit the goal plan
         clickOn(root.goalPlanButton);
@@ -208,7 +207,7 @@ public class GoalPlanIntegrationTests extends AppIntegrationTest {
         clickOn(root.goalPlanPage.deletePlanButton);
 
         // Click the "OK" button to confirm the input
-        clickOn(".dialog-pane .button:label('OK')"); // Clicking the "OK" button by its label
+        clickOn(".dialog-pane .button:label('OK')");
 
         // Verify that the goal plan has been updated
         assertEquals(null, root.goalPlanModel.getGoalPlan(), "Goal Plan should be set to null");
@@ -290,7 +289,7 @@ public class GoalPlanIntegrationTests extends AppIntegrationTest {
 
         root.goalPlanModel.syncGoalPlanToDate(LocalDate.now().plusDays(1));
 
-        // Verify the error message is visible
+        // Verify goal plan current goal number has properly incremented
         assertEquals(4, root.goalPlanModel.getGoalPlanCurrent(), "Goal Plan current number should have been incremented");
     }
 

@@ -18,6 +18,10 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Integration (UI) tests for the goal motivation feature functionality, where the app is opened for the first time.
+ * (i.e. tests for Persona 5, User Story 2)
+ */
 public class GoalMotivationFirstOpenIntegrationTests extends ApplicationTest {
 
     protected DashboardView root;
@@ -26,6 +30,8 @@ public class GoalMotivationFirstOpenIntegrationTests extends ApplicationTest {
 
     @Override
     public void start(Stage stage) throws Exception {
+        // 1. Make a copy of the userHistoryData, because want to reset it to run these tests
+
         // Create a backup of the original file if it exists
         if (Files.exists(originalJsonPath)) {
             Files.copy(originalJsonPath, backupJsonPath, StandardCopyOption.REPLACE_EXISTING);
@@ -65,7 +71,7 @@ public class GoalMotivationFirstOpenIntegrationTests extends ApplicationTest {
         write("HasAPlanFran");
 
         // Click the "OK" button to confirm the input
-        clickOn(".dialog-pane .button:label('OK')"); // Clicking the "OK" button by its label
+        clickOn(".dialog-pane .button:label('OK')");
 
         // Verify that the userHistoryDataModel has the updated username
         assertEquals("HasAPlanFran", root.userHistoryDataModel.getUserName(), "User name should be set to 'HasAPlanFran'");
@@ -83,7 +89,7 @@ public class GoalMotivationFirstOpenIntegrationTests extends ApplicationTest {
         write("");
 
         // Click the "OK" button to confirm the input
-        clickOn(".dialog-pane .button:label('OK')"); // Clicking the "OK" button by its label
+        clickOn(".dialog-pane .button:label('OK')");
 
         // Verify that the userHistoryDataModel has the updated username
         assertEquals("User", root.userHistoryDataModel.getUserName(), "User name should be set to 'User'");
@@ -92,7 +98,7 @@ public class GoalMotivationFirstOpenIntegrationTests extends ApplicationTest {
 
     @AfterAll
     public static void cleanup() throws IOException {
-        // After the test, restore the original JSON data from the backup
+        // After all the tests, restore the original JSON data from the backup.
         if (Files.exists(backupJsonPath)) {
             Files.copy(backupJsonPath, originalJsonPath, StandardCopyOption.REPLACE_EXISTING);
         }
