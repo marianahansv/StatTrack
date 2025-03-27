@@ -1,15 +1,9 @@
 package com.example.cmpt370project;
 
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,81 +16,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
     @Override
     public void start(Stage stage) throws Exception {
         super.start(stage);
-
     }
-
-//    @Nested
-//    class NoPreviousUserHistoryTestNest extends AppIntegrationTest {
-//
-//        Path originalJsonPath = Paths.get("C:\\Users\\katew\\GoalApplication\\userHistoryData.json");
-//        Path backupJsonPath = Paths.get("C:\\Users\\katew\\GoalApplication\\userHistoryDataB.json");
-//
-//        @Override
-//        public void start(Stage stage) throws Exception {
-//            // Create a backup of the original file if it exists
-//            if (Files.exists(originalJsonPath)) {
-//                Files.copy(originalJsonPath, backupJsonPath, StandardCopyOption.REPLACE_EXISTING);
-//            }
-//
-//            Files.write(originalJsonPath, new byte[] {});
-//            super.start(stage);
-//
-//        }
-//
-//        /**
-//         * Test 1: Set New Username to Receive Motivational Greetings (valid data)
-//         */
-//        @Test
-//        public void P5_US2_TC01() throws Exception {
-//            // Click the "OK" button to confirm the input
-//            clickOn(".text-input"); // Clicking the "OK" button by its label
-//
-//            // Find the text field inside the dialog and type in a name
-//            write("HasAPlanFran");
-//
-//            // Click the "OK" button to confirm the input
-//            clickOn(".dialog-pane .button:label('OK')"); // Clicking the "OK" button by its label
-//
-//            // Verify that the userHistoryDataModel has the updated username
-//            assertEquals("HasAPlanFran", root.userHistoryDataModel.getUserName(), "User name should be updated to 'User'");
-//        }
-//
-//        @AfterEach
-//        public void cleanup() throws IOException {
-//            // After the test, restore the original JSON data from the backup
-//            if (Files.exists(backupJsonPath)) {
-//                Files.copy(backupJsonPath, originalJsonPath, StandardCopyOption.REPLACE_EXISTING);
-//            }
-//
-//            // Clean up the backup file if necessary
-//            Files.deleteIfExists(backupJsonPath);
-//        }
-//
-//
-//
-//    }
-
-
-    /**
-     * Test 2: Set Username to Receive Motivational Greetings (choosing not to set username)
-     */
-    @Test
-    public void P5_US2_TC02() {
-//        // Simulate first app open
-//        root.userHistoryDataModel.setFirstOpen();
-//
-//
-//
-//        // Find the text field inside the dialog and type in a name
-//        write("HasAPlanFran");
-//
-//        // Click the "OK" button to confirm the input
-//        clickOn(".dialog-pane .button:label('OK')"); // Clicking the "OK" button by its label
-//
-//        // Verify that the userHistoryDataModel has the updated username
-//        assertEquals("HasAPlanFran", root.userHistoryDataModel.getUserName(), "User name should be updated to 'User'");
-    }
-
 
     /**
      * Test 3: Edit Previous Username to Receive Motivational Greetings (valid data)
@@ -130,7 +50,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
         // Trigger the dialog by clicking the button
         clickOn(root.goalsButton);
 
-        String expectedString = "You need to complete 7 more goals today to stay on track with your goal plan. Time to complete some goals!";
+        String expectedString = "You need to complete 7 more goals for the WEEK to stay on track with your goal plan. Time to complete some goals!";
         String outputString = root.goalsPage.progressFeedback.getText();
 
         // Verify that the userHistoryDataModel has the updated username
@@ -173,7 +93,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
         // Trigger the dialog by clicking the button
         clickOn(root.goalsButton);
 
-        String expectedString = "You have completed 2 more goals than your target number of goals for your goal plan. Overachiever!";
+        String expectedString = "You have completed 2 more goals than your target number of goals for the DAY. Overachiever!";
         String outputString = root.goalsPage.progressFeedback.getText();
 
         // Verify that the userHistoryDataModel has the updated username
@@ -194,7 +114,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
         // Trigger the dialog by clicking the button
         clickOn(root.goalsButton);
 
-        String expectedString = "You need to complete 7 more goals today to stay on track with your goal plan. Time to complete some goals!";
+        String expectedString = "You need to complete 7 more goals for the WEEK to stay on track with your goal plan. Time to complete some goals!";
         String outputString = root.goalsPage.progressFeedback.getText();
 
         // Verify that the userHistoryDataModel has the updated username
@@ -204,7 +124,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
         Platform.runLater(() -> {
             root.userHistoryDataModel.hardSetWeeklyData(LocalDate.now().plusDays(7));
 
-            String expectedString2= "You need to complete 8 more goals today to stay on track with your goal plan. Time to complete some goals!";
+            String expectedString2= "You need to complete 8 more goals for the WEEK to stay on track with your goal plan. Time to complete some goals!";
             String outputString2 = root.goalsPage.progressFeedback.getText();
 
             // Verify that the userHistoryDataModel has the updated username
@@ -227,7 +147,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
         // Trigger the dialog by clicking the button
         clickOn(root.goalsButton);
 
-        String expectedString = "You need to complete 4 more goals today to stay on track with your goal plan. Time to complete some goals!";
+        String expectedString = "You need to complete 4 more goals for the DAY to stay on track with your goal plan. Time to complete some goals!";
         String outputString = root.goalsPage.progressFeedback.getText();
 
         // Verify that the userHistoryDataModel has the updated username
@@ -237,7 +157,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
         Platform.runLater(() -> {
             root.userHistoryDataModel.hardSetDayData(LocalDate.now().plusDays(1));
 
-            String expectedString2= "You need to complete 8 more goals today to stay on track with your goal plan. Time to complete some goals!";
+            String expectedString2= "You need to complete 8 more goals for the DAY to stay on track with your goal plan. Time to complete some goals!";
             String outputString2 = root.goalsPage.progressFeedback.getText();
 
             // Verify that the userHistoryDataModel has the updated username
@@ -260,7 +180,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
         // Trigger the dialog by clicking the button
         clickOn(root.goalsButton);
 
-        String expectedString = "You need to complete 4 more goals today to stay on track with your goal plan. Time to complete some goals!";
+        String expectedString = "You need to complete 4 more goals for the WEEK to stay on track with your goal plan. Time to complete some goals!";
         String outputString = root.goalsPage.progressFeedback.getText();
 
         // Verify that the userHistoryDataModel has the updated username
