@@ -56,7 +56,19 @@ public class SuggestionsModel {
         double averageDuration = nonOutlierDurations.stream().mapToLong(Long::longValue).average().orElse(0);
         double stdDev = calculateStandardDeviation(nonOutlierDurations, averageDuration);
         long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
-        double stdDevsAway = (newGoalDuration - averageDuration) / stdDev;
+
+        if (stdDev == 0) {
+            double ratio = newGoalDuration / averageDuration;
+
+            if (ratio > 1.5) {
+                int suggestedTasks = (int) Math.max(2, Math.round(ratio)*0.3);
+                return "This goal is significantly longer than your typical " + difficulty + " goals. Consider breaking it down into " + suggestedTasks + " smaller goals.";
+            } else if (ratio < 0.75 && completedGoalsOfDifficulty.size() > MIN_GOALS_FOR_STATS*2) {
+                return "This goal is significantly shorter than your typical " + difficulty + " goals. You might consider combining it with another goal if possible.";
+            }
+        }
+
+        double stdDevsAway = (newGoalDuration - averageDuration) / (stdDev);
 
         if (stdDev > 0 && stdDevsAway > SIGNIFICANTLY_LONGER_STD_DEV) {
             long suggestedTasks = Math.max(2, Math.round((double) newGoalDuration / averageDuration));

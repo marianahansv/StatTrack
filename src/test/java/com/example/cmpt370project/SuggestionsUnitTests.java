@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,7 +22,7 @@ public class SuggestionsUnitTests {
     }
 
     // Helper method to create past goals
-    private List<Goal> createPastGoals(String difficulty, int count, int avgDurationDays, int durationVariationDays, boolean completed) {
+    private List<Goal> createPastGoals(String difficulty, int count, int avgDurationDays, int durationVariationDays, boolean completed, String completionTime) {
         List<Goal> goals = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             int duration = avgDurationDays + (int) (Math.random() * 2 * durationVariationDays - durationVariationDays);
@@ -30,7 +31,9 @@ public class SuggestionsUnitTests {
             LocalDate endDate = startDate.plusDays(duration);
             Goal goal = new Goal("Past " + difficulty + " Goal " + i, "History", difficulty, startDate, endDate, completed);
             if (completed) {
-                goal.setCompletionDate(endDate.plusDays((int) (Math.random() * 3 - 1))); // Simulate variation
+                if (completionTime.equals("early")) goal.setCompletionDate(endDate.plusDays((int) (Math.random() * - 6 + 1)));
+                else if (completionTime.equals("late")) goal.setCompletionDate(endDate.plusDays((int) (Math.random() * 6 - 1)));
+                else goal.setCompletionDate(endDate.plusDays((int) (Math.random() * 3 - 1)));
             }
             goals.add(goal);
         }
@@ -38,10 +41,10 @@ public class SuggestionsUnitTests {
     }
 
     // User Story 1: Realistic Deadline Suggestions
-
     @Test
     public void testTimelineSuggestion_realisticDeadline() {
-        goals.addAll(createPastGoals("medium", 5, 7, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("medium", 5, 7, 1, true, "onTime"));
         Goal newGoal = new Goal("Medium Task", "Test", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(8), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTimelineSuggestion(newGoal);
@@ -50,7 +53,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTimelineSuggestion_shorterDeadline() {
-        goals.addAll(createPastGoals("easy", 5, 5, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("easy", 5, 5, 1, true, "early"));
         for (Goal goal : goals) {
             goal.setCompletionDate(goal.getEndDate().minusDays(2));
         }
@@ -62,7 +66,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTimelineSuggestion_longerDeadline() {
-        goals.addAll(createPastGoals("hard", 5, 10, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("hard", 5, 10, 1, true, "late"));
         for (Goal goal : goals) {
             goal.setCompletionDate(goal.getEndDate().plusDays(2));
         }
@@ -74,7 +79,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTimelineSuggestion_noSimilarGoals() {
-        goals.addAll(createPastGoals("easy", 2, 5, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("easy", 2, 5, 1, true, "onTime"));
         Goal newGoal = new Goal("hard Task", "Test", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(10), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTimelineSuggestion(newGoal);
@@ -83,7 +89,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testUnrealisticDeadline_highIncompleteGoals() {
-        goals.addAll(createPastGoals("medium", 6, 7, 1, false));
+        goals.clear();
+        goals.addAll(createPastGoals("medium", 6, 7, 1, false, "onTime"));
         Goal newGoal = new Goal("Quick Task", "Test", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.checkUnrealisticDeadline(newGoal);
@@ -92,6 +99,7 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTimelineSuggestion_noData() {
+        goals.clear();
         Goal newGoal = new Goal("New Task", "Test", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(7), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTimelineSuggestion(newGoal);
@@ -100,7 +108,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testUnrealisticDeadline_allIncomplete() {
-        goals.addAll(createPastGoals("easy", 3, 5, 1, false));
+        goals.clear();
+        goals.addAll(createPastGoals("easy", 3, 5, 1, false, "onTime"));
         Goal newGoal = new Goal("New Task", "Test", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.checkUnrealisticDeadline(newGoal);
@@ -109,7 +118,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTimelineSuggestion_lateCompletion() {
-        goals.addAll(createPastGoals("medium", 5, 7, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("medium", 5, 7, 1, true, "late"));
         for (Goal goal : goals) {
             goal.setCompletionDate(goal.getEndDate().plusDays(2));
         }
@@ -121,7 +131,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTimelineSuggestion_earlyCompletion() {
-        goals.addAll(createPastGoals("easy", 5, 5, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("easy", 5, 5, 1, true,"early"));
         for (Goal goal : goals) {
             goal.setCompletionDate(goal.getEndDate().minusDays(2));
         }
@@ -133,7 +144,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTimelineSuggestion_diffTimelines() {
-        goals.addAll(createPastGoals("medium", 5, 7, 3, true));
+        goals.clear();
+        goals.addAll(createPastGoals("medium", 5, 7, 3, true, "onTime"));
         Goal newGoal = new Goal("Medium Task", "Test", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(7), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTimelineSuggestion(newGoal);
@@ -144,7 +156,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_typicalGoalSize() {
-        goals.addAll(createPastGoals("medium", 5, 7, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("medium", 5, 7, 1, true, "onTime"));
         Goal newGoal = new Goal("Medium Task", "Test", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(7), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTaskBreakdownSuggestion(newGoal);
@@ -153,8 +166,9 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_longerGoalSize() {
-        goals.addAll(createPastGoals("hard", 5, 7, 1, true));
-        Goal newGoal = new Goal("Long Hard Task", "Test", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(20), false);
+        goals.clear();
+        goals.addAll(createPastGoals("hard", 8, 7, 1, true, "onTime"));
+        Goal newGoal = new Goal("Long Hard Task", "Test", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(14), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTaskBreakdownSuggestion(newGoal);
         assertTrue(suggestion.contains("significantly longer"));
@@ -162,7 +176,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_shorterGoalSize() {
-        goals.addAll(createPastGoals("easy", 5, 7, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("easy", 8, 7, 1, true, "onTime"));
         Goal newGoal = new Goal("Short Easy Task", "Test", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTaskBreakdownSuggestion(newGoal);
@@ -171,7 +186,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_noSimilarDuration() {
-        goals.addAll(createPastGoals("easy", 5, 7, 1, true));
+        goals.clear();
+        goals.addAll(createPastGoals("easy", 8, 7, 1, true, "onTime"));
         Goal newGoal = new Goal("Unique Task", "Test", "unique", LocalDate.now().plusDays(1), LocalDate.now().plusDays(10), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTaskBreakdownSuggestion(newGoal);
@@ -180,6 +196,7 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_noUserHistory() {
+        goals.clear();
         Goal newGoal = new Goal("New Task", "Test", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(7), false);
         suggestionsModel.initializeSuggestionsModel(goals);
         String suggestion = suggestionsModel.getTaskBreakdownSuggestion(newGoal);
@@ -188,10 +205,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_easyGoalsLate() {
-        List<Goal> easyGoals = createPastGoals("easy", 5, 5, 1, true);
-        for(Goal goal : easyGoals){
-            goal.setCompletionDate(goal.getEndDate().plusDays(2));
-        }
+        goals.clear();
+        List<Goal> easyGoals = createPastGoals("easy", 10, 5, 1, true, "onTime");
         goals.addAll(easyGoals);
         Goal newGoal = new Goal("Easy Task", "Test", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(6), false);
         suggestionsModel.initializeSuggestionsModel(goals);
@@ -201,10 +216,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_mediumGoalsLate() {
-        List<Goal> mediumGoals = createPastGoals("medium", 5, 7, 1, true);
-        for(Goal goal : mediumGoals){
-            goal.setCompletionDate(goal.getEndDate().plusDays(2));
-        }
+        goals.clear();
+        List<Goal> mediumGoals = createPastGoals("medium", 10, 7, 1, true, "onTime");
         goals.addAll(mediumGoals);
         Goal newGoal = new Goal("Medium Task", "Test", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(9), false);
         suggestionsModel.initializeSuggestionsModel(goals);
@@ -214,10 +227,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_hardGoalsLate() {
-        List<Goal> hardGoals = createPastGoals("hard", 5, 10, 1, true);
-        for(Goal goal : hardGoals){
-            goal.setCompletionDate(goal.getEndDate().plusDays(2));
-        }
+        goals.clear();
+        List<Goal> hardGoals = createPastGoals("hard", 10, 10, 1, true, "onTime");
         goals.addAll(hardGoals);
         Goal newGoal = new Goal("Hard Task", "Test", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(12), false);
         suggestionsModel.initializeSuggestionsModel(goals);
@@ -227,10 +238,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_easyGoalsEarly() {
-        List<Goal> easyGoals = createPastGoals("easy", 5, 5, 1, true);
-        for(Goal goal : easyGoals){
-            goal.setCompletionDate(goal.getEndDate().minusDays(2));
-        }
+        goals.clear();
+        List<Goal> easyGoals = createPastGoals("easy", 5, 5, 1, true, "onTime");
         goals.addAll(easyGoals);
         Goal newGoal = new Goal("Easy Task", "Test", "easy", LocalDate.now().plusDays(1), LocalDate.now().plusDays(4), false);
         suggestionsModel.initializeSuggestionsModel(goals);
@@ -240,10 +249,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_mediumGoalsEarly() {
-        List<Goal> mediumGoals = createPastGoals("medium", 5, 7, 1, true);
-        for(Goal goal : mediumGoals){
-            goal.setCompletionDate(goal.getEndDate().minusDays(2));
-        }
+        goals.clear();
+        List<Goal> mediumGoals = createPastGoals("medium", 5, 7, 1, true, "onTime");
         goals.addAll(mediumGoals);
         Goal newGoal = new Goal("Medium Task", "Test", "medium", LocalDate.now().plusDays(1), LocalDate.now().plusDays(6), false);
         suggestionsModel.initializeSuggestionsModel(goals);
@@ -253,10 +260,8 @@ public class SuggestionsUnitTests {
 
     @Test
     public void testTaskBreakdown_hardGoalsEarly() {
-        List<Goal> hardGoals = createPastGoals("hard", 5, 10, 1, true);
-        for(Goal goal : hardGoals){
-            goal.setCompletionDate(goal.getEndDate().minusDays(2));
-        }
+        goals.clear();
+        List<Goal> hardGoals = createPastGoals("hard", 5, 10, 1, true, "onTime");
         goals.addAll(hardGoals);
         Goal newGoal = new Goal("Hard Task", "Test", "hard", LocalDate.now().plusDays(1), LocalDate.now().plusDays(9), false);
         suggestionsModel.initializeSuggestionsModel(goals);
