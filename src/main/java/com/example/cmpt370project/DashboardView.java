@@ -1,6 +1,7 @@
 package com.example.cmpt370project;
 
 
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -80,7 +81,7 @@ public class DashboardView extends BorderPane {
     /**
      * The goals page of the application.
      */
-    private GoalView goalsPage;
+    GoalView goalsPage;
 
     /**
      * The goal plan page of the application.
@@ -117,7 +118,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button for going to the goals page.
      */
-    private Button goalsButton;
+    Button goalsButton;
 
     /**
      * The button for going to the goal plan page.
@@ -247,22 +248,26 @@ public class DashboardView extends BorderPane {
 
         // If first time running the app, get the users name
         // Do this here in this class, because not specific to any view
-        if (userHistoryDataModel.isFirstOpen()) {
-            // Create a TextInputDialog
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Welcome to your Goal Planning Application!");
-            dialog.setHeaderText("Please enter your name:");
-            dialog.setContentText("Name:");
 
-            // Show the dialog and capture the input
-            Optional<String> result = dialog.showAndWait();
+        Platform.runLater(() -> {
+            if (userHistoryDataModel.isFirstOpen()) {
+                // Create a TextInputDialog
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Welcome to your Goal Planning Application!");
+                dialog.setHeaderText("Please enter your name:");
+                dialog.setContentText("Name:");
 
-            if (result.isPresent() && !result.get().isBlank()) {
-                userHistoryDataModel.setUserName(result.get().trim());
-            } else {
-                userHistoryDataModel.setUserName("User");
+                // Show the dialog and capture the input
+                Optional<String> result = dialog.showAndWait();
+
+                if (result.isPresent() && !result.get().isBlank()) {
+                    userHistoryDataModel.setUserName(result.get().trim());
+                } else {
+                    userHistoryDataModel.setUserName("User");
+                }
             }
-        }
+        });
+
 
         // ************************* POPULATE DUMMY DATA *************************
         // Here is where we can manually set data to show for testing/demo purposes!!
