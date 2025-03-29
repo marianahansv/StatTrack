@@ -213,18 +213,23 @@ public class GoalView extends StackPane implements Subscriber {
         deleteGoalButton = new Button("Delete Goal");
         deleteGoalButton.getStyleClass().add("cbutton");
 
-        // Container for dashboard controls (list view, feedback, filtering, buttons)
-        VBox dashboardControls = new VBox();
-        dashboardControls.setAlignment(Pos.TOP_CENTER);
-        dashboardControls.setSpacing(5);
-        dashboardControls.getChildren().addAll(
-                goalListView,
-                goalProgressModule,
-                difficultyComboBox,
-                filtersContainer,
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(
                 completeGoalButton,
                 editGoalButton,
                 deleteGoalButton
+        );
+
+        // Container for dashboard controls (list view, feedback, filtering, buttons)
+        VBox dashboardControls = new VBox();
+        dashboardControls.setAlignment(Pos.TOP_CENTER);
+        dashboardControls.setSpacing(15);
+        dashboardControls.getChildren().addAll(
+                goalListView,
+                goalProgressModule,
+                buttonBox,
+                filtersContainer
         );
 
         goalListView.getItems();
