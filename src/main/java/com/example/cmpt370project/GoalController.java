@@ -29,5 +29,13 @@ public class GoalController {
         //suggestionsModel.onGoalCompletedUpdate(goal);
         //System.out.println(55555);
     }
-    
+    /**
+     * Deletes a goal from the model by its title. This removes the goal from:
+     * @param title The title of the goal to be deleted
+     * @return true if the goal was found and deleted successfully, false otherwise
+     */
+    public boolean deleteGoal(String title) {
+        return goalModel.deleteGoal(title);
+    }
+
 }

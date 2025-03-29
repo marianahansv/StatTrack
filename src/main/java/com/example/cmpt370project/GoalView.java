@@ -61,7 +61,7 @@ public class GoalView extends StackPane implements Subscriber {
     private ComboBox<String> completionStatusComboBox;
     private Button completeGoalButton;
     private Button editGoalButton;
-
+    private Button deleteGoalButton;
     
     
 
@@ -210,6 +210,8 @@ public class GoalView extends StackPane implements Subscriber {
         completeGoalButton.getStyleClass().add("cbutton");
         editGoalButton = new Button("Edit Goal");
         editGoalButton.getStyleClass().add("cbutton");
+        deleteGoalButton = new Button("Delete Goal");
+        deleteGoalButton.getStyleClass().add("cbutton");
 
         // Container for dashboard controls (list view, feedback, filtering, buttons)
         VBox dashboardControls = new VBox();
@@ -221,7 +223,8 @@ public class GoalView extends StackPane implements Subscriber {
                 difficultyComboBox,
                 filtersContainer,
                 completeGoalButton,
-                editGoalButton
+                editGoalButton,
+                deleteGoalButton
         );
 
         goalListView.getItems();
@@ -245,6 +248,15 @@ public class GoalView extends StackPane implements Subscriber {
             goalModel.notifySubscribers();
             drawEditGoalView(selectedGoal);
        });
+
+        // On delete button pressed, delete the selected goal
+        deleteGoalButton.setOnAction(e -> {
+            Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
+            if (selectedGoal != null) {
+                goalModel.deleteGoal(selectedGoal.getTitle());
+                goalModel.notifySubscribers();
+            }
+        });
 
         root.getChildren().addAll(welcomeLabel, dashboardControls);
         goalModel.addSubscriber(this);
