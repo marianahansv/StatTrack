@@ -753,9 +753,12 @@ public class HomeView extends StackPane implements Subscriber {
 
         List<Goal> upcomingGoals = goalModel.getGoals().stream()
                 .filter(goal -> !goal.isCompleted())
-                .filter(goal -> goal.getEndDate().isAfter(today) && goal.getEndDate().isBefore(nextWeek))
+                .filter(goal ->
+                        !goal.getEndDate().isBefore(today) &&
+                                !goal.getEndDate().isAfter(nextWeek)
+                )
                 .sorted(Comparator.comparing(Goal::getEndDate))
-                .collect(Collectors.toList());
+                .toList();
 
         if (upcomingGoals.isEmpty()) {
             Label noGoalsLabel = new Label("No goals due in the next 7 days!");
