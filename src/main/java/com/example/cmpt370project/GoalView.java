@@ -185,7 +185,7 @@ public class GoalView extends StackPane implements Subscriber {
         // instantiate and configure the ComboBox for filtering difficulties
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("All", "Easy", "Medium", "Hard");
-        difficultyComboBox.setValue("Difficulty"); // default
+        difficultyComboBox.setValue("All"); // default
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
 
@@ -419,25 +419,30 @@ public class GoalView extends StackPane implements Subscriber {
         String selectedDifficulty = difficultyComboBox.getValue();
         String selectedCompletionStatus = completionStatusComboBox.getValue();
 
-        List<Goal> filteredGoals = goalModel.getGoalsByDifficulty(selectedDifficulty);
+        System.out.println("Filtering goals - Difficulty: " + selectedDifficulty + ", Completion: " + selectedCompletionStatus);
 
-        if (!"All".equals(selectedCompletionStatus)) {
-            boolean completedFilter = "Completed".equals(selectedCompletionStatus);
-            filteredGoals = goalModel.getGoalsByCompletionStatus(completedFilter);
-            List<Goal> intersection = new ArrayList<>();
-            List<Goal> completionFiltered = goalModel.getGoalsByCompletionStatus(completedFilter);
-            for (Goal goal : filteredGoals) {
-                if (completionFiltered.contains(goal)) {
-                    intersection.add(goal);
-                }
+        List<Goal> allGoals = goalModel.getGoals();
+        List<Goal> filteredGoals = new ArrayList<>();
+
+        for (Goal goal : allGoals) {
+            String goalDifficulty = goal.getDifficulty() != null ? goal.getDifficulty().trim() : "";
+            boolean matchesDifficulty = selectedDifficulty.equals("All") || goalDifficulty.equalsIgnoreCase(selectedDifficulty);
+
+            boolean matchesCompletion = selectedCompletionStatus.equals("All")
+                    || (selectedCompletionStatus.equals("Completed") && goal.isCompleted())
+                    || (selectedCompletionStatus.equals("Uncompleted") && !goal.isCompleted());
+
+            if (matchesDifficulty && matchesCompletion) {
+                filteredGoals.add(goal);
             }
-            filteredGoals = intersection;
         }
+
+        System.out.println("Filtered goals found: " + filteredGoals.size());
         goalListView.getItems().clear();
-        for (Goal goal : filteredGoals) {
-            goalListView.getItems().add(goal);
-        }
+        goalListView.getItems().addAll(filteredGoals);
     }
+
+
 
     /**
      * Set up interaction with a controller for this view.
