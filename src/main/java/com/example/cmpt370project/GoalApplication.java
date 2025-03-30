@@ -30,7 +30,7 @@ public class GoalApplication extends Application {
         Scene scene = new Scene(root, screenBounds.getWidth() - 100, screenBounds.getHeight() - 100);
 
         // Set the title of the window when it comes up
-        stage.setTitle("Goal Tracker");
+        stage.setTitle("StatTrack");
 
         // Set the scene to the stage and show it!
         stage.setScene(scene);

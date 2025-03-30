@@ -1,18 +1,22 @@
 package com.example.cmpt370project;
 
-
 import java.util.Optional;
-
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
@@ -79,7 +83,7 @@ public class DashboardView extends BorderPane {
     /**
      * The goals page of the application.
      */
-    private GoalView goalsPage;
+    GoalView goalsPage;
 
     /**
      * The goal plan page of the application.
@@ -116,7 +120,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button for going to the goals page.
      */
-    private Button goalsButton;
+    Button goalsButton;
 
     /**
      * The button for going to the goal plan page.
@@ -246,22 +250,26 @@ public class DashboardView extends BorderPane {
 
         // If first time running the app, get the users name
         // Do this here in this class, because not specific to any view
-        if (userHistoryDataModel.isFirstOpen()) {
-            // Create a TextInputDialog
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Welcome to your Goal Planning Application!");
-            dialog.setHeaderText("Please enter your name:");
-            dialog.setContentText("Name:");
 
-            // Show the dialog and capture the input
-            Optional<String> result = dialog.showAndWait();
+        Platform.runLater(() -> {
+            if (userHistoryDataModel.isFirstOpen()) {
+                // Create a TextInputDialog
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Welcome to StatTrack!");
+                dialog.setHeaderText("Please enter your name:");
+                dialog.setContentText("Name:");
 
-            if (result.isPresent() && !result.get().isBlank()) {
-                userHistoryDataModel.setUserName(result.get().trim());
-            } else {
-                userHistoryDataModel.setUserName("User");
+                // Show the dialog and capture the input
+                Optional<String> result = dialog.showAndWait();
+
+                if (result.isPresent() && !result.get().isBlank()) {
+                    userHistoryDataModel.setUserName(result.get().trim());
+                } else {
+                    userHistoryDataModel.setUserName("User");
+                }
             }
-        }
+        });
+
 
         // ************************* POPULATE DUMMY DATA *************************
         // Here is where we can manually set data to show for testing/demo purposes!!
@@ -282,9 +290,14 @@ public class DashboardView extends BorderPane {
         this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
 
         // --- header ---
-        HBox header = new HBox(new Label("Goal Tracker Dashboard"));
+        Image appLogo = new Image((Objects.requireNonNull(getClass().getResourceAsStream("/StatTrackLogo.png"))));
+        ImageView appLogoView = new ImageView(appLogo);
+        appLogoView.setFitHeight(32);  // Set the width of the image
+        appLogoView.setPreserveRatio(true);
+
+        HBox header = new HBox(appLogoView);
         header.setAlignment(Pos.CENTER);
-        header.setStyle("-fx-background-color: lightgray; -fx-padding: 5px;");
+        header.setStyle("-fx-background-color: lightgray; -fx-padding: 7px;");
         this.setTop(header);
 
         // --- sidebar ---

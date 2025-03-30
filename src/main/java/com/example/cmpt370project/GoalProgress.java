@@ -17,6 +17,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 
 /*
@@ -37,7 +38,7 @@ public class GoalProgress extends VBox implements Subscriber {
     /**
      * ChoiceBox for selecting the type of chart to display.
      */
-    private ChoiceBox<String> chartTypeSelector;
+    private ComboBox<String> chartTypeSelector;
 
     /**
      * PieChart for visualization
@@ -79,9 +80,11 @@ public class GoalProgress extends VBox implements Subscriber {
      * Sets up the chart type selector allowing the user to choose the visualization type.
      */
     private void setupChartSelector() {
-        chartTypeSelector = new ChoiceBox<>();
+        chartTypeSelector = new ComboBox<>();
         chartTypeSelector.getItems().addAll("Pie Chart", "Bar Chart", "Line Chart"); // Types of visualization
         chartTypeSelector.setValue("Pie Chart"); // Defaulting to pie chart bc they are more epic
+
+        chartTypeSelector.getStyleClass().add("filter-combo");
 
         chartTypeSelector.setOnAction(e -> updateChart());
         getChildren().add(chartTypeSelector);

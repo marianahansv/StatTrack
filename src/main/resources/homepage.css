@@ -6,12 +6,12 @@
 }
 
 .welcome-label {
-    -fx-font-size: 28px;
+    -fx-font-size: 34px;
     -fx-font-weight: bold;
     -fx-text-fill: black;
 }
 
-.motivation-module {
+.module {
     -fx-border-color: black;
     -fx-border-width: 2px;
     -fx-border-radius: 10px;
@@ -31,6 +31,10 @@
     -fx-font-size: 22px;
     -fx-font-weight: bold;
     -fx-text-fill: black;
+}
+
+.bigger-paragraph-text {
+    -fx-font-size: 16px;
 }
 
 /* goal view buttons */
@@ -186,6 +190,14 @@
     -fx-background-color: #676464FF;
 }
 
+.edit-button {
+    -fx-background-color: #3c3939;
+}
+
+.edit-button:hover {
+    -fx-background-color: #676464FF;
+}
+
 .cancel-button {
     -fx-background-color: #F44336;
 }
@@ -296,7 +308,7 @@
     -fx-font-style: italic;
 }
 
-/* scroll bar inside of upcoming goals module */
+/* all scroll bars */
 .scroll-bar:vertical {
     -fx-background-color: transparent;
 }
@@ -321,6 +333,34 @@
 .scroll-bar:vertical .decrement-arrow {
     -fx-shape: " ";
     -fx-padding: 0;
+}
+
+/* scroll bar inside of upcoming goals module */
+.scroll-bar:horizontal {
+    -fx-background-color: white;
+    -fx-background-radius: 5em;
+}
+
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #4A90E2;
+    -fx-background-radius: 5em;
+}
+
+.scroll-bar:horizontal .increment-button,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 0;
+}
+
+.scroll-bar:horizontal .increment-arrow,
+.scroll-bar:horizontal .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* for the goal list*/
+.list-cell {
+    -fx-font-size: 14px;
 }
 
 

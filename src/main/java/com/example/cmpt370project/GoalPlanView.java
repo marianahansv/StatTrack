@@ -45,19 +45,19 @@ public class GoalPlanView extends StackPane implements Subscriber {
     // ********* EDIT/CREATE PAGE ELEMENTS *********
     private ToggleGroup planStyleSelect;
     RadioButton maintainPlan;
-    private RadioButton increasePlan;
+    RadioButton increasePlan;
 
     Spinner<Integer> endGoalNumberInput;
-    private Spinner<Integer> startGoalNumberInput;
+    Spinner<Integer> startGoalNumberInput;
 
-    private Button cancelEditGoalPlanButton;
+    Button cancelEditGoalPlanButton;
     Button savePlanChangesButton;
-    private Button deletePlanButton;
+    Button deletePlanButton;
 
     ComboBox<String> timelineSelectBox;
-    private DatePicker endDatePicker;
+    DatePicker endDatePicker;
 
-    private Label errorLabel;
+    Label errorLabel;
     /**
      * Create a new goal plan page.
      */
@@ -248,7 +248,9 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 startGoalPlanModule.setSpacing(20);
 
                 // Info Label
-                startGoalPlanModule.getChildren().add(new Label("You do not currently have a goal plan set up yet. Create one to get started!"));
+                Label makeNewLabel = new Label("You do not currently have a goal plan set up yet. Create one to get started!");
+                makeNewLabel.getStyleClass().add("bigger-paragraph-text");
+                startGoalPlanModule.getChildren().add(makeNewLabel);
 
                 // Set Goal Plan Button
                 goCreateEditGoalPlanButton.setText("Set Up Your Goal Plan");
@@ -263,9 +265,10 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 HBox goalSummaryHeaderModule = new HBox(20);
                 goalSummaryHeaderModule.setAlignment(Pos.CENTER_LEFT);
                 Label currentPlanTitle = new Label();
-                currentPlanTitle.setMinWidth(300);
-                currentPlanTitle.setMaxWidth(500);
-                currentPlanTitle.setWrapText(true);
+                currentPlanTitle.getStyleClass().add("bigger-paragraph-text");
+//                currentPlanTitle.setMinWidth(300);
+//                currentPlanTitle.setMaxWidth(500);
+//                currentPlanTitle.setWrapText(true);
 
                 // Get the completed goal values whether it is the week/day
                 String planTimelineString = "";
@@ -299,19 +302,21 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 root.getChildren().add(goalSummaryHeaderModule);
 
                 Label progressTitle = new Label("Here's your current progress on your plan:");
+                progressTitle.getStyleClass().add("bigger-paragraph-text");
                 progressTitle.setStyle("-fx-font-weight: bold;");
                 root.getChildren().add(progressTitle);
 
                 VBox goalProgressModule = new VBox(20);
                 goalProgressModule.setAlignment(Pos.CENTER_LEFT);
-                goalProgressModule.setMaxWidth(670);
+//                goalProgressModule.setMaxWidth(670);
                 goalProgressModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
                 goalProgressModule.setPadding(new Insets(20));
+                goalProgressModule.getStyleClass().add("module");
 
 
-                Label currentProgressSum = new Label("Your current number of goals completed for the " + planTimelineString + " : " + timelineCompleted);
+                Label currentProgressSum = new Label("Your current number of goals completed for the " + planTimelineString + ": " + timelineCompleted);
                 Label targetProgressSum = new Label("Your current target number of goals to complete for the "
-                        + planTimelineString + " : " + goalPlanModel.getGoalPlan().getGoalPlanCurrent());
+                        + planTimelineString + ": " + goalPlanModel.getGoalPlan().getGoalPlanCurrent());
 
                 int progressDiff = goalPlanModel.getGoalPlan().getGoalPlanCurrent() - timelineCompleted;
                 String progressMessage = "";
@@ -326,6 +331,11 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
                 Label progressFeedback = new Label(progressMessage);
                 progressFeedback.setWrapText(true);
+
+                currentProgressSum.getStyleClass().add("bigger-paragraph-text");
+                targetProgressSum.getStyleClass().add("bigger-paragraph-text");
+                progressFeedback.getStyleClass().add("bigger-paragraph-text");
+                progressFeedback.setStyle("-fx-font-weight: bold;");
 
                 goalProgressModule.getChildren().addAll(currentProgressSum, targetProgressSum, progressFeedback);
                 root.getChildren().add(goalProgressModule);

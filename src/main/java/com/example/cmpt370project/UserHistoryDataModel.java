@@ -169,6 +169,13 @@ public class UserHistoryDataModel {
     }
 
     /**
+     * Set next app open to be considered the first open.
+     */
+    public void setFirstOpen() {
+        this.firstOpen = true;
+    }
+
+    /**
      * Hard resets the daily data to the specified current date.
      * @param currentDate the date to set as the new data day and reset the daily goals.
      */

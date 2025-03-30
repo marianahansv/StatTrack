@@ -43,13 +43,7 @@ public class GoalVisView extends StackPane implements Subscriber {
         goalVisualizations.getChildren().add(goalChartView);
         root.getChildren().add(goalVisualizations);
 
-        // SCROLL BAR because too much content not enough space 🔥🔥🔥
-        ScrollPane scrollPane = new ScrollPane(root);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
-        this.getChildren().add(scrollPane);
+        this.getChildren().add(root);
     }
 
     /**
