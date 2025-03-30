@@ -190,6 +190,14 @@
     -fx-background-color: #676464FF;
 }
 
+.edit-button {
+    -fx-background-color: #3c3939;
+}
+
+.edit-button:hover {
+    -fx-background-color: #676464FF;
+}
+
 .cancel-button {
     -fx-background-color: #F44336;
 }
@@ -348,6 +356,11 @@
 .scroll-bar:horizontal .decrement-arrow {
     -fx-shape: " ";
     -fx-padding: 0;
+}
+
+/* for the goal list*/
+.list-cell {
+    -fx-font-size: 14px;
 }
 
 

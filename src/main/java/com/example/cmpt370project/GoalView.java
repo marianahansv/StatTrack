@@ -17,6 +17,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -204,22 +205,40 @@ public class GoalView extends StackPane implements Subscriber {
         // Container for filters
         HBox filtersContainer = new HBox(10);
         filtersContainer.setAlignment(Pos.CENTER);
+
+        Label filterLabel = new Label("Filter Your Goals:");
+        filterLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+
+        Region filterActionsSpacer = new Region();
+
         filtersContainer.getChildren().addAll(
+                filterLabel,
+                filterActionsSpacer,
                 difficultyComboBox,
                 completionStatusComboBox
         );
 
         // ********* Action Buttons *********
-        completeGoalButton = new Button("Complete");
+        completeGoalButton = new Button("Complete Goal");
         completeGoalButton.getStyleClass().add("cbutton");
+        completeGoalButton.getStyleClass().add("add-goal-button");
         editGoalButton = new Button("Edit Goal");
         editGoalButton.getStyleClass().add("cbutton");
+        editGoalButton.getStyleClass().add("edit-button");
         deleteGoalButton = new Button("Delete Goal");
         deleteGoalButton.getStyleClass().add("cbutton");
+        deleteGoalButton.getStyleClass().add("cancel-button");
+
+        Label goalActionsLabel = new Label("Selected Goal Quick Actions:");
+        goalActionsLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+
+        Region goalActionsSpacer = new Region();
 
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().addAll(
+                goalActionsLabel,
+                goalActionsSpacer,
                 completeGoalButton,
                 editGoalButton,
                 deleteGoalButton
