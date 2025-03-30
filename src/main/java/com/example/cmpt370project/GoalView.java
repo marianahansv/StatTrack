@@ -6,16 +6,7 @@ import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -281,8 +272,20 @@ public class GoalView extends StackPane implements Subscriber {
         deleteGoalButton.setOnAction(e -> {
             Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
             if (selectedGoal != null) {
-                goalModel.deleteGoal(selectedGoal.getTitle());
-                goalModel.notifySubscribers();
+
+                // Confirm to make sure the user want to delete their goal
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirm Goal Deletion");
+                alert.setHeaderText("Are you sure you want to delete this goal from the system?");
+                alert.setContentText("This action cannot be undone.");
+
+                // Show the dialog and wait for the user's response
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        goalModel.deleteGoal(selectedGoal.getTitle());
+                        goalModel.notifySubscribers();
+                    }
+                });
             }
         });
 

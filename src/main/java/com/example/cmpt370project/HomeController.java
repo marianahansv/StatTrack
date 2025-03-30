@@ -71,8 +71,6 @@ public class HomeController {
                 gm.clearGoals();
             }
         });
-
-
     }
 
     public void handleChangeName(ActionEvent actionEvent) {
