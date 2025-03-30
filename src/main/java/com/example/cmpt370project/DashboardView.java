@@ -1,7 +1,10 @@
 package com.example.cmpt370project;
 
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,8 +17,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -319,17 +324,45 @@ public class DashboardView extends BorderPane {
         goalVisButton.setMaxWidth(Double.MAX_VALUE);
         historicalChartButton.setMaxWidth(Double.MAX_VALUE);
 
-        //
+        // Style the buttons
         homeButton.getStyleClass().add("cbutton");
         goalsButton.getStyleClass().add("cbutton");
         goalPlanButton.getStyleClass().add("cbutton");
         goalVisButton.getStyleClass().add("cbutton");
         historicalChartButton.getStyleClass().add("cbutton");
 
+        // Add current date display
+        Label dateLabel = new Label();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy");
+        dateLabel.setText(formatter.format(LocalDate.now()));
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), e -> {
+                    dateLabel.setText(formatter.format(LocalDate.now()));
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+        VBox dateModule = new VBox();
+        Label dateIntro = new Label("\uD83D\uDCC5 Today's date is:");
+
+        dateLabel.getStyleClass().add("bigger-paragraph-text");
+        dateIntro.getStyleClass().add("bigger-paragraph-text");
+        dateLabel.setStyle("-fx-font-weight: bold");
+        dateModule.getStyleClass().add("date-module");
+
+        dateModule.getChildren().addAll(dateIntro, dateLabel);
+
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
-        sidebar.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
         VBox.setVgrow(sidebar, Priority.ALWAYS);
-        this.setLeft(sidebar);
+
+        VBox sidebarParent = new VBox();
+        sidebarParent.getChildren().addAll(dateModule, sidebar);
+        sidebarParent.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
+
+        this.setLeft(sidebarParent);
 
         // --- center ---
         this.setCenter(scrollPane);
