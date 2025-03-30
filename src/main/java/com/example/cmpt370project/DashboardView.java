@@ -253,7 +253,7 @@ public class DashboardView extends BorderPane {
             if (userHistoryDataModel.isFirstOpen()) {
                 // Create a TextInputDialog
                 TextInputDialog dialog = new TextInputDialog();
-                dialog.setTitle("Welcome to your Goal Planning Application!");
+                dialog.setTitle("Welcome to StatTrack!");
                 dialog.setHeaderText("Please enter your name:");
                 dialog.setContentText("Name:");
 
@@ -288,7 +288,7 @@ public class DashboardView extends BorderPane {
         this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
 
         // --- header ---
-        HBox header = new HBox(new Label("Goal Tracker Dashboard"));
+        HBox header = new HBox(new Label("Your StatTrack Dashboard"));
         header.setAlignment(Pos.CENTER);
         header.setStyle("-fx-background-color: lightgray; -fx-padding: 5px;");
         this.setTop(header);

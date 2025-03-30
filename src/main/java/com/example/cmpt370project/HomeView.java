@@ -138,7 +138,7 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalButton.getStyleClass().add("cbutton");
 //        addGoalButton.getStyleClass().add("add-goal-button");
 
-        welcomeLabel = new Label("Welcome to Your Personal Goal Tracker!");
+        welcomeLabel = new Label("Welcome to StatTrack!");
         welcomeLabel.getStyleClass().add("welcome-label");
 
         sectionHeading = new Label("Goal Sections");
