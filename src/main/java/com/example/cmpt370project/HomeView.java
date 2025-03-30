@@ -396,6 +396,9 @@ public class HomeView extends StackPane implements Subscriber {
         if (currentViewPage == HomeViewPage.HOME && sectionToggleGroup.getSelectedToggle() != null) {
             String selectedSection = ((ToggleButton) sectionToggleGroup.getSelectedToggle()).getText();
             updateGoalsDisplay(selectedSection);
+            if (userHistoryDataModel != null) {
+                userGreeting.setText(currentGreeting + ", " + userHistoryDataModel.getUserName() + "! Let's complete some goals.");
+            }
         } else {
             drawView();
         }
