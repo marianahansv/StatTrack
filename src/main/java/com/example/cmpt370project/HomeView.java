@@ -182,12 +182,12 @@ public class HomeView extends StackPane implements Subscriber {
         userGreeting.setText(currentGreeting + ", User! Let's complete some goals.");
 
         // Add goal page elements
-        addGoalTitleLabel = new Label("Add a Goal!");
-        addGoalTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        addGoalTitleLabel = new Label("Let's Add a New Goal:");
+        addGoalTitleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
         submitGoalButton = new Button("Add Goal");
         submitGoalButton.getStyleClass().add("cbutton");
-        giveMeSuggestionsButton = new Button("Give me suggestions");
+        giveMeSuggestionsButton = new Button("Give Me Suggestions");
         giveMeSuggestionsButton.getStyleClass().add("cbutton");
 
         titleInput = new TextField();
@@ -201,7 +201,7 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalFormRow1 = new HBox(20);
         addGoalFormRow2 = new HBox(20);
         addGoalFormRow3 = new HBox(20);
-        addGoalForm = new VBox(20);
+        addGoalForm = new VBox(35);
 
         suggestionsContentLabel = new Label("");
 
@@ -575,7 +575,7 @@ public class HomeView extends StackPane implements Subscriber {
         VBox root = new VBox();
         root.setPadding(new Insets(30));
         root.setAlignment(Pos.TOP_LEFT);
-        root.setSpacing(30);
+        root.setSpacing(35);
         this.getChildren().add(root);
 
         //clear to avoid dupes
@@ -606,20 +606,27 @@ public class HomeView extends StackPane implements Subscriber {
         }
 
         //box for suggestions!
-        Label sectionLabel = new Label("Your Suggestions, Dani:");
-        sectionLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        Label sectionLabel = new Label("Want Suggestions on Your New Goal, " + userHistoryDataModel.getUserName() + "?");
+        sectionLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         String suggestionsContent = "Click the button to find out!";
         suggestionsContentLabel.setText(suggestionsContent);
+        suggestionsContentLabel.setStyle("-fx-font-size: 14px;");
 
         VBox suggestionsBox = new VBox();
         suggestionsBox.setSpacing(10);
         suggestionsBox.setPadding(new Insets(10));
-        suggestionsBox.setStyle("-fx-border-color: grey; -fx-border-width: 2px; -fx-background-color: #f9f9f9;");
+//        suggestionsBox.setStyle("-fx-border-color: grey; -fx-border-width: 2px; -fx-background-color: #f9f9f9;");
+        suggestionsBox.getStyleClass().add("module");
         suggestionsBox.getChildren().addAll(suggestionsContentLabel);
+
+        // Spacer (to separate Form from suggestions)
+
+        Region spacer1 = new Region();
 
         root.getChildren().addAll(
                 addGoalTitleLabel,
                 addGoalForm,
+                spacer1,
                 sectionLabel,
                 suggestionsBox
         );
