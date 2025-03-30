@@ -247,7 +247,7 @@ public class GoalView extends StackPane implements Subscriber {
         // Container for dashboard controls (list view, feedback, filtering, buttons)
         VBox dashboardControls = new VBox();
         dashboardControls.setAlignment(Pos.TOP_CENTER);
-        dashboardControls.setSpacing(15);
+        dashboardControls.setSpacing(25);
         dashboardControls.getChildren().addAll(
                 goalListView,
                 goalProgressModule,
@@ -299,7 +299,7 @@ public class GoalView extends StackPane implements Subscriber {
         this.getChildren().clear();
 
         // Create a new container for the edit form
-        VBox editRoot = new VBox(20);
+        VBox editRoot = new VBox(12);
         editRoot.setAlignment(Pos.TOP_LEFT);
         editRoot.setPadding(new Insets(20));
 
@@ -329,6 +329,7 @@ public class GoalView extends StackPane implements Subscriber {
                 sectionButton.setSelected(true);
             }
             editSectionButtons.getChildren().add(sectionButton);
+            sectionButton.getStyleClass().add("cbutton");
         }
 
         // Buttons to submit or cancel the edit
@@ -378,22 +379,38 @@ public class GoalView extends StackPane implements Subscriber {
             drawView();
         });
 
+        // Title for Goal Edit
+        Label editGoalTitle = new Label("Let's Edit Your Goal:");
+        editGoalTitle.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+
         // Build the edit form view by adding all UI elements
         editRoot.getChildren().addAll(
+                editGoalTitle,
+                new Region(),
                 new Label("Edit Goal Title:"), titleField,
+                new Region(),
                 new Label("Difficulty:"), editDifficultyComboBox,
+                new Region(),
                 new Label("Sections:"), editSectionButtons,
+                new Region(),
                 new Label("Start Date:"), editStartDatePicker,
+                new Region(),
                 new Label("End Date:"), editEndDatePicker,
-                submitEditButton, cancelEditButton
+                new Region(),
+                new HBox(10, submitEditButton, cancelEditButton)
         );
+
+        // Styling of the form
+        titleField.setMaxWidth(300);
+        submitEditButton.getStyleClass().add("cbutton");
+        submitEditButton.getStyleClass().add("add-goal-button");
+        cancelEditButton.getStyleClass().add("cbutton");
+        cancelEditButton.getStyleClass().add("cancel-button");
+
 
         // Display the edit form in the view
         this.getChildren().add(editRoot);
     }
-    
-
-
 
 
     /**
