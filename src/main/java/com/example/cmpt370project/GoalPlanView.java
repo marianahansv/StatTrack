@@ -427,6 +427,10 @@ public class GoalPlanView extends StackPane implements Subscriber {
             VBox endDateSelectLayout = new VBox(10);
             Label endDateLabel= new Label("When would you like to reach your target number of goals to complete?");
 
+            Label endDateNote= new Label("NOTE: A DAILY Increase plan must run for a minimum of 1 week, and a WEEKLY Increase plan must run for a minimum of 2 weeks." +
+                    " Increase plans will roll-over to a new Maintain plan on their specified end date.");
+            endDateNote.setStyle("-fx-text-fill: royalblue; -fx-font-weight: bold;");
+
             endDatePicker = new DatePicker();
 
             // Set default value of date picker
@@ -451,7 +455,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 }
             });
 
-            endDateSelectLayout.getChildren().addAll(endDateLabel, endDatePicker);
+            endDateSelectLayout.getChildren().addAll(endDateLabel, endDateNote, endDatePicker);
 
 
             // Create container for submission and cancel buttons
