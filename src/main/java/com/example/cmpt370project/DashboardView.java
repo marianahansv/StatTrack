@@ -8,12 +8,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -288,9 +291,14 @@ public class DashboardView extends BorderPane {
         this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
 
         // --- header ---
-        HBox header = new HBox(new Label("Your StatTrack Dashboard"));
+        Image appLogo = new Image((Objects.requireNonNull(getClass().getResourceAsStream("/StatTrackLogo.png"))));
+        ImageView appLogoView = new ImageView(appLogo);
+        appLogoView.setFitHeight(32);  // Set the width of the image
+        appLogoView.setPreserveRatio(true);
+
+        HBox header = new HBox(appLogoView);
         header.setAlignment(Pos.CENTER);
-        header.setStyle("-fx-background-color: lightgray; -fx-padding: 5px;");
+        header.setStyle("-fx-background-color: lightgray; -fx-padding: 7px;");
         this.setTop(header);
 
         // --- sidebar ---
