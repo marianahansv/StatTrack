@@ -11,6 +11,8 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
  * View to handle organization of page(s) related to the Goal Plan feature.
@@ -339,6 +341,56 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
                 goalProgressModule.getChildren().addAll(currentProgressSum, targetProgressSum, progressFeedback);
                 root.getChildren().add(goalProgressModule);
+
+                // Additional Plan details
+                Label addInfoTitle = new Label("Here's some additional information about your plan:");
+                addInfoTitle.getStyleClass().add("bigger-paragraph-text");
+                addInfoTitle.setStyle("-fx-font-weight: bold;");
+                root.getChildren().addAll(new Region(), addInfoTitle);
+
+                VBox addInfoTitleModule = new VBox(20);
+                addInfoTitleModule.setAlignment(Pos.CENTER_LEFT);
+                addInfoTitleModule.setPadding(new Insets(20));
+                addInfoTitleModule.getStyleClass().add("b-module");
+
+                Label startDate = new Label("You started this goal plan on " + goalPlanModel.getGoalPlan().getPlanStartDate().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + ".");
+                startDate.getStyleClass().add("bigger-paragraph-text");
+
+                Label endDate = new Label();
+                endDate.getStyleClass().add("bigger-paragraph-text");
+
+                if (goalPlanModel.getGoalPlan().hasEndDate()) {
+                    endDate.setText("This plan will end and roll-over to a new Maintain plan on " + goalPlanModel.getGoalPlan().getPlanEndDate().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + ".");
+                } else {
+                    endDate.setText("This plan has no end date and will go on forever and ever and ever...");
+                }
+
+                Label progressLabel = new Label();
+                progressLabel.getStyleClass().add("bigger-paragraph-text");
+
+                if (goalPlanModel.getGoalPlan().getTimeline().equals(IGoalPlan.Timeline.DAILY)) {
+                    progressLabel.setText("You have been following this plan for a total of " + ChronoUnit.DAYS.between(goalPlanModel.getGoalPlan().getPlanStartDate(), LocalDate.now()) + " days.");
+                } else {
+                    progressLabel.setText("You have been following this plan for a total of " + ChronoUnit.WEEKS.between(goalPlanModel.getGoalPlan().getPlanStartDate(), LocalDate.now()) + " weeks.");
+                }
+
+                addInfoTitleModule.getChildren().addAll(startDate, endDate, progressLabel);
+
+                // If the plan is an increase plan, show some additional information
+                if (goalPlanModel.getGoalPlan() instanceof IncreaseGoalPlan) {
+                    Label increasePlanIntro = new Label("Since you are on an Increase plan, here are the details for the next increase cycle:");
+                    Label nextIncrementDate = new Label("The next day that your target number of goals to complete will increase is on " + ((IncreaseGoalPlan) goalPlanModel.getGoalPlan()).getNextIncrementDate().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + ".");
+                    Label nextIncrementValue = new Label("On this increase date, the your new target number of goals will be increased to " + ((IncreaseGoalPlan) goalPlanModel.getGoalPlan()).getNextIncrementValue()+ ".");
+
+                    increasePlanIntro.getStyleClass().add("bigger-paragraph-text");
+                    increasePlanIntro.setStyle("-fx-font-weight: bold;");
+                    nextIncrementValue.getStyleClass().add("bigger-paragraph-text");
+                    nextIncrementDate.getStyleClass().add("bigger-paragraph-text");
+
+                    addInfoTitleModule.getChildren().addAll(new Region(), increasePlanIntro, nextIncrementDate, nextIncrementValue);
+                }
+
+                root.getChildren().add(addInfoTitleModule);
             }
         }
     }

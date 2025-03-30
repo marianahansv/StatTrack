@@ -21,6 +21,16 @@
     -fx-spacing: 10px;
 }
 
+.b-module {
+    -fx-border-color: #4A90E2;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-color: #E3F2FD;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-spacing: 10px;
+}
+
 .user-greeting {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
