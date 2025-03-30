@@ -773,6 +773,7 @@ public class HomeView extends StackPane implements Subscriber {
         if (upcomingGoals.isEmpty()) {
             Label noGoalsLabel = new Label("No goals due in the next 7 days!");
             noGoalsLabel.getStyleClass().add("upcoming-goals-label");
+            noGoalsLabel.setStyle("-fx-font-size: 16");
             scrollContent.getChildren().add(noGoalsLabel);
         } else {
             HBox goalsRow = new HBox(15);
