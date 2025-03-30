@@ -177,7 +177,11 @@ public class GoalView extends StackPane implements Subscriber {
         }
 
         progressFeedback.setWrapText(true);
+        progressFeedback.getStyleClass().add("bigger-paragraph-text");
+        progressFeedback.setStyle("-fx-font-weight: bold;");
         goalProgressModule.getChildren().add(progressFeedback);
+        goalProgressModule.setAlignment(Pos.CENTER);
+        goalProgressModule.getStyleClass().add("module");
         // ********* END OF MOTIVATIONAL FEEDBACK MODULE *********
 
         // 🔥 Goal difficulty filtering button 🔥

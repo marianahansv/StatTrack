@@ -162,7 +162,7 @@ public class HomeView extends StackPane implements Subscriber {
         // Motivational Message module
         motivationModule = new VBox(20);
         motivationModule.setAlignment(Pos.CENTER_LEFT);
-        motivationModule.getStyleClass().add("motivation-module");
+        motivationModule.getStyleClass().add("module");
 
         // Greeting text configuration
         userGreeting = new Label();
@@ -174,7 +174,7 @@ public class HomeView extends StackPane implements Subscriber {
         int randomIndex = random.nextInt(motivationalMessages.length);
         motivationalLabel = new Label();
         motivationalLabel.setText(motivationalMessages[randomIndex]);
-        motivationalLabel.getStyleClass().add("motivation-label");
+        motivationalLabel.getStyleClass().add("bigger-paragraph-text");
         motivationModule.getChildren().add(motivationalLabel);
 
         randomIndex = random.nextInt(greetings.length);
@@ -491,7 +491,7 @@ public class HomeView extends StackPane implements Subscriber {
         root.setPadding(new Insets(20));
 
         Label sectionTitle = new Label("Here are your current goal sections:");
-        sectionTitle.getStyleClass().add("section-title");
+        sectionTitle.getStyleClass().add("bigger-paragraph-text");
 
         // hbox for title and sections
         HBox titleAndButtons = new HBox(10);
