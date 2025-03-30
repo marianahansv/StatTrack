@@ -41,7 +41,7 @@ public class SuggestionsController{
     public String handleButtonPress(Goal newGoal) {
         if (goalModel.getGoals().stream().filter(Goal::isCompleted).count() < 3) {
             return "Here is what I found...\n" +
-                    "This looks like a great start for you! But...I don't have enough data to make suggestions yet (I need at least 3 goals in you history!)";
+                    "This looks like a great start for you! But...I don't have enough data to make suggestions yet (I need at least 3 goals in your history!)";
         }
         String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
         String taskDifficultySuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
