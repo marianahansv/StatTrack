@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -147,6 +148,8 @@ public class DashboardView extends BorderPane implements Subscriber {
 
     // ************************* UI Elements for Dashboard Sidebar Widgets  *************************
     private Label totalGoals;
+    private Label dailyCompleted;
+    private Label weeklyCompleted;
 
     /**
      * Construct the dashboard view and MVC structure of the application.
@@ -196,6 +199,7 @@ public class DashboardView extends BorderPane implements Subscriber {
         userHistoryDataModel.addSubscriber(goalPlanPage);
         userHistoryDataModel.addSubscriber(goalsPage);
         userHistoryDataModel.addSubscriber(homePage);
+        userHistoryDataModel.addSubscriber(this);
         historicalChartModel.addSubscriber(historicalChartView);
 
         // ********* 3. Setup controller with each view *********
@@ -339,8 +343,10 @@ public class DashboardView extends BorderPane implements Subscriber {
         dateLabel.setText(formatter.format(LocalDate.now()));
 
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), e -> {
+                // Have date update every 60 seconds, to not affect focus change
+                new KeyFrame(Duration.seconds(60), e -> {
                     dateLabel.setText(formatter.format(LocalDate.now()));
+                    userHistoryDataModel.updateCompletedValues(LocalDate.now());
                 })
         );
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -363,16 +369,32 @@ public class DashboardView extends BorderPane implements Subscriber {
         Label totalGoalsLabel = new Label("Total Tracked Goals: ");
         totalGoals = new Label("" + goalModel.getGoals().size());
 
+        HBox dailyCompletedRow = new HBox();
+        Label dailyCompletedLabel = new Label("Goals Completed Today: ");
+        dailyCompleted = new Label("" + userHistoryDataModel.getDailyCompletedGoals());
+
+        HBox weeklyCompletedRow = new HBox();
+        Label weeklyCompletedLabel = new Label("Goals Completed This Week: ");
+        weeklyCompleted = new Label("" + userHistoryDataModel.getWeeklyCompletedGoals());
+
         goalQuickSummaryTitle.getStyleClass().add("bigger-paragraph-text");
         goalQuickSummaryTitle.setStyle("-fx-font-weight: bold");
         totalGoals.getStyleClass().add("bigger-paragraph-text");
         totalGoals.setStyle("-fx-font-weight: bold");
+        weeklyCompleted.getStyleClass().add("bigger-paragraph-text");
+        weeklyCompleted.setStyle("-fx-font-weight: bold");
+        dailyCompleted.getStyleClass().add("bigger-paragraph-text");
+        dailyCompleted.setStyle("-fx-font-weight: bold");
         totalGoalsLabel.getStyleClass().add("bigger-paragraph-text");
+        weeklyCompletedLabel.getStyleClass().add("bigger-paragraph-text");
+        dailyCompletedLabel.getStyleClass().add("bigger-paragraph-text");
         goalQuickSummaryModule.getStyleClass().add("date-module");
 
         totalGoalsRow.getChildren().addAll(totalGoalsLabel, totalGoals);
+        weeklyCompletedRow.getChildren().addAll(weeklyCompletedLabel, weeklyCompleted);
+        dailyCompletedRow.getChildren().addAll(dailyCompletedLabel, dailyCompleted);
 
-        goalQuickSummaryModule.getChildren().addAll(goalQuickSummaryTitle, totalGoalsRow);
+        goalQuickSummaryModule.getChildren().addAll(goalQuickSummaryTitle, dailyCompletedRow, weeklyCompletedRow, totalGoalsRow);
 
 
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
@@ -398,6 +420,16 @@ public class DashboardView extends BorderPane implements Subscriber {
     @Override
     public void modelUpdated() {
         // Update the responsive elements of the Dashboard
-        totalGoals.setText("" + goalModel.getGoals().size());
+        if (totalGoals != null) {
+            totalGoals.setText("" + goalModel.getGoals().size());
+        }
+
+        if (weeklyCompleted != null) {
+            weeklyCompleted.setText("" + userHistoryDataModel.getWeeklyCompletedGoals());
+        }
+
+        if (dailyCompleted != null) {
+            dailyCompleted.setText("" + userHistoryDataModel.getDailyCompletedGoals());
+        }
     }
 }

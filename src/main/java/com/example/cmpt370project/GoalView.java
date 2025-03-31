@@ -253,8 +253,9 @@ public class GoalView extends StackPane implements Subscriber {
             
              Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
 
-             goalModel.completeGoal(selectedGoal);
-
+             if (!selectedGoal.isCompleted()) {
+                 goalModel.completeGoal(selectedGoal);
+             }
         });
         
         // On edit button pressed take to editing page
@@ -366,7 +367,6 @@ public class GoalView extends StackPane implements Subscriber {
 
             // Update user history data
             historyModel.notifySubscribers();
-            historyModel.completeGoal(LocalDate.now());
             historyModel.saveDataToFile();
 
             // Return to the main view
