@@ -478,7 +478,7 @@ public class HomeView extends StackPane implements Subscriber {
     private void resetAddGoalPage() {
         titleInput.clear();
         difficultyComboBox.setValue("Medium");
-        sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().getFirst());
+        sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().get(0));
     }
 
     private void drawHomeView() {

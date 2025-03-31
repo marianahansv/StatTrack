@@ -1027,6 +1027,7 @@ import java.util.concurrent.atomic.AtomicReference;
         popupDialog.setTitle("Your Charts and Descriptive Statistics!");
         popupDialog.getDialogPane().setContent(wholeDisplay);
         popupDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+        popupDialog.getDialogPane().setPrefSize(1100,700);
         popupDialog.showAndWait();
     }
 
