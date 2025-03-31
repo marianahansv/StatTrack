@@ -53,7 +53,7 @@ public class DashboardView extends BorderPane {
     /**
      * The model that holds the historical data of each user and their goals
      */
-    private UserProgressHIstoryVisModel historicalChartModel;
+    UserProgressHIstoryVisModel historicalChartModel;
 
     /**
      * The model that holds the user's name and current/past goal trend/behaviour data of the application.
@@ -112,7 +112,7 @@ public class DashboardView extends BorderPane {
     /**
      * The visualization of the front end UI and the generation of the graphs for the application.
      */
-    private UserHIstoryProgressVisuals historicalChartProgress;
+    UserHIstoryProgressVisuals historicalChartProgress;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
@@ -141,7 +141,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button to go the historical data visualization page.
      */
-    private Button historicalChartButton;
+    Button historicalChartButton;
 
     /**
      * ScrollPane for adding vertical scrolling to all views.
@@ -169,7 +169,7 @@ public class DashboardView extends BorderPane {
         homeController = new HomeController();
         goalPlanController = new GoalPlanController();
         chartController = new GoalChartController(goalChartView, goalModel);
-        historicalChartController = new UserProgressHistoryController(historicalChartProgress, historicalChartModel);
+        historicalChartController = new UserProgressHistoryController(historicalChartModel);
         suggestionsController = new SuggestionsController(goalModel,suggestionsModel);
 
         // VIEWS
@@ -178,7 +178,7 @@ public class DashboardView extends BorderPane {
         this.goalPlanPage = new GoalPlanView();
         this.goalVisPage = new GoalVisView(goalModel);
         this.historicalChartView = new UserProgressHistoryVisView(historicalChartController);
-
+        this.historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartController);
         //goalChartView = new GoalProgress(goalModel);
 
         // ********* 2. Add subscribers to models *********

@@ -27,11 +27,9 @@ public class UserProgressHistoryController {
 
     /**
      * The constructor for the controller which is aware of both the model and the view page.
-     * @param historicalChartProgress: The view page for "Goal History" page.
      * @param historicalChartModel: The model page for the "Goal History" page.
      */
-    public UserProgressHistoryController(UserHIstoryProgressVisuals historicalChartProgress,
-                                                                    UserProgressHIstoryVisModel historicalChartModel) {
+    public UserProgressHistoryController(UserProgressHIstoryVisModel historicalChartModel) {
         this.historicalChartProgress = historicalChartProgress;
         this.historicalChartModel = historicalChartModel;
     }

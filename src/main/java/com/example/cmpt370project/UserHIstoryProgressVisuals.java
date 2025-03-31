@@ -27,73 +27,73 @@ import java.util.concurrent.atomic.AtomicReference;
     /**
      * The controller for the "Goal History" page.
      */
-    private UserProgressHistoryController historicalChartController;
+    protected UserProgressHistoryController historicalChartController;
 
     /**
      * CheckBox to select if the Pie Chart should be selected or not.
      */
-    private CheckBox checkboxPieChart;
+    protected CheckBox checkboxPieChart;
 
     /**
      * CheckBox to select if the Line Chart should be selected or not.
      */
-    private CheckBox checkboxLineChart;
+    protected CheckBox checkboxLineChart;
 
     /**
      * CheckBox to select if the Scatter Chart should be selected or not.
      */
-    private CheckBox checkboxScatterGraph;
+    protected CheckBox checkboxScatterGraph;
 
     /**
      * Radio Button to select if the user wants descriptive statistics to be
      * created alongside the graphs.
      */
-    private RadioButton includeDescriptiveStatistics;
+    protected RadioButton includeDescriptiveStatistics;
 
     /**
      * Radio Button to select if the user doesn't want descriptive statistics to be
      * created alongside the graphs.
      */
-    private RadioButton notincludeDescriptiveStatistics;
+    protected RadioButton notincludeDescriptiveStatistics;
 
     /**
      * Radio Button to select to allow the user to choose the red color as main
      * for the graphs.
      */
-    private RadioButton redcolorPreference;
+    protected RadioButton redcolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the purple color as main
      * for the graphs.
      */
-    private RadioButton purplecolorPreference;
+    protected RadioButton purplecolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the blue color as main
      * for the graphs.
      */
-    private RadioButton bluecolorPreference;
+    protected RadioButton bluecolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the orange color as main
      * for the graphs.
      */
-    private RadioButton orangecolorPreference;
+    protected RadioButton orangecolorPreference;
 
     /**
      * Piechart for the visualization purposes.
      */
-    private PieChart pieChart;
+    protected PieChart pieChart;
 
     /**
      * Linechart for the visualization purposes.
      */
-    private LineChart<String, Number> lineChart;
+    protected LineChart<String, Number> lineChart;
 
     /**
      * Scatter chart for the visualization purposes.
      */
-    private ScatterChart<String, Number> scatterChart;
+    protected ScatterChart<String, Number> scatterChart;
 
     /**
      * A VBox to store the descriptive statistics of the user's goals.
@@ -133,7 +133,7 @@ import java.util.concurrent.atomic.AtomicReference;
     /**
      * This is a button to generate the visualization based on the preferences set by the users.
      */
-    private Button generate_visualizaton;
+    protected Button generate_visualizaton;
 
 
     /**
@@ -388,7 +388,7 @@ import java.util.concurrent.atomic.AtomicReference;
         getChildren().addAll(horizontalbox_CP);
 
         /* Container for descriptive statistics */
-        HBox horizontalbox_DS = new HBox(30);
+        HBox horizontalbox_DS = new HBox(20);
         HBox horizontalbox_DS_label = new HBox(10);
         horizontalbox_DS_label.getChildren().addAll(new Label("Include Descriptive Statistics: "));
         horizontalbox_DS_label.setAlignment(Pos.BASELINE_LEFT);
@@ -400,7 +400,7 @@ import java.util.concurrent.atomic.AtomicReference;
         getChildren().addAll(horizontalbox_DS);
 
         /* Container for the generate button */
-        HBox horizontalbox_G = new HBox(30);
+        HBox horizontalbox_G = new HBox(20);
         horizontalbox_G.getChildren().addAll(generate_visualizaton, reset_visualization);
         horizontalbox_G.setAlignment(Pos.CENTER);
         getChildren().addAll(horizontalbox_G);
@@ -419,13 +419,13 @@ import java.util.concurrent.atomic.AtomicReference;
      * return:  VBox containing the Pie Chart inside it.
      */
     private VBox drawPieCharts() {
-        VBox pieChart_display = new VBox(10);
+        VBox pieChart_display = new VBox(20);
 
         /* Storing all useful information in the respective variables */
         pieChart = new PieChart();
         pieChart.setTitle("Pie Chart by Categories");
-        pieChart.setPrefWidth(400);
-        pieChart.setPrefHeight(400);
+        pieChart.setPrefWidth(500);
+        pieChart.setPrefHeight(500);
 
         /* Deriving all calculations used for the charts */
         List<Goal> easyGoals = historicalChartController.getEasyGoals();
@@ -485,7 +485,7 @@ import java.util.concurrent.atomic.AtomicReference;
         HBox curatedLegend = new HBox(10);
         int current_index_again = 0;
         for (PieChart.Data data: pieChart.getData()){
-            Rectangle colorbox = new Rectangle(20, 20); // Square to store the color
+            Rectangle colorbox = new Rectangle(10, 10); // Square to store the color
             colorbox.setFill(Color.web(shadesofColor[current_index_again % shadesofColor.length]));
             Text label_info = new Text(data.getName());
             curatedLegend.getChildren().addAll(colorbox, label_info);
@@ -501,7 +501,7 @@ import java.util.concurrent.atomic.AtomicReference;
      * return:  VBox containing the Line Chart inside it.
      */
     private VBox drawLineCharts() {
-        VBox lineChart_display = new VBox(10);
+        VBox lineChart_display = new VBox(20);
 
         /* Adding all the basics elements of the line chart together */
         CategoryAxis x_axis = new CategoryAxis();
@@ -600,7 +600,7 @@ import java.util.concurrent.atomic.AtomicReference;
         int current_index_again_LC = 0;
         for (Object series: lineChart.getData()){
             XYChart.Series<String, Number> series_LC = (XYChart.Series<String, Number>) series;
-            Rectangle colorbox_LC = new Rectangle(20, 20); // Square to store the color
+            Rectangle colorbox_LC = new Rectangle(10, 10); // Square to store the color
             colorbox_LC.setFill(Color.web(shadesofColor_LC[current_index_again_LC % shadesofColor_LC.length]));
             Text label_info = new Text(series_LC.getName());
             curatedLegend_LC.getChildren().addAll(colorbox_LC, label_info);
@@ -616,7 +616,7 @@ import java.util.concurrent.atomic.AtomicReference;
      * return:  VBox containing the Scatter Chart inside it.
      */
     private VBox drawScatterCharts(){
-        VBox scatterChart_display = new VBox(10);
+        VBox scatterChart_display = new VBox(20);
 
         /* Adding all the basic elements of the scatter chart together */
         CategoryAxis x_axis = new CategoryAxis();
@@ -685,7 +685,7 @@ import java.util.concurrent.atomic.AtomicReference;
         int current_index_again_SC = 0;
         for (Object series: scatterChart.getData()){
             XYChart.Series<String, Number> series_SC = (XYChart.Series<String, Number>) series;
-            Rectangle colorbox_SC = new Rectangle(20, 20); // Square to store the color
+            Rectangle colorbox_SC = new Rectangle(10, 10); // Square to store the color
             colorbox_SC.setFill(Color.web(shadesofColor_SC[current_index_again_SC % shadesofColor_SC.length]));
             Text label_info = new Text(series_SC.getName());
             curatedLegend_SC.getChildren().addAll(colorbox_SC, label_info);
@@ -968,7 +968,7 @@ import java.util.concurrent.atomic.AtomicReference;
      */
     private void resultsPageView(){
         /* Adds all the charts on the top of the page - Pie Chart, Line Chart and Scatter Graph */
-        HBox allCharts = new HBox(20);
+        HBox allCharts = new HBox(10);
         VBox noLineChart = new VBox(new Label("No Line Chart was selected by the user! "));
         noLineChart.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 16px;" + "-fx-background-color: #a3a2a2;" +
                              "-fx-padding: 10px;" + "-fx-background-radius: 5px;" + "-fx-wrap-text: true;");
@@ -1014,7 +1014,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
         /* The VBox containing the wholeDisplay will have everything we need which includes the three graphs
         * as well as the descriptive statistics at the bottom. */
-        VBox wholeDisplay = new VBox(30);
+        VBox wholeDisplay = new VBox(20);
         if (notincludeDescriptiveStatistics.isSelected()){
             wholeDisplay.getChildren().addAll(allCharts, noDescriptiveStatistics);
         }
@@ -1027,6 +1027,7 @@ import java.util.concurrent.atomic.AtomicReference;
         popupDialog.setTitle("Your Charts and Descriptive Statistics!");
         popupDialog.getDialogPane().setContent(wholeDisplay);
         popupDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+        popupDialog.getDialogPane().setPrefSize(1100,500);
         popupDialog.showAndWait();
     }
 
@@ -1245,7 +1246,7 @@ import java.util.concurrent.atomic.AtomicReference;
      * situation.
      * @return: a boolean value to indicate if the parameters have been set or not.
      */
-    private boolean isNoneSelected(){
+    boolean isNoneSelected(){
         return ((yearSelector_left.getValue().equals("2025")) && (yearSelector_right.getValue().equals("2025")) &&
                 ((rightmonth_grid_selector.getValue().equals("January"))) &&
                 ((leftmonth_grid_selector.getValue().equals("January")))
