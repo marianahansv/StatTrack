@@ -464,6 +464,7 @@ public class HomeView extends StackPane implements Subscriber {
     private void handleSuggestions(SuggestionsController s) {
         try {
             suggestionsBox.getChildren().clear();
+            endDatePicker.setValue(LocalDate.now());
             Goal newGoal = getGoalFromInput();
             s.validateInput(newGoal);
             List<String> suggestionsInText = s.handleButtonPress(newGoal);
@@ -680,15 +681,13 @@ public class HomeView extends StackPane implements Subscriber {
      * */
     public void acceptTimelineSuggestion(String suggestion){
         if (suggestion.contains("add")){
-            Pattern pattern = Pattern.compile("add\\s+(\\d+)"); // Match "add" followed by a space and digits
-            Matcher matcher = pattern.matcher(suggestion);
-            String numberOfDays = matcher.group(1);
+            String[] allStrings = suggestion.split(" ");
+            String numberOfDays = allStrings[allStrings.length - 2];
             endDatePicker.setValue(endDatePicker.getValue().plusDays(Long.parseLong(numberOfDays)));
         }
         else if (suggestion.contains("minus")){
-            Pattern pattern = Pattern.compile("minus\\s+(\\d+)"); // Match "add" followed by a space and digits
-            Matcher matcher = pattern.matcher(suggestion);
-            String numberOfDays = matcher.group(1);
+            String[] allStrings = suggestion.split(" ");
+            String numberOfDays = allStrings[allStrings.length - 2];
             endDatePicker.setValue(endDatePicker.getValue().minusDays(Long.parseLong(numberOfDays)));
         }
     }
