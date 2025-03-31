@@ -464,7 +464,6 @@ public class HomeView extends StackPane implements Subscriber {
     private void handleSuggestions(SuggestionsController s) {
         try {
             suggestionsBox.getChildren().clear();
-            endDatePicker.setValue(LocalDate.now());
             Goal newGoal = getGoalFromInput();
             s.validateInput(newGoal);
             List<String> suggestionsInText = s.handleButtonPress(newGoal);
