@@ -326,7 +326,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 if (progressDiff > 0) {
                     progressMessage = "You need to complete " + progressDiff + " more goals today to stay on track with your goal plan. Time to complete some goals!";
                 } else if (progressDiff == 0){
-                    progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with you goal plan. Props to you!";
+                    progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with your goal plan. Props to you!";
                 } else {
                     progressMessage = "You have completed " + -progressDiff + " more goals than your target number of goals. Overachiever!";
                 }
