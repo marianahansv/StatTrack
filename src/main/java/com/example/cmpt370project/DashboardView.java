@@ -343,10 +343,14 @@ public class DashboardView extends BorderPane implements Subscriber {
         dateLabel.setText(formatter.format(LocalDate.now()));
 
         Timeline timeline = new Timeline(
-                // Have date update every 60 seconds, to not affect focus change
-                new KeyFrame(Duration.seconds(60), e -> {
-                    dateLabel.setText(formatter.format(LocalDate.now()));
-                    userHistoryDataModel.updateCompletedValues(LocalDate.now());
+                // Have date update every second
+                new KeyFrame(Duration.seconds(1), e -> {
+                    String newTestDate = formatter.format(LocalDate.now());
+
+                    if (!newTestDate.equals(dateLabel.getText())) {
+                        dateLabel.setText(formatter.format(LocalDate.now()));
+                        userHistoryDataModel.updateCompletedValues(LocalDate.now());
+                    }
                 })
         );
         timeline.setCycleCount(Timeline.INDEFINITE);
