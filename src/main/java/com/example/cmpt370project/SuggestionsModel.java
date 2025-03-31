@@ -15,8 +15,8 @@ public class SuggestionsModel {
     private static final double OUTLIER_THRESHOLD_MULTIPLIER = 1.5;
     private static final double SIGNIFICANTLY_LONGER_STD_DEV = 2.5;
     private static final double SIGNIFICANTLY_SHORTER_STD_DEV = -2.5;
-    private static final double LATE_COMPLETION_THRESHOLD_PERCENTAGE = 0.3;
-    private static final double EARLY_COMPLETION_THRESHOLD_PERCENTAGE = -0.4;
+    private static final double LATE_COMPLETION_THRESHOLD_PERCENTAGE = 30;
+    private static final double EARLY_COMPLETION_THRESHOLD_PERCENTAGE = -35;
     private static final int MIN_GOALS_FOR_STATS = 3;
     private static final double HIGH_INCOMPLETE_GOAL_RATIO = 0.5;
     private static final int HIGH_INCOMPLETE_GOAL_COUNT = 5;
@@ -112,12 +112,14 @@ public class SuggestionsModel {
         long suggestedAdjustmentDays = Math.round(newGoalDuration * (averagePercentage/100));
         LocalDate suggestedDeadline = newGoal.getEndDate().plusDays(suggestedAdjustmentDays);
 
-        if (averagePercentage > LATE_COMPLETION_THRESHOLD_PERCENTAGE && suggestedAdjustmentDays != 0) {
+        if ( averagePercentage > LATE_COMPLETION_THRESHOLD_PERCENTAGE && suggestedAdjustmentDays != 0) {
             return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", averagePercentage) + "% late. Consider setting your deadline to " + suggestedDeadline.toString() + " (add " + suggestedAdjustmentDays + " days).";
-        } else if (averagePercentage < EARLY_COMPLETION_THRESHOLD_PERCENTAGE && suggestedAdjustmentDays > 1) {
+        } else if (averagePercentage < EARLY_COMPLETION_THRESHOLD_PERCENTAGE) {
             return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", Math.abs(averagePercentage)) + "% early. You might be able to set your deadline to " + suggestedDeadline.toString() + " (minus " + Math.abs(suggestedAdjustmentDays) + " days).";
         } else {
+            System.out.println(averagePercentage);
             return "Based on your past behaviour, your initial deadline it's perfect!";
+
         }
     }
 
