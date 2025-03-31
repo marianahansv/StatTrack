@@ -13,10 +13,7 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 import java.time.LocalDate;
@@ -27,7 +24,7 @@ import java.util.Optional;
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
  */
-public class DashboardView extends BorderPane {
+public class DashboardView extends BorderPane implements Subscriber {
 
     private GoalProgress goalChartView;
     private GoalChartController chartController;
@@ -148,6 +145,9 @@ public class DashboardView extends BorderPane {
      */
     private ScrollPane scrollPane;
 
+    // ************************* UI Elements for Dashboard Sidebar Widgets  *************************
+    private Label totalGoals;
+
     /**
      * Construct the dashboard view and MVC structure of the application.
      */
@@ -186,6 +186,7 @@ public class DashboardView extends BorderPane {
         // GOAL MODEL SUBS
         goalModel.addSubscriber(goalsPage);
         goalModel.addSubscriber(homePage);
+        goalModel.addSubscriber(this);
 
         // GOAL PLAN MODEL SUBS
         goalPlanModel.addSubscriber(goalPlanPage);
@@ -355,11 +356,30 @@ public class DashboardView extends BorderPane {
 
         dateModule.getChildren().addAll(dateIntro, dateLabel);
 
+        // Add goal summary data
+        VBox goalQuickSummaryModule = new VBox();
+        Label goalQuickSummaryTitle = new Label("\uD83C\uDFAF Goal Quick Summary:");
+        HBox totalGoalsRow = new HBox();
+        Label totalGoalsLabel = new Label("Total Tracked Goals: ");
+        totalGoals = new Label("" + goalModel.getGoals().size());
+
+        goalQuickSummaryTitle.getStyleClass().add("bigger-paragraph-text");
+        goalQuickSummaryTitle.setStyle("-fx-font-weight: bold");
+        totalGoals.getStyleClass().add("bigger-paragraph-text");
+        totalGoals.setStyle("-fx-font-weight: bold");
+        totalGoalsLabel.getStyleClass().add("bigger-paragraph-text");
+        goalQuickSummaryModule.getStyleClass().add("date-module");
+
+        totalGoalsRow.getChildren().addAll(totalGoalsLabel, totalGoals);
+
+        goalQuickSummaryModule.getChildren().addAll(goalQuickSummaryTitle, totalGoalsRow);
+
+
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
         VBox.setVgrow(sidebar, Priority.ALWAYS);
 
-        VBox sidebarParent = new VBox();
-        sidebarParent.getChildren().addAll(dateModule, sidebar);
+        VBox sidebarParent = new VBox(10);
+        sidebarParent.getChildren().addAll(dateModule, goalQuickSummaryModule, sidebar);
         sidebarParent.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
 
         this.setLeft(sidebarParent);
@@ -373,5 +393,11 @@ public class DashboardView extends BorderPane {
         footer.setAlignment(Pos.CENTER);
         footer.setStyle("-fx-background-color: lightgray; -fx-padding: 10px;");
         this.setBottom(footer);
+    }
+
+    @Override
+    public void modelUpdated() {
+        // Update the responsive elements of the Dashboard
+        totalGoals.setText("" + goalModel.getGoals().size());
     }
 }
