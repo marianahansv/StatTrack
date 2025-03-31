@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -1055,7 +1056,7 @@ import java.util.concurrent.atomic.AtomicReference;
         }
 
         /* If user doesn't pick the accurate startDate or endDate*/
-        if ((rightgrid_dates.get() == null) || (leftgrid_dates.get() == null)){
+        if ((Objects.equals(historicalChartController.getStartDate(), "0") || (Objects.equals(historicalChartController.getEndDate(), "0")))){
             Alert alert_three= new Alert(Alert.AlertType.WARNING);
             alert_three.setTitle("No dates have been selected! ");
             alert_three.setHeaderText(null);
@@ -1253,5 +1254,50 @@ import java.util.concurrent.atomic.AtomicReference;
                 && !redcolorPreference.isSelected()  && !orangecolorPreference.isSelected()
                 && !bluecolorPreference.isSelected() && !purplecolorPreference.isSelected()
                 && !includeDescriptiveStatistics.isSelected() && !notincludeDescriptiveStatistics.isSelected());
+    }
+
+    public static void main(String[] args){
+        System.out.println("Entering into test cases ...");
+        /* Test Case 1: No goals set in the parameter given */
+
+        /* Test Case 2: Setting no parameters on the Goal History page */
+
+        /* Test Case 3: Missing one parameter on the Goal History page */
+
+        /* Test Case 4: Picking a start date after the end date [day focused] */
+
+        /* Test Case 5: Picking a start date after the end date [months focused] */
+
+        /* Test Case 6: Picking a start date after the end date [year focused] */
+
+        /* Test Case 7: User clicks the Reset button */
+
+        /* Test Case 8: Viewing line chart without any descriptive statistics */
+
+        /* Test Case 9: Viewing line chart with the descriptive statistics */
+
+        /* Test Case 10: View the line chart and the descriptive statistics with user specified colors */
+
+        /* Test Case 11: Generating the graphs after re-tweaking the variables */
+
+        /* Test Case 12: View only line chart and the pie chart - placeholder for scatter graph */
+
+        /* Test Case 13: Delete goals and re-generate the descriptive statistics */
+
+        /* Test Case 14: Displaying the legend appropriately from the JSON files */
+
+        /* Test Case 15: Displaying the shades of the legend based on the color preference of the user */
+
+        /* Test Case 16: Descriptive statistics should only be in non-negative integers */
+
+        /* Test Case 17: Testing the difficulty levels descriptive statistics to ensure as expected */
+
+        /* Test Case 18: Testing the sections being displayed in the descriptive statistics */
+
+        /* Test Case 19: Ensuring that the colors in both the graphs and descriptive statistics are in the same family
+                         color */
+
+        /* Test Case 20: Checking the format of the start and the end date for all the graphical representations */
+        System.out.println("Completing all test cases ...");
     }
 }
