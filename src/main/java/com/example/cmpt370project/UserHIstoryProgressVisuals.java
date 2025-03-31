@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
     /**
      * CheckBox to select if the Line Chart should be selected or not.
      */
-    private CheckBox checkboxLineChart;
+    CheckBox checkboxLineChart;
 
     /**
      * CheckBox to select if the Scatter Chart should be selected or not.
@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicReference;
      * Radio Button to select if the user wants descriptive statistics to be
      * created alongside the graphs.
      */
-    private RadioButton includeDescriptiveStatistics;
+    RadioButton includeDescriptiveStatistics;
 
     /**
      * Radio Button to select if the user doesn't want descriptive statistics to be
@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicReference;
      * Radio Button to select to allow the user to choose the red color as main
      * for the graphs.
      */
-    private RadioButton redcolorPreference;
+    RadioButton redcolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the purple color as main
@@ -72,7 +72,7 @@ import java.util.concurrent.atomic.AtomicReference;
      * Radio Button to select to allow the user to choose the blue color as main
      * for the graphs.
      */
-    private RadioButton bluecolorPreference;
+    RadioButton bluecolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the orange color as main
@@ -133,7 +133,7 @@ import java.util.concurrent.atomic.AtomicReference;
     /**
      * This is a button to generate the visualization based on the preferences set by the users.
      */
-    private Button generate_visualizaton;
+    Button generate_visualizaton;
 
 
     /**
@@ -1246,7 +1246,7 @@ import java.util.concurrent.atomic.AtomicReference;
      * situation.
      * @return: a boolean value to indicate if the parameters have been set or not.
      */
-    private boolean isNoneSelected(){
+    boolean isNoneSelected(){
         return ((yearSelector_left.getValue().equals("2025")) && (yearSelector_right.getValue().equals("2025")) &&
                 ((rightmonth_grid_selector.getValue().equals("January"))) &&
                 ((leftmonth_grid_selector.getValue().equals("January")))

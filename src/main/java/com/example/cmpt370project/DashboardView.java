@@ -103,7 +103,7 @@ public class DashboardView extends BorderPane {
     /**
      * The visualization of the front end UI and the generation of the graphs for the application.
      */
-    private UserHIstoryProgressVisuals historicalChartProgress;
+    UserHIstoryProgressVisuals historicalChartProgress;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
@@ -132,7 +132,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button to go the historical data visualization page.
      */
-    private Button historicalChartButton;
+    Button historicalChartButton;
 
     /**
      * ScrollPane for adding vertical scrolling to all views.
