@@ -88,6 +88,7 @@ public class HomeView extends StackPane implements Subscriber {
             "Be proud of how far you’ve come, but keep going!",
             "Goals are dreams with deadlines. Let’s make them happen!"
     };
+    private String[] emojis = {"🎯"," "};
     private String[] greetings = {
             "Hi",
             "Hello",
@@ -186,7 +187,7 @@ public class HomeView extends StackPane implements Subscriber {
         userGreeting.setText(currentGreeting + ", User! Let's complete some goals.");
 
         // Add goal page elements
-        addGoalTitleLabel = new Label("Let's Add a New Goal:");
+        addGoalTitleLabel = new Label("Let's Add a New Goal 🎯");
         addGoalTitleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
         submitGoalButton = new Button("Add Goal");
