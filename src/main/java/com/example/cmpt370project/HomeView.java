@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -110,6 +112,8 @@ public class HomeView extends StackPane implements Subscriber {
     private HBox addGoalFormRow1;
     private HBox addGoalFormRow2;
     private HBox addGoalFormRow3;
+    private HBox addGoalFormRow4;
+    private VBox suggestionsBox;
     private VBox addGoalForm;
     private ToggleGroup sectionToggleGroup;
     private final DatePicker startDatePicker;
@@ -201,7 +205,8 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalFormRow1 = new HBox(20);
         addGoalFormRow2 = new HBox(20);
         addGoalFormRow3 = new HBox(20);
-        addGoalForm = new VBox(35);
+        addGoalFormRow4 = new HBox(20);
+        addGoalForm = new VBox(30);
 
         suggestionsContentLabel = new Label("");
 
@@ -458,10 +463,15 @@ public class HomeView extends StackPane implements Subscriber {
      */
     private void handleSuggestions(SuggestionsController s) {
         try {
+            suggestionsBox.getChildren().clear();
+            endDatePicker.setValue(LocalDate.now());
             Goal newGoal = getGoalFromInput();
             s.validateInput(newGoal);
-            String suggestionsInText = s.handleButtonPress(newGoal);
-            suggestionsContentLabel.setText(suggestionsInText);
+            List<String> suggestionsInText = s.handleButtonPress(newGoal);
+            for (String suggestion: suggestionsInText){
+                suggestionsBox.getChildren().add(createSuggestionBox(suggestion));
+            }
+            suggestionsContentLabel.setText("Here's what I found...");
         } catch (InputMismatchException e) {
             showErrorAlert(e.getMessage());
         }
@@ -481,7 +491,7 @@ public class HomeView extends StackPane implements Subscriber {
     private void resetAddGoalPage() {
         titleInput.clear();
         difficultyComboBox.setValue("Medium");
-        sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().getFirst());
+        sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().get(0));
     }
 
     private void drawHomeView() {
@@ -582,6 +592,7 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalFormRow1.getChildren().clear();
         addGoalFormRow2.getChildren().clear();
         addGoalFormRow3.getChildren().clear();
+        addGoalFormRow4.getChildren().clear();
         addGoalForm.getChildren().clear();
 
         submitGoalButton.getStyleClass().add("button");
@@ -590,55 +601,94 @@ public class HomeView extends StackPane implements Subscriber {
         giveMeSuggestionsButton.getStyleClass().add("suggestions-button");
         cancelAddGoalButton.getStyleClass().add("button");
         cancelAddGoalButton.getStyleClass().add("cancel-button");
-
+        Label sectionLabel = new Label("Want Suggestions on Your New Goal, " + userHistoryDataModel.getUserName() + "?");
+        sectionLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
         //organize UI elements
         addGoalFormRow1.getChildren().addAll(new Label("Goal Title:"), titleInput, new Label("Sections:"), sectionButtons);
         addGoalFormRow2.getChildren().addAll(new Label("Difficulty:"), difficultyComboBox,
                 new Label("Start Date:"), startDatePicker,
                 new Label("End Date:"), endDatePicker);
-        addGoalFormRow3.getChildren().addAll(giveMeSuggestionsButton, submitGoalButton, cancelAddGoalButton);
+        addGoalFormRow3.getChildren().addAll(giveMeSuggestionsButton,submitGoalButton, cancelAddGoalButton);
+        addGoalFormRow4.getChildren().addAll(sectionLabel);
 
-        addGoalForm.getChildren().addAll(addGoalFormRow1, addGoalFormRow2, addGoalFormRow3);
+        addGoalForm.getChildren().addAll(addGoalFormRow1, addGoalFormRow2, addGoalFormRow3, addGoalFormRow4);
         titleInput.setPrefWidth(275);
 
         if (sectionToggleGroup.getSelectedToggle() == null && !sectionToggleGroup.getToggles().isEmpty()) {
             sectionToggleGroup.selectToggle(sectionToggleGroup.getToggles().get(0));
         }
 
-        //box for suggestions!
-        Label sectionLabel = new Label("Want Suggestions on Your New Goal, " + userHistoryDataModel.getUserName() + "?");
-        sectionLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         String suggestionsContent = "Click the button to find out!";
         suggestionsContentLabel.setText(suggestionsContent);
-        suggestionsContentLabel.setStyle("-fx-font-size: 14px;");
+        suggestionsContentLabel.setStyle("-fx-font-size: 16px;");
 
-        VBox suggestionsBox = new VBox();
-        suggestionsBox.setSpacing(10);
-        suggestionsBox.setPadding(new Insets(10));
+        suggestionsBox = new VBox();
+        suggestionsBox.setSpacing(4);
+        //suggestionsBox.setPadding(new Insets(10));
 //        suggestionsBox.setStyle("-fx-border-color: grey; -fx-border-width: 2px; -fx-background-color: #f9f9f9;");
         suggestionsBox.getStyleClass().add("module");
         suggestionsBox.getChildren().addAll(suggestionsContentLabel);
 
         // Spacer (to separate Form from suggestions)
 
-        Region spacer1 = new Region();
+        //Region spacer1 = new Region();
 
         root.getChildren().addAll(
                 addGoalTitleLabel,
                 addGoalForm,
-                spacer1,
-                sectionLabel,
+                //spacer1,
                 suggestionsBox
         );
 
         //selecting general section toggle
-        Toggle default_toggle = sectionToggleGroup.getToggles().getFirst();
+        Toggle default_toggle = sectionToggleGroup.getToggles().get(0);
         for (Toggle t : sectionToggleGroup.getToggles()) {
             if (default_toggle.equals(t)) t.setSelected(true);
             else {
                 t.setSelected(false);
             }
 
+        }
+    }
+    /**
+     * Helper method to create each suggestion box
+     * */
+    private HBox createSuggestionBox(String content) {
+        Label suggestionContentLabel = new Label(content);
+        suggestionContentLabel.setStyle("-fx-font-size: 14px;");
+        suggestionContentLabel.setWrapText(true);
+
+        HBox suggestionBox = new HBox(30); // 10px spacing between elements
+        suggestionBox.getChildren().addAll(suggestionContentLabel);
+        if (content.contains("you tend to finish around"))
+        {
+            Button acceptButton = new Button("Change it! ✅");
+            acceptButton.setPrefWidth(300);
+            acceptButton.setOnAction(e -> {
+                acceptTimelineSuggestion(content);
+                acceptButton.setDisable(true);
+            });
+            suggestionBox.getChildren().add(acceptButton);
+        }
+        suggestionBox.setSpacing(10);
+        suggestionBox.getStyleClass().add("module");
+
+        return suggestionBox;
+    }
+
+    /**
+     * Updates the view timeline for the goal after user accepts changes
+     * */
+    public void acceptTimelineSuggestion(String suggestion){
+        if (suggestion.contains("add")){
+            String[] allStrings = suggestion.split(" ");
+            String numberOfDays = allStrings[allStrings.length - 2];
+            endDatePicker.setValue(endDatePicker.getValue().plusDays(Long.parseLong(numberOfDays)));
+        }
+        else if (suggestion.contains("minus")){
+            String[] allStrings = suggestion.split(" ");
+            String numberOfDays = allStrings[allStrings.length - 2];
+            endDatePicker.setValue(endDatePicker.getValue().minusDays(Long.parseLong(numberOfDays)));
         }
     }
 
