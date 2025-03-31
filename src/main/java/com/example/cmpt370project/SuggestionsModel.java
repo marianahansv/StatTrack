@@ -13,58 +13,72 @@ public class SuggestionsModel {
 
     /*Stats constants used in score calculations for the suggestions*/
     private static final double OUTLIER_THRESHOLD_MULTIPLIER = 1.5;
-    private static final double SIGNIFICANTLY_LONGER_STD_DEV = 1.5;
-    private static final double SIGNIFICANTLY_SHORTER_STD_DEV = -1.5;
-    private static final double LATE_COMPLETION_THRESHOLD_PERCENTAGE = 10.0;
-    private static final double EARLY_COMPLETION_THRESHOLD_PERCENTAGE = -10.0;
+    private static final double SIGNIFICANTLY_LONGER_STD_DEV = 2.5;
+    private static final double SIGNIFICANTLY_SHORTER_STD_DEV = -2.5;
+    private static final double LATE_COMPLETION_THRESHOLD_PERCENTAGE = 0.3;
+    private static final double EARLY_COMPLETION_THRESHOLD_PERCENTAGE = -0.4;
     private static final int MIN_GOALS_FOR_STATS = 3;
     private static final double HIGH_INCOMPLETE_GOAL_RATIO = 0.5;
     private static final int HIGH_INCOMPLETE_GOAL_COUNT = 5;
 
     public SuggestionsModel() {
     }
-
     public void initializeSuggestionsModel(List<Goal> goals) {
         this.goals = goals;
     }
-
     public void updateGoalList(List<Goal> goals) {
         this.goals = goals;
     }
-
-
-
     /**
      * Generates a task breakdown suggestion based on historical goal completion data.
      */
     public String getTaskBreakdownSuggestion(Goal newGoal) {
+
         String difficulty = newGoal.getDifficulty();
         List<Goal> completedGoalsOfDifficulty = goals.stream()
                 .filter(Goal::isCompleted)
                 .filter(g -> g.getDifficulty().equals(difficulty))
                 .toList();
+
         if (completedGoalsOfDifficulty.size() < MIN_GOALS_FOR_STATS) {
             return "I don't have enough data to suggest a goal breakdown!";
         }
+
         List<Long> durations = completedGoalsOfDifficulty.stream()
                 .map(g -> ChronoUnit.DAYS.between(g.getStartDate(), g.getEndDate()))
                 .collect(Collectors.toList());
         List<Long> nonOutlierDurations = excludeOutliers(durations);
+
         if (nonOutlierDurations.isEmpty()) {
-            return "I don't have enough reliable data suggest a goal breakdown!";
+            return "Your behaviour is still unpredictable for me...let's finish more goals!";
         }
+
         double averageDuration = nonOutlierDurations.stream().mapToLong(Long::longValue).average().orElse(0);
         double stdDev = calculateStandardDeviation(nonOutlierDurations, averageDuration);
         long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
         double stdDevsAway = (newGoalDuration - averageDuration) / stdDev;
 
-        if (stdDev > 0 && stdDevsAway > SIGNIFICANTLY_LONGER_STD_DEV) {
-            long suggestedTasks = Math.max(2, Math.round((double) newGoalDuration / averageDuration));
-            return "This goal is significantly longer than your typical " + difficulty + " goals. Consider breaking it down into " + suggestedTasks + " smaller goals.";
-        } else if (stdDev > 0 && stdDevsAway < SIGNIFICANTLY_SHORTER_STD_DEV && completedGoalsOfDifficulty.size() > MIN_GOALS_FOR_STATS * 2) {
-            return "This goal is significantly shorter than your typical " + difficulty + " goals. You might consider combining it with another goal if possible.";
-        } else {
-            return "The size of this goal seems to align with your typical " + difficulty + " completed goals.";
+        if (stdDevsAway > SIGNIFICANTLY_LONGER_STD_DEV && (newGoalDuration - averageDuration) > averageDuration*0.5) {
+            long suggestedTasks = (long) Math.max(2, Math.round((newGoalDuration / averageDuration))*0.6);
+            return String.format(
+                    "This %s goal (%d days) is significantly longer than your average (%ddays). " +
+                            "Consider breaking it into %d smaller goals of about %d days each.",
+                    difficulty, newGoalDuration, (long)averageDuration,
+                    suggestedTasks, (long)Math.ceil(averageDuration)
+            );
+        }
+        else if (stdDevsAway < SIGNIFICANTLY_SHORTER_STD_DEV && (averageDuration-newGoalDuration) > averageDuration*0.3) {
+            return String.format(
+                    "This %s goal (%d days) is significantly shorter than your average (%d days). " +
+                            "You might want to combine it with another goal!",
+                    difficulty, newGoalDuration, (long)averageDuration
+            );
+        }
+        else {
+            return String.format(
+                    "This %s goal (%d days) fits well with your typical duration range (%d days). No need to break it down!!",
+                    difficulty, newGoalDuration, (long)averageDuration
+            );
         }
     }
 
@@ -72,6 +86,7 @@ public class SuggestionsModel {
      * Generates a timeline suggestion for a new goal based on historical goal completion data.
      */
     public String getTimelineSuggestion(Goal newGoal) {
+
         String difficulty = newGoal.getDifficulty();
         List<Goal> completedGoalsOfDifficulty = goals.stream()
                 .filter(Goal::isCompleted)
@@ -94,12 +109,12 @@ public class SuggestionsModel {
 
         double averagePercentage = nonOutlierPercentages.stream().mapToDouble(Double::doubleValue).average().orElse(0);
         long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
-        long suggestedAdjustmentDays = Math.round(newGoalDuration * (averagePercentage*0.8 / 100.0));
+        long suggestedAdjustmentDays = Math.round(newGoalDuration * (averagePercentage/100));
         LocalDate suggestedDeadline = newGoal.getEndDate().plusDays(suggestedAdjustmentDays);
 
-        if (averagePercentage > LATE_COMPLETION_THRESHOLD_PERCENTAGE) {
+        if (averagePercentage > LATE_COMPLETION_THRESHOLD_PERCENTAGE && suggestedAdjustmentDays != 0) {
             return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", averagePercentage) + "% late. Consider setting your deadline to " + suggestedDeadline.toString() + " (add " + suggestedAdjustmentDays + " days).";
-        } else if (averagePercentage < EARLY_COMPLETION_THRESHOLD_PERCENTAGE) {
+        } else if (averagePercentage < EARLY_COMPLETION_THRESHOLD_PERCENTAGE && suggestedAdjustmentDays > 1) {
             return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", Math.abs(averagePercentage)) + "% early. You might be able to set your deadline to " + suggestedDeadline.toString() + " (minus " + Math.abs(suggestedAdjustmentDays) + " days).";
         } else {
             return "Based on your past behaviour, your initial deadline it's perfect!";
@@ -174,6 +189,7 @@ public class SuggestionsModel {
         if (data.size() < 3) {
             return new ArrayList<>(data);
         }
+
         List<Long> sortedData = new ArrayList<>(data);
         Collections.sort(sortedData);
 
@@ -213,9 +229,6 @@ public class SuggestionsModel {
     }
 
     private double calculateStandardDeviation(List<Long> data, double mean) {
-        if (data.size() < 2) {
-            return 0;
-        }
         double sumOfSquares = 0;
         for (long val : data) {
             sumOfSquares += Math.pow(val - mean, 2);
