@@ -71,8 +71,6 @@ public class HomeController {
                 gm.clearGoals();
             }
         });
-
-
     }
 
     public void handleChangeName(ActionEvent actionEvent) {
@@ -87,7 +85,7 @@ public class HomeController {
 
         if (result.isPresent() && !result.get().isBlank()) {
             userHistoryDataModel.setUserName(result.get().trim());
-        } else if (result.get().isBlank()) {
+        } else if (result.isPresent() && result.get().isBlank()) {
             userHistoryDataModel.setUserName("User");
         }
     }

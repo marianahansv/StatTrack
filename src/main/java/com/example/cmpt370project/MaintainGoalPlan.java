@@ -18,12 +18,18 @@ public class MaintainGoalPlan implements IGoalPlan {
     private int goalMaintenanceNumber;
 
     /**
+     * The start date of this plan.
+     */
+    private LocalDate startDate;
+
+    /**
      * Create this goal plan.
      * @param goalMaintenanceNumber The number of goals the user wants to maintain on the regular.
      */
     public MaintainGoalPlan(int goalMaintenanceNumber, Timeline timeline) {
         this.goalMaintenanceNumber = goalMaintenanceNumber;
         this.timeline = timeline;
+        this.startDate = LocalDate.now();
     }
 
     @Override
@@ -88,6 +94,22 @@ public class MaintainGoalPlan implements IGoalPlan {
     @Override
     public boolean isPlanFinished(LocalDate date) {
         // This goal plan has no end date.
+        return false;
+    }
+
+    @Override
+    public LocalDate getPlanStartDate() {
+        return startDate;
+    }
+
+    @Override
+    public LocalDate getPlanEndDate() {
+        // This goal plan has no end date.
+        return null;
+    }
+
+    @Override
+    public boolean hasEndDate() {
         return false;
     }
 }

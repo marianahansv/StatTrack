@@ -1,24 +1,31 @@
 package com.example.cmpt370project;
 
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
  */
-public class DashboardView extends BorderPane {
+public class DashboardView extends BorderPane implements Subscriber {
 
     private GoalProgress goalChartView;
     private GoalChartController chartController;
@@ -80,7 +87,7 @@ public class DashboardView extends BorderPane {
     /**
      * The goals page of the application.
      */
-    private GoalView goalsPage;
+    GoalView goalsPage;
 
     /**
      * The goal plan page of the application.
@@ -117,7 +124,7 @@ public class DashboardView extends BorderPane {
     /**
      * The button for going to the goals page.
      */
-    private Button goalsButton;
+    Button goalsButton;
 
     /**
      * The button for going to the goal plan page.
@@ -138,6 +145,12 @@ public class DashboardView extends BorderPane {
      * ScrollPane for adding vertical scrolling to all views.
      */
     private ScrollPane scrollPane;
+
+    // ************************* UI Elements for Dashboard Sidebar Widgets  *************************
+    private Label totalGoals;
+    private Label dailyCompleted;
+    private Label weeklyCompleted;
+    private Label nearestDeadline;
 
     /**
      * Construct the dashboard view and MVC structure of the application.
@@ -177,6 +190,7 @@ public class DashboardView extends BorderPane {
         // GOAL MODEL SUBS
         goalModel.addSubscriber(goalsPage);
         goalModel.addSubscriber(homePage);
+        goalModel.addSubscriber(this);
 
         // GOAL PLAN MODEL SUBS
         goalPlanModel.addSubscriber(goalPlanPage);
@@ -186,6 +200,7 @@ public class DashboardView extends BorderPane {
         userHistoryDataModel.addSubscriber(goalPlanPage);
         userHistoryDataModel.addSubscriber(goalsPage);
         userHistoryDataModel.addSubscriber(homePage);
+        userHistoryDataModel.addSubscriber(this);
         historicalChartModel.addSubscriber(historicalChartView);
 
         // ********* 3. Setup controller with each view *********
@@ -237,7 +252,10 @@ public class DashboardView extends BorderPane {
         setupDashboardViewUI();
 
         // Set up page change interactions on button press
-        homeButton.setOnAction(e -> scrollPane.setContent(homePage));
+        homeButton.setOnAction(e -> {
+            scrollPane.setContent(homePage);
+            homePage.changePage(HomeView.HomeViewPage.HOME);
+        });
         goalsButton.setOnAction(e -> scrollPane.setContent(goalsPage));
         goalPlanButton.setOnAction(e -> {
             goalPlanPage.setPageToSummaryView();
@@ -247,22 +265,26 @@ public class DashboardView extends BorderPane {
 
         // If first time running the app, get the users name
         // Do this here in this class, because not specific to any view
-        if (userHistoryDataModel.isFirstOpen()) {
-            // Create a TextInputDialog
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Welcome to your Goal Planning Application!");
-            dialog.setHeaderText("Please enter your name:");
-            dialog.setContentText("Name:");
 
-            // Show the dialog and capture the input
-            Optional<String> result = dialog.showAndWait();
+        Platform.runLater(() -> {
+            if (userHistoryDataModel.isFirstOpen()) {
+                // Create a TextInputDialog
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Welcome to StatTrack!");
+                dialog.setHeaderText("Please enter your name:");
+                dialog.setContentText("Name:");
 
-            if (result.isPresent() && !result.get().isBlank()) {
-                userHistoryDataModel.setUserName(result.get().trim());
-            } else {
-                userHistoryDataModel.setUserName("User");
+                // Show the dialog and capture the input
+                Optional<String> result = dialog.showAndWait();
+
+                if (result.isPresent() && !result.get().isBlank()) {
+                    userHistoryDataModel.setUserName(result.get().trim());
+                } else {
+                    userHistoryDataModel.setUserName("User");
+                }
             }
-        }
+        });
+
 
         // ************************* POPULATE DUMMY DATA *************************
         // Here is where we can manually set data to show for testing/demo purposes!!
@@ -283,9 +305,14 @@ public class DashboardView extends BorderPane {
         this.getStylesheets().add(getClass().getResource("/homepage.css").toExternalForm());
 
         // --- header ---
-        HBox header = new HBox(new Label("Goal Tracker Dashboard"));
+        Image appLogo = new Image((Objects.requireNonNull(getClass().getResourceAsStream("/StatTrackLogo.png"))));
+        ImageView appLogoView = new ImageView(appLogo);
+        appLogoView.setFitHeight(32);  // Set the width of the image
+        appLogoView.setPreserveRatio(true);
+
+        HBox header = new HBox(appLogoView);
         header.setAlignment(Pos.CENTER);
-        header.setStyle("-fx-background-color: lightgray; -fx-padding: 5px;");
+        header.setStyle("-fx-background-color: lightgray; -fx-padding: 7px;");
         this.setTop(header);
 
         // --- sidebar ---
@@ -306,17 +333,105 @@ public class DashboardView extends BorderPane {
         goalVisButton.setMaxWidth(Double.MAX_VALUE);
         historicalChartButton.setMaxWidth(Double.MAX_VALUE);
 
-        //
+        // Style the buttons
         homeButton.getStyleClass().add("cbutton");
         goalsButton.getStyleClass().add("cbutton");
         goalPlanButton.getStyleClass().add("cbutton");
         goalVisButton.getStyleClass().add("cbutton");
         historicalChartButton.getStyleClass().add("cbutton");
 
+        // Add current date display
+        Label dateLabel = new Label();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy");
+        dateLabel.setText(formatter.format(LocalDate.now()));
+
+        Timeline timeline = new Timeline(
+                // Have date update every second
+                new KeyFrame(Duration.seconds(1), e -> {
+                    String newTestDate = formatter.format(LocalDate.now());
+
+                    if (!newTestDate.equals(dateLabel.getText())) {
+                        dateLabel.setText(formatter.format(LocalDate.now()));
+                        userHistoryDataModel.updateCompletedValues(LocalDate.now());
+                    }
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+        VBox dateModule = new VBox();
+        Label dateIntro = new Label("\uD83D\uDCC5 Today's date is:");
+
+        dateLabel.getStyleClass().add("bigger-paragraph-text");
+        dateIntro.getStyleClass().add("bigger-paragraph-text");
+        dateLabel.setStyle("-fx-font-weight: bold");
+        dateModule.getStyleClass().add("date-module");
+
+        dateModule.getChildren().addAll(dateIntro, dateLabel);
+
+        // Add goal summary data
+        VBox goalQuickSummaryModule = new VBox();
+        Label goalQuickSummaryTitle = new Label("\uD83C\uDFAF Goal Quick Summary:");
+        HBox totalGoalsRow = new HBox();
+        Label totalGoalsLabel = new Label("Total Tracked Goals: ");
+        totalGoals = new Label("" + goalModel.getGoals().size());
+
+        HBox dailyCompletedRow = new HBox();
+        Label dailyCompletedLabel = new Label("Goals Completed Today: ");
+        dailyCompleted = new Label("" + userHistoryDataModel.getDailyCompletedGoals());
+
+        HBox weeklyCompletedRow = new HBox();
+        Label weeklyCompletedLabel = new Label("Goals Completed This Week: ");
+        weeklyCompleted = new Label("" + userHistoryDataModel.getWeeklyCompletedGoals());
+
+        goalQuickSummaryTitle.getStyleClass().add("bigger-paragraph-text");
+        goalQuickSummaryTitle.setStyle("-fx-font-weight: bold");
+        totalGoals.getStyleClass().add("bigger-paragraph-text");
+        totalGoals.setStyle("-fx-font-weight: bold");
+        weeklyCompleted.getStyleClass().add("bigger-paragraph-text");
+        weeklyCompleted.setStyle("-fx-font-weight: bold");
+        dailyCompleted.getStyleClass().add("bigger-paragraph-text");
+        dailyCompleted.setStyle("-fx-font-weight: bold");
+        totalGoalsLabel.getStyleClass().add("bigger-paragraph-text");
+        weeklyCompletedLabel.getStyleClass().add("bigger-paragraph-text");
+        dailyCompletedLabel.getStyleClass().add("bigger-paragraph-text");
+        goalQuickSummaryModule.getStyleClass().add("date-module");
+
+        totalGoalsRow.getChildren().addAll(totalGoalsLabel, totalGoals);
+        weeklyCompletedRow.getChildren().addAll(weeklyCompletedLabel, weeklyCompleted);
+        dailyCompletedRow.getChildren().addAll(dailyCompletedLabel, dailyCompleted);
+
+        goalQuickSummaryModule.getChildren().addAll(goalQuickSummaryTitle, dailyCompletedRow, weeklyCompletedRow, totalGoalsRow);
+
+        // Add nearest deadline module
+        VBox nearestDeadlineModule = new VBox();
+        Label nearestDeadlineTitle = new Label("⏰ Your next goal deadline is:");
+
+        LocalDate nearestDeadlineDate = findNextDeadline();
+
+        if (nearestDeadlineDate != null && (nearestDeadlineDate.isAfter(LocalDate.now()) || nearestDeadlineDate.isEqual(LocalDate.now()))) {
+            nearestDeadline = new Label("" + formatter.format(nearestDeadlineDate));
+        } else {
+            nearestDeadline = new Label("Never—time to make a goal!");
+        }
+
+        nearestDeadlineTitle.getStyleClass().add("bigger-paragraph-text");
+        nearestDeadline.setStyle("-fx-font-weight: bold");
+        nearestDeadline.getStyleClass().add("bigger-paragraph-text");
+        nearestDeadlineModule.getStyleClass().add("next-deadline-module");
+
+        nearestDeadlineModule.getChildren().addAll(nearestDeadlineTitle, nearestDeadline);
+
+
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
-        sidebar.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
         VBox.setVgrow(sidebar, Priority.ALWAYS);
-        this.setLeft(sidebar);
+
+        VBox sidebarParent = new VBox(10);
+        sidebarParent.getChildren().addAll(dateModule, goalQuickSummaryModule, nearestDeadlineModule, sidebar);
+        sidebarParent.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
+
+        this.setLeft(sidebarParent);
 
         // --- center ---
         this.setCenter(scrollPane);
@@ -327,5 +442,52 @@ public class DashboardView extends BorderPane {
         footer.setAlignment(Pos.CENTER);
         footer.setStyle("-fx-background-color: lightgray; -fx-padding: 10px;");
         this.setBottom(footer);
+    }
+
+    @Override
+    public void modelUpdated() {
+        // Update the responsive elements of the Dashboard
+        if (totalGoals != null) {
+            totalGoals.setText("" + goalModel.getGoals().size());
+        }
+
+        if (weeklyCompleted != null) {
+            weeklyCompleted.setText("" + userHistoryDataModel.getWeeklyCompletedGoals());
+        }
+
+        if (dailyCompleted != null) {
+            dailyCompleted.setText("" + userHistoryDataModel.getDailyCompletedGoals());
+        }
+
+        if (nearestDeadline != null) {
+            LocalDate nearestDeadlineDate = findNextDeadline();
+
+            if (nearestDeadlineDate != null && (nearestDeadlineDate.isAfter(LocalDate.now()) || nearestDeadlineDate.isEqual(LocalDate.now()))) {
+                nearestDeadline.setText("" + nearestDeadlineDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")));
+            } else {
+                nearestDeadline.setText("Never—Time to make a goal!");
+            }
+        }
+    }
+
+    /**
+     * Helper method to calculate the nearest deadline.
+     * @return the nearest goal deadline.
+     */
+    private LocalDate findNextDeadline() {
+        LocalDate nextDeadline = null;
+
+        for (Goal goal: this.goalModel.getGoals()) {
+
+            if (nextDeadline == null && !goal.isCompleted()) {
+                nextDeadline = goal.getEndDate();
+            } else if (!goal.isCompleted()) {
+                if (goal.getEndDate().isBefore(nextDeadline)) {
+                    nextDeadline = goal.getEndDate();
+                }
+            }
+
+        }
+        return nextDeadline;
     }
 }

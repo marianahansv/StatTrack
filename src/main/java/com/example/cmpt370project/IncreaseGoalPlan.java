@@ -178,6 +178,37 @@ public class IncreaseGoalPlan implements IGoalPlan {
         return date.isAfter(endDate) || date.equals(endDate);
     }
 
+    @Override
+    public LocalDate getPlanStartDate() {
+        return startDate;
+    }
+
+    @Override
+    public LocalDate getPlanEndDate() {
+        return endDate;
+    }
+
+    @Override
+    public boolean hasEndDate() {
+        return true;
+    }
+
+    /**
+     * Get the next increment date.
+     * @return the next day that the plan will increment.
+     */
+    public LocalDate getNextIncrementDate() {
+        return nextIncrementDate;
+    }
+
+    /**
+     * Get the new current goal number to completing at the next increment date.
+     * @return the new current goal number to completing at the next increment date.
+     */
+    public int getNextIncrementValue() {
+        return (int) Math.round(currGoalNumberDouble + goalNumberIncrement);
+    }
+
     /**
      * Unit testing for increase plan increment logic.
      */
