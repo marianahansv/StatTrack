@@ -29,10 +29,13 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber 
         Label enterlabel = new Label("Let's Visualize Your Goal History: ");
         enterlabel.setStyle("-fx-font-weight: bold; -fx-font-size: 28px");
 
+        Label goalVisSubtitle = new Label("Fill out the following fields to view your historical goal data for a specified time period of your choice.");
+        goalVisSubtitle.getStyleClass().add("bigger-paragraph-text");
+
         // Space down the calendar a little more
         Region spacer = new Region();
 
-        root.getChildren().add(enterlabel);
+        root.getChildren().addAll(new VBox(25, enterlabel, goalVisSubtitle), new Region());
         root.setAlignment(Pos.TOP_LEFT);
         historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartController);
         root.getChildren().addAll(spacer, historicalChartProgress);
