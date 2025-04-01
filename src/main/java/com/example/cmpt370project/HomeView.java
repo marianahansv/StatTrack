@@ -404,6 +404,7 @@ public class HomeView extends StackPane implements Subscriber {
     public void modelUpdated() {
         // If a section is currently selected, update its goals display; otherwise, redraw the view.
         if (currentViewPage == HomeViewPage.HOME && sectionToggleGroup.getSelectedToggle() != null) {
+            drawView();
             String selectedSection = ((ToggleButton) sectionToggleGroup.getSelectedToggle()).getText();
             updateGoalsDisplay(selectedSection);
             if (userHistoryDataModel != null) {
@@ -504,14 +505,6 @@ public class HomeView extends StackPane implements Subscriber {
         root.setSpacing(20);
         root.setPadding(new Insets(20));
 
-        Label sectionTitle = new Label("Here are your current goal sections:");
-        sectionTitle.getStyleClass().add("bigger-paragraph-text");
-
-        // hbox for title and sections
-        HBox titleAndButtons = new HBox(10);
-        titleAndButtons.setAlignment(Pos.CENTER_LEFT);
-        titleAndButtons.getChildren().addAll(sectionTitle);
-
         FlowPane sectionButtonsBox = new FlowPane();
         sectionButtonsBox.getStyleClass().add("flow-pane");
         sectionButtonsBox.setHgap(10);
@@ -535,7 +528,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         VBox mySectionsBox = new VBox(15);
         mySectionsBox.setAlignment(Pos.CENTER);
-        mySectionsBox.getChildren().addAll(titleAndButtons, sectionButtonsBox);
+        mySectionsBox.getChildren().addAll(sectionButtonsBox);
 
         VBox sectionsAndGoalsBox = new VBox(20);
         sectionsAndGoalsBox.getChildren().addAll(mySectionsBox, goalsBox);
@@ -647,6 +640,9 @@ public class HomeView extends StackPane implements Subscriber {
                     .max(Map.Entry.comparingByValue()) // Compare by count
                     .map(Map.Entry::getKey) // Get the difficulty key
                     .orElse(null); // In case there are no goals
+            if (maxDifficulty == null) {
+                maxDifficulty = "None";
+            }
 
             Label goalDifficultyPopCategoryLabel = new Label(maxDifficulty);
             goalDifficultyPopLabel.getStyleClass().add("bigger-paragraph-text");
@@ -674,8 +670,18 @@ public class HomeView extends StackPane implements Subscriber {
         Region homeSpacer4 = new Region();
         homeSpacer4.setPrefWidth(homeViewSpaceSize);
 
-        root.getChildren().addAll(welcomeLabel, motivationModule, homeSpacer1, quickActionsHeading, quickActionsGroup, homeSpacer2,
-                goalDataOverviewLabel, goalDataOverviewModule, homeSpacer4, upcomingGoalsHeading, upcomingGoalsModule, homeSpacer3, sectionHeading, sectionsAndGoalsBox);
+        Label quickActionsSubtitle = new Label("What would you like to do next in your goal planning?");
+        quickActionsSubtitle.getStyleClass().add("bigger-paragraph-text");
+        Label overviewGoalsSubtitle = new Label("Here are some summary stats for your currently planned goals:");
+        overviewGoalsSubtitle.getStyleClass().add("bigger-paragraph-text");
+        Label upcomingGoalsSubtitle = new Label("Let's see which goals you should focus on completing next:");
+        upcomingGoalsSubtitle.getStyleClass().add("bigger-paragraph-text");
+        Label sectionGoalsSubtitle = new Label("Here are your current sections and their goals:");
+        sectionGoalsSubtitle.getStyleClass().add("bigger-paragraph-text");
+
+        root.getChildren().addAll(welcomeLabel, motivationModule, homeSpacer1, new VBox(5, quickActionsHeading, quickActionsSubtitle), quickActionsGroup, homeSpacer2,
+                new VBox(5, goalDataOverviewLabel, overviewGoalsSubtitle), goalDataOverviewModule, homeSpacer4, new VBox(5, upcomingGoalsHeading, upcomingGoalsSubtitle),
+                upcomingGoalsModule, homeSpacer3, new VBox(5, sectionHeading, sectionGoalsSubtitle), sectionsAndGoalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.

@@ -413,7 +413,7 @@ public class DashboardView extends BorderPane implements Subscriber {
         if (nearestDeadlineDate != null && (nearestDeadlineDate.isAfter(LocalDate.now()) || nearestDeadlineDate.isEqual(LocalDate.now()))) {
             nearestDeadline = new Label("" + formatter.format(nearestDeadlineDate));
         } else {
-            nearestDeadline = new Label("Never—Time to make a goal!");
+            nearestDeadline = new Label("Never—time to make a goal!");
         }
 
         nearestDeadlineTitle.getStyleClass().add("bigger-paragraph-text");
