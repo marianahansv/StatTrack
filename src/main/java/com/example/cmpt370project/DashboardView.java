@@ -252,7 +252,10 @@ public class DashboardView extends BorderPane implements Subscriber {
         setupDashboardViewUI();
 
         // Set up page change interactions on button press
-        homeButton.setOnAction(e -> scrollPane.setContent(homePage));
+        homeButton.setOnAction(e -> {
+            scrollPane.setContent(homePage);
+            homePage.changePage(HomeView.HomeViewPage.HOME);
+        });
         goalsButton.setOnAction(e -> scrollPane.setContent(goalsPage));
         goalPlanButton.setOnAction(e -> {
             goalPlanPage.setPageToSummaryView();

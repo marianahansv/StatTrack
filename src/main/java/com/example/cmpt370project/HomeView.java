@@ -46,7 +46,7 @@ public class HomeView extends StackPane implements Subscriber {
     /**
      * All the possible pages of the home view.
      */
-    private enum HomeViewPage {HOME, ADD_GOAL}
+    enum HomeViewPage {HOME, ADD_GOAL}
 
     /**
      * The current page that the home view should show.
@@ -122,6 +122,8 @@ public class HomeView extends StackPane implements Subscriber {
     private final Button deleteSectionButton;
     private final Button giveMeSuggestionsButton;
     private final Label suggestionsContentLabel;
+    private final Label goalDataOverviewLabel;
+    private HBox goalDataOverviewModule;
 
 
     /**
@@ -148,10 +150,13 @@ public class HomeView extends StackPane implements Subscriber {
         sectionHeading = new Label("Goal Sections");
         quickActionsHeading = new Label("Quick Actions");
         upcomingGoalsHeading = new Label("Upcoming Goals");
+        goalDataOverviewLabel = new Label("Goal Data Overview");
+        goalDataOverviewModule = new HBox();
 
         sectionHeading.getStyleClass().add("heading-level-2");
         quickActionsHeading.getStyleClass().add("heading-level-2");
         upcomingGoalsHeading.getStyleClass().add("heading-level-2");
+        goalDataOverviewLabel.getStyleClass().add("heading-level-2");
 
         clearGoalsButton = new Button("Clear Goals");
         clearGoalsButton.getStyleClass().add("cbutton");
@@ -358,7 +363,7 @@ public class HomeView extends StackPane implements Subscriber {
         }
     }
 
-    private void changePage(HomeViewPage newPage) {
+    void changePage(HomeViewPage newPage) {
         this.currentViewPage = newPage;
         drawView();
     }
@@ -547,6 +552,114 @@ public class HomeView extends StackPane implements Subscriber {
         spacer2.setPrefWidth(20);
         quickActionsGroup.getChildren().addAll(addGoalButton, clearGoalsButton, spacer1, createSectionButton, deleteSectionButton, spacer2, changeNameButton);
 
+        // Goal Overview Module
+        goalDataOverviewModule = new HBox(20);
+        goalDataOverviewModule.getStyleClass().add("b-module");
+
+        if (goalModel != null) {
+
+            // Goals Completed
+            VBox goalsCompletedBox = new VBox(10);
+            goalsCompletedBox.setAlignment(Pos.CENTER);
+            Label goalsCompletedLabel = new Label("Total Goals Completed: ");
+            Label goalsCompletedNumberLabel = new Label("" + goalModel.getGoals().stream().filter(Goal::isCompleted).collect(Collectors.toList()).size());
+            goalsCompletedLabel.getStyleClass().add("bigger-paragraph-text");
+            goalsCompletedNumberLabel.getStyleClass().add("bigger-paragraph-text");
+            goalsCompletedNumberLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+
+            goalsCompletedBox.getStyleClass().add("goal-card");
+            goalsCompletedBox.getChildren().addAll(goalsCompletedLabel, goalsCompletedNumberLabel);
+
+            goalDataOverviewModule.getChildren().addAll(goalsCompletedBox);
+            HBox.setHgrow(goalsCompletedBox, Priority.ALWAYS);
+
+            // Goals In-Progress
+            VBox goalsInProgressBox = new VBox(10);
+            goalsInProgressBox.setAlignment(Pos.CENTER);
+            Label goalsInProgressLabel = new Label("Total Goals In-Progress: ");
+
+            Label goalsInProgressNumberLabel = new Label("" + goalModel.getGoals().stream()
+                    .filter(goal -> (!goal.getEndDate().isBefore(LocalDate.now()))
+                            && (!goal.getStartDate().isAfter(LocalDate.now()) || goal.getStartDate().isEqual(LocalDate.now()))
+                            && !goal.isCompleted())
+                    .count());
+            goalsInProgressLabel.getStyleClass().add("bigger-paragraph-text");
+            goalsInProgressNumberLabel.getStyleClass().add("bigger-paragraph-text");
+            goalsInProgressNumberLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+
+            goalsInProgressBox.getStyleClass().add("goal-card");
+            goalsInProgressBox.getChildren().addAll(goalsInProgressLabel, goalsInProgressNumberLabel);
+
+            goalDataOverviewModule.getChildren().addAll(goalsInProgressBox);
+            HBox.setHgrow(goalsInProgressBox, Priority.ALWAYS);
+
+
+            // Goals Expired
+            VBox goalsExpiredBox = new VBox(10);
+            goalsExpiredBox.setAlignment(Pos.CENTER);
+            Label goalsExpiredLabel = new Label("Total Goals Expired: ");
+
+            Label goalsExpiredNumberLabel = new Label("" + goalModel.getGoals().stream()
+                    .filter(goal -> (goal.getEndDate().isBefore(LocalDate.now())))
+                    .count());
+            goalsExpiredLabel.getStyleClass().add("bigger-paragraph-text");
+            goalsExpiredNumberLabel.getStyleClass().add("bigger-paragraph-text");
+            goalsExpiredNumberLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+
+            goalsExpiredBox.getStyleClass().add("goal-card");
+            goalsExpiredBox.getChildren().addAll(goalsExpiredLabel, goalsExpiredNumberLabel);
+
+            goalDataOverviewModule.getChildren().addAll(goalsExpiredBox);
+            HBox.setHgrow(goalsExpiredBox, Priority.ALWAYS);
+
+
+            // Goal Avg. Timeline
+            VBox goalTimelineAvgBox = new VBox(10);
+            goalTimelineAvgBox.setAlignment(Pos.CENTER);
+            Label goalTimelineAvgLabel = new Label("Average Goal Duration: ");
+
+            long totalDays = goalModel.getGoals().stream()
+                    .mapToLong(goal -> ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate().plusDays(1)))
+                    .sum();
+
+            Label goalTimelineAvgNumberLabel = new Label("" + (long) Math.ceil(((double) totalDays / goalModel.getGoals().size())) + " days");
+            goalTimelineAvgLabel.getStyleClass().add("bigger-paragraph-text");
+            goalTimelineAvgNumberLabel.getStyleClass().add("bigger-paragraph-text");
+            goalTimelineAvgNumberLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+
+            goalTimelineAvgBox.getStyleClass().add("goal-card");
+            goalTimelineAvgBox.getChildren().addAll(goalTimelineAvgLabel, goalTimelineAvgNumberLabel);
+
+            goalDataOverviewModule.getChildren().addAll(goalTimelineAvgBox);
+            HBox.setHgrow(goalTimelineAvgBox, Priority.ALWAYS);
+
+
+            // Goal Most Popular Difficulty
+            VBox goalDifficultyPopBox = new VBox(10);
+            goalDifficultyPopBox.setAlignment(Pos.CENTER);
+            Label goalDifficultyPopLabel = new Label("Most Popular Difficulty: ");
+
+            Map<String, Long> difficultyCounts = goalModel.getGoals().stream()
+                    .collect(Collectors.groupingBy(Goal::getDifficulty, Collectors.counting()));
+
+            // Find the difficulty with the most goals
+            String maxDifficulty = difficultyCounts.entrySet().stream()
+                    .max(Map.Entry.comparingByValue()) // Compare by count
+                    .map(Map.Entry::getKey) // Get the difficulty key
+                    .orElse(null); // In case there are no goals
+
+            Label goalDifficultyPopCategoryLabel = new Label(maxDifficulty);
+            goalDifficultyPopLabel.getStyleClass().add("bigger-paragraph-text");
+            goalDifficultyPopCategoryLabel.getStyleClass().add("bigger-paragraph-text");
+            goalDifficultyPopCategoryLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+
+            goalDifficultyPopBox.getStyleClass().add("goal-card");
+            goalDifficultyPopBox.getChildren().addAll(goalDifficultyPopLabel, goalDifficultyPopCategoryLabel);
+
+            goalDataOverviewModule.getChildren().addAll(goalDifficultyPopBox);
+            HBox.setHgrow(goalDifficultyPopBox, Priority.ALWAYS);
+        }
+
         int homeViewSpaceSize = 20;
 
         Region homeSpacer1 = new Region();
@@ -558,8 +671,11 @@ public class HomeView extends StackPane implements Subscriber {
         Region homeSpacer3 = new Region();
         homeSpacer3.setPrefWidth(homeViewSpaceSize);
 
+        Region homeSpacer4 = new Region();
+        homeSpacer4.setPrefWidth(homeViewSpaceSize);
+
         root.getChildren().addAll(welcomeLabel, motivationModule, homeSpacer1, quickActionsHeading, quickActionsGroup, homeSpacer2,
-                upcomingGoalsHeading, upcomingGoalsModule, homeSpacer3, sectionHeading, sectionsAndGoalsBox);
+                goalDataOverviewLabel, goalDataOverviewModule, homeSpacer4, upcomingGoalsHeading, upcomingGoalsModule, homeSpacer3, sectionHeading, sectionsAndGoalsBox);
         this.getChildren().add(root);
 
         //restore the selected toggle if a section was previously selected.
