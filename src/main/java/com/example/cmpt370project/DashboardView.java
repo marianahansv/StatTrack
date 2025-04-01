@@ -407,7 +407,7 @@ public class DashboardView extends BorderPane implements Subscriber {
 
         LocalDate nearestDeadlineDate = findNextDeadline();
 
-        if (nearestDeadlineDate != null) {
+        if (nearestDeadlineDate != null && (nearestDeadlineDate.isAfter(LocalDate.now()) || nearestDeadlineDate.isEqual(LocalDate.now()))) {
             nearestDeadline = new Label("" + formatter.format(nearestDeadlineDate));
         } else {
             nearestDeadline = new Label("Never—Time to make a goal!");
@@ -459,7 +459,7 @@ public class DashboardView extends BorderPane implements Subscriber {
         if (nearestDeadline != null) {
             LocalDate nearestDeadlineDate = findNextDeadline();
 
-            if (nearestDeadlineDate != null) {
+            if (nearestDeadlineDate != null && (nearestDeadlineDate.isAfter(LocalDate.now()) || nearestDeadlineDate.isEqual(LocalDate.now()))) {
                 nearestDeadline.setText("" + nearestDeadlineDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")));
             } else {
                 nearestDeadline.setText("Never—Time to make a goal!");
