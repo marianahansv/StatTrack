@@ -150,6 +150,7 @@ public class DashboardView extends BorderPane implements Subscriber {
     private Label totalGoals;
     private Label dailyCompleted;
     private Label weeklyCompleted;
+    private Label nearestDeadline;
 
     /**
      * Construct the dashboard view and MVC structure of the application.
@@ -400,12 +401,31 @@ public class DashboardView extends BorderPane implements Subscriber {
 
         goalQuickSummaryModule.getChildren().addAll(goalQuickSummaryTitle, dailyCompletedRow, weeklyCompletedRow, totalGoalsRow);
 
+        // Add nearest deadline module
+        VBox nearestDeadlineModule = new VBox();
+        Label nearestDeadlineTitle = new Label("⏰ Your next goal deadline is:");
+
+        LocalDate nearestDeadlineDate = findNextDeadline();
+
+        if (nearestDeadlineDate != null) {
+            nearestDeadline = new Label("" + formatter.format(nearestDeadlineDate));
+        } else {
+            nearestDeadline = new Label("Never—Time to make a goal!");
+        }
+
+        nearestDeadlineTitle.getStyleClass().add("bigger-paragraph-text");
+        nearestDeadline.setStyle("-fx-font-weight: bold");
+        nearestDeadline.getStyleClass().add("bigger-paragraph-text");
+        nearestDeadlineModule.getStyleClass().add("next-deadline-module");
+
+        nearestDeadlineModule.getChildren().addAll(nearestDeadlineTitle, nearestDeadline);
+
 
         sidebar.getChildren().addAll(homeButton, goalsButton, goalPlanButton, goalVisButton, historicalChartButton);
         VBox.setVgrow(sidebar, Priority.ALWAYS);
 
         VBox sidebarParent = new VBox(10);
-        sidebarParent.getChildren().addAll(dateModule, goalQuickSummaryModule, sidebar);
+        sidebarParent.getChildren().addAll(dateModule, goalQuickSummaryModule, nearestDeadlineModule, sidebar);
         sidebarParent.setStyle("-fx-background-color: #92d3f5; -fx-padding: 10px;");
 
         this.setLeft(sidebarParent);
@@ -435,5 +455,36 @@ public class DashboardView extends BorderPane implements Subscriber {
         if (dailyCompleted != null) {
             dailyCompleted.setText("" + userHistoryDataModel.getDailyCompletedGoals());
         }
+
+        if (nearestDeadline != null) {
+            LocalDate nearestDeadlineDate = findNextDeadline();
+
+            if (nearestDeadlineDate != null) {
+                nearestDeadline.setText("" + nearestDeadlineDate.format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")));
+            } else {
+                nearestDeadline.setText("Never—Time to make a goal!");
+            }
+        }
+    }
+
+    /**
+     * Helper method to calculate the nearest deadline.
+     * @return the nearest goal deadline.
+     */
+    private LocalDate findNextDeadline() {
+        LocalDate nextDeadline = null;
+
+        for (Goal goal: this.goalModel.getGoals()) {
+
+            if (nextDeadline == null && !goal.isCompleted()) {
+                nextDeadline = goal.getEndDate();
+            } else if (!goal.isCompleted()) {
+                if (goal.getEndDate().isBefore(nextDeadline)) {
+                    nextDeadline = goal.getEndDate();
+                }
+            }
+
+        }
+        return nextDeadline;
     }
 }
