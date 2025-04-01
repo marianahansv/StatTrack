@@ -129,7 +129,6 @@ public class SuggestionsModel {
         } else if (averagePercentage < EARLY_COMPLETION_THRESHOLD_PERCENTAGE) {
             return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", Math.abs(averagePercentage)) + "% early. You might be able to set your deadline to " + suggestedDeadline.toString() + " (minus " + Math.abs(suggestedAdjustmentDays) + " days).";
         } else {
-            System.out.println(averagePercentage);
             return "Based on your past behaviour, your initial deadline it's perfect!";
 
         }
