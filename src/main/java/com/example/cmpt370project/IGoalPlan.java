@@ -74,4 +74,22 @@ public interface IGoalPlan {
      * Has this plan ended by the input target date? (i.e. has the user reached their completion date?)
      */
     boolean isPlanFinished(LocalDate date);
+
+    /**
+     * The start date of this plan.
+     * @return start date of this plan.
+     */
+    LocalDate getPlanStartDate();
+
+    /**
+     * The end date of this plan.
+     * @return end date of this plan.
+     */
+    LocalDate getPlanEndDate();
+
+    /**
+     * Does this plan have an end date?
+     * @return true if plan has end date, false otherwise.
+     */
+    boolean hasEndDate();
 }

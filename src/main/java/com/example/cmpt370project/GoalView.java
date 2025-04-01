@@ -6,17 +6,9 @@ import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -61,7 +53,7 @@ public class GoalView extends StackPane implements Subscriber {
     private ComboBox<String> completionStatusComboBox;
     private Button completeGoalButton;
     private Button editGoalButton;
-
+    private Button deleteGoalButton;
     
     
 
@@ -165,7 +157,7 @@ public class GoalView extends StackPane implements Subscriber {
             if (progressDiff > 0) {
                 progressMessage = "You need to complete " + progressDiff + " more goals for the " + planTimelineString + " to stay on track with your goal plan. Time to complete some goals!";
             } else if (progressDiff == 0){
-                progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with you goal plan. Props to you!";
+                progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with your goal plan. Props to you!";
             } else {
                 progressMessage = "You have completed " + -progressDiff + " more goals than your target number of goals for the " + planTimelineString + ". Overachiever!";
             }
@@ -177,7 +169,11 @@ public class GoalView extends StackPane implements Subscriber {
         }
 
         progressFeedback.setWrapText(true);
+        progressFeedback.getStyleClass().add("bigger-paragraph-text");
+        progressFeedback.setStyle("-fx-font-weight: bold;");
         goalProgressModule.getChildren().add(progressFeedback);
+        goalProgressModule.setAlignment(Pos.CENTER);
+        goalProgressModule.getStyleClass().add("module");
         // ********* END OF MOTIVATIONAL FEEDBACK MODULE *********
 
         // 🔥 Goal difficulty filtering button 🔥
@@ -185,7 +181,7 @@ public class GoalView extends StackPane implements Subscriber {
         // instantiate and configure the ComboBox for filtering difficulties
         difficultyComboBox = new ComboBox<>();
         difficultyComboBox.getItems().addAll("All", "Easy", "Medium", "Hard");
-        difficultyComboBox.setValue("Difficulty"); // default
+        difficultyComboBox.setValue("All"); // default
         // updates the goals list when the selection changes
         difficultyComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilteredGoals());
 
@@ -200,28 +196,54 @@ public class GoalView extends StackPane implements Subscriber {
         // Container for filters
         HBox filtersContainer = new HBox(10);
         filtersContainer.setAlignment(Pos.CENTER);
+
+        Label filterLabel = new Label("Filter Your Goals:");
+        filterLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+
+        Region filterActionsSpacer = new Region();
+
         filtersContainer.getChildren().addAll(
+                filterLabel,
+                filterActionsSpacer,
                 difficultyComboBox,
                 completionStatusComboBox
         );
 
         // ********* Action Buttons *********
-        completeGoalButton = new Button("Complete");
+        completeGoalButton = new Button("Complete Goal");
         completeGoalButton.getStyleClass().add("cbutton");
+        completeGoalButton.getStyleClass().add("add-goal-button");
         editGoalButton = new Button("Edit Goal");
         editGoalButton.getStyleClass().add("cbutton");
+        editGoalButton.getStyleClass().add("edit-button");
+        deleteGoalButton = new Button("Delete Goal");
+        deleteGoalButton.getStyleClass().add("cbutton");
+        deleteGoalButton.getStyleClass().add("cancel-button");
+
+        Label goalActionsLabel = new Label("Selected Goal Quick Actions:");
+        goalActionsLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+
+        Region goalActionsSpacer = new Region();
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(
+                goalActionsLabel,
+                goalActionsSpacer,
+                completeGoalButton,
+                editGoalButton,
+                deleteGoalButton
+        );
 
         // Container for dashboard controls (list view, feedback, filtering, buttons)
         VBox dashboardControls = new VBox();
         dashboardControls.setAlignment(Pos.TOP_CENTER);
-        dashboardControls.setSpacing(5);
+        dashboardControls.setSpacing(25);
         dashboardControls.getChildren().addAll(
                 goalListView,
                 goalProgressModule,
-                difficultyComboBox,
-                filtersContainer,
-                completeGoalButton,
-                editGoalButton
+                buttonBox,
+                filtersContainer
         );
 
         goalListView.getItems();
@@ -231,8 +253,9 @@ public class GoalView extends StackPane implements Subscriber {
             
              Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
 
-             goalModel.completeGoal(selectedGoal);
-
+             if (!selectedGoal.isCompleted()) {
+                 goalModel.completeGoal(selectedGoal);
+             }
         });
         
         // On edit button pressed take to editing page
@@ -245,6 +268,27 @@ public class GoalView extends StackPane implements Subscriber {
             goalModel.notifySubscribers();
             drawEditGoalView(selectedGoal);
        });
+
+        // On delete button pressed, delete the selected goal
+        deleteGoalButton.setOnAction(e -> {
+            Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
+            if (selectedGoal != null) {
+
+                // Confirm to make sure the user want to delete their goal
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirm Goal Deletion");
+                alert.setHeaderText("Are you sure you want to delete this goal from the system?");
+                alert.setContentText("This action cannot be undone.");
+
+                // Show the dialog and wait for the user's response
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        goalModel.deleteGoal(selectedGoal.getTitle());
+                        goalModel.notifySubscribers();
+                    }
+                });
+            }
+        });
 
         root.getChildren().addAll(welcomeLabel, dashboardControls);
         goalModel.addSubscriber(this);
@@ -259,7 +303,7 @@ public class GoalView extends StackPane implements Subscriber {
         this.getChildren().clear();
 
         // Create a new container for the edit form
-        VBox editRoot = new VBox(20);
+        VBox editRoot = new VBox(12);
         editRoot.setAlignment(Pos.TOP_LEFT);
         editRoot.setPadding(new Insets(20));
 
@@ -289,6 +333,7 @@ public class GoalView extends StackPane implements Subscriber {
                 sectionButton.setSelected(true);
             }
             editSectionButtons.getChildren().add(sectionButton);
+            sectionButton.getStyleClass().add("cbutton");
         }
 
         // Buttons to submit or cancel the edit
@@ -322,7 +367,6 @@ public class GoalView extends StackPane implements Subscriber {
 
             // Update user history data
             historyModel.notifySubscribers();
-            historyModel.completeGoal(LocalDate.now());
             historyModel.saveDataToFile();
 
             // Return to the main view
@@ -338,22 +382,38 @@ public class GoalView extends StackPane implements Subscriber {
             drawView();
         });
 
+        // Title for Goal Edit
+        Label editGoalTitle = new Label("Let's Edit Your Goal:");
+        editGoalTitle.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+
         // Build the edit form view by adding all UI elements
         editRoot.getChildren().addAll(
+                editGoalTitle,
+                new Region(),
                 new Label("Edit Goal Title:"), titleField,
+                new Region(),
                 new Label("Difficulty:"), editDifficultyComboBox,
+                new Region(),
                 new Label("Sections:"), editSectionButtons,
+                new Region(),
                 new Label("Start Date:"), editStartDatePicker,
+                new Region(),
                 new Label("End Date:"), editEndDatePicker,
-                submitEditButton, cancelEditButton
+                new Region(),
+                new HBox(10, submitEditButton, cancelEditButton)
         );
+
+        // Styling of the form
+        titleField.setMaxWidth(300);
+        submitEditButton.getStyleClass().add("cbutton");
+        submitEditButton.getStyleClass().add("add-goal-button");
+        cancelEditButton.getStyleClass().add("cbutton");
+        cancelEditButton.getStyleClass().add("cancel-button");
+
 
         // Display the edit form in the view
         this.getChildren().add(editRoot);
     }
-    
-
-
 
 
     /**
@@ -402,25 +462,30 @@ public class GoalView extends StackPane implements Subscriber {
         String selectedDifficulty = difficultyComboBox.getValue();
         String selectedCompletionStatus = completionStatusComboBox.getValue();
 
-        List<Goal> filteredGoals = goalModel.getGoalsByDifficulty(selectedDifficulty);
+        System.out.println("Filtering goals - Difficulty: " + selectedDifficulty + ", Completion: " + selectedCompletionStatus);
 
-        if (!"All".equals(selectedCompletionStatus)) {
-            boolean completedFilter = "Completed".equals(selectedCompletionStatus);
-            filteredGoals = goalModel.getGoalsByCompletionStatus(completedFilter);
-            List<Goal> intersection = new ArrayList<>();
-            List<Goal> completionFiltered = goalModel.getGoalsByCompletionStatus(completedFilter);
-            for (Goal goal : filteredGoals) {
-                if (completionFiltered.contains(goal)) {
-                    intersection.add(goal);
-                }
+        List<Goal> allGoals = goalModel.getGoals();
+        List<Goal> filteredGoals = new ArrayList<>();
+
+        for (Goal goal : allGoals) {
+            String goalDifficulty = goal.getDifficulty() != null ? goal.getDifficulty().trim() : "";
+            boolean matchesDifficulty = selectedDifficulty.equals("All") || goalDifficulty.equalsIgnoreCase(selectedDifficulty);
+
+            boolean matchesCompletion = selectedCompletionStatus.equals("All")
+                    || (selectedCompletionStatus.equals("Completed") && goal.isCompleted())
+                    || (selectedCompletionStatus.equals("Uncompleted") && !goal.isCompleted());
+
+            if (matchesDifficulty && matchesCompletion) {
+                filteredGoals.add(goal);
             }
-            filteredGoals = intersection;
         }
+
+        System.out.println("Filtered goals found: " + filteredGoals.size());
         goalListView.getItems().clear();
-        for (Goal goal : filteredGoals) {
-            goalListView.getItems().add(goal);
-        }
+        goalListView.getItems().addAll(filteredGoals);
     }
+
+
 
     /**
      * Set up interaction with a controller for this view.

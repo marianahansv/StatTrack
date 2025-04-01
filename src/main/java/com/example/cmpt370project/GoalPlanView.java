@@ -11,6 +11,8 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
  * View to handle organization of page(s) related to the Goal Plan feature.
@@ -248,7 +250,9 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 startGoalPlanModule.setSpacing(20);
 
                 // Info Label
-                startGoalPlanModule.getChildren().add(new Label("You do not currently have a goal plan set up yet. Create one to get started!"));
+                Label makeNewLabel = new Label("You do not currently have a goal plan set up yet. Create one to get started!");
+                makeNewLabel.getStyleClass().add("bigger-paragraph-text");
+                startGoalPlanModule.getChildren().add(makeNewLabel);
 
                 // Set Goal Plan Button
                 goCreateEditGoalPlanButton.setText("Set Up Your Goal Plan");
@@ -263,9 +267,10 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 HBox goalSummaryHeaderModule = new HBox(20);
                 goalSummaryHeaderModule.setAlignment(Pos.CENTER_LEFT);
                 Label currentPlanTitle = new Label();
-                currentPlanTitle.setMinWidth(300);
-                currentPlanTitle.setMaxWidth(500);
-                currentPlanTitle.setWrapText(true);
+                currentPlanTitle.getStyleClass().add("bigger-paragraph-text");
+//                currentPlanTitle.setMinWidth(300);
+//                currentPlanTitle.setMaxWidth(500);
+//                currentPlanTitle.setWrapText(true);
 
                 // Get the completed goal values whether it is the week/day
                 String planTimelineString = "";
@@ -299,19 +304,21 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 root.getChildren().add(goalSummaryHeaderModule);
 
                 Label progressTitle = new Label("Here's your current progress on your plan:");
+                progressTitle.getStyleClass().add("bigger-paragraph-text");
                 progressTitle.setStyle("-fx-font-weight: bold;");
                 root.getChildren().add(progressTitle);
 
                 VBox goalProgressModule = new VBox(20);
                 goalProgressModule.setAlignment(Pos.CENTER_LEFT);
-                goalProgressModule.setMaxWidth(670);
+//                goalProgressModule.setMaxWidth(670);
                 goalProgressModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
                 goalProgressModule.setPadding(new Insets(20));
+                goalProgressModule.getStyleClass().add("module");
 
 
-                Label currentProgressSum = new Label("Your current number of goals completed for the " + planTimelineString + " : " + timelineCompleted);
+                Label currentProgressSum = new Label("Your current number of goals completed for the " + planTimelineString + ": " + timelineCompleted);
                 Label targetProgressSum = new Label("Your current target number of goals to complete for the "
-                        + planTimelineString + " : " + goalPlanModel.getGoalPlan().getGoalPlanCurrent());
+                        + planTimelineString + ": " + goalPlanModel.getGoalPlan().getGoalPlanCurrent());
 
                 int progressDiff = goalPlanModel.getGoalPlan().getGoalPlanCurrent() - timelineCompleted;
                 String progressMessage = "";
@@ -319,7 +326,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 if (progressDiff > 0) {
                     progressMessage = "You need to complete " + progressDiff + " more goals today to stay on track with your goal plan. Time to complete some goals!";
                 } else if (progressDiff == 0){
-                    progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with you goal plan. Props to you!";
+                    progressMessage = "You have met your target for the " + planTimelineString + " and are currently on track with your goal plan. Props to you!";
                 } else {
                     progressMessage = "You have completed " + -progressDiff + " more goals than your target number of goals. Overachiever!";
                 }
@@ -327,8 +334,63 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 Label progressFeedback = new Label(progressMessage);
                 progressFeedback.setWrapText(true);
 
+                currentProgressSum.getStyleClass().add("bigger-paragraph-text");
+                targetProgressSum.getStyleClass().add("bigger-paragraph-text");
+                progressFeedback.getStyleClass().add("bigger-paragraph-text");
+                progressFeedback.setStyle("-fx-font-weight: bold;");
+
                 goalProgressModule.getChildren().addAll(currentProgressSum, targetProgressSum, progressFeedback);
                 root.getChildren().add(goalProgressModule);
+
+                // Additional Plan details
+                Label addInfoTitle = new Label("Here's some additional information about your plan:");
+                addInfoTitle.getStyleClass().add("bigger-paragraph-text");
+                addInfoTitle.setStyle("-fx-font-weight: bold;");
+                root.getChildren().addAll(new Region(), addInfoTitle);
+
+                VBox addInfoTitleModule = new VBox(20);
+                addInfoTitleModule.setAlignment(Pos.CENTER_LEFT);
+                addInfoTitleModule.setPadding(new Insets(20));
+                addInfoTitleModule.getStyleClass().add("b-module");
+
+                Label startDate = new Label("You started this goal plan on " + goalPlanModel.getGoalPlan().getPlanStartDate().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + ".");
+                startDate.getStyleClass().add("bigger-paragraph-text");
+
+                Label endDate = new Label();
+                endDate.getStyleClass().add("bigger-paragraph-text");
+
+                if (goalPlanModel.getGoalPlan().hasEndDate()) {
+                    endDate.setText("This plan will end and roll-over to a new Maintain plan on " + goalPlanModel.getGoalPlan().getPlanEndDate().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + ".");
+                } else {
+                    endDate.setText("This plan has no end date and will go on forever and ever and ever...");
+                }
+
+                Label progressLabel = new Label();
+                progressLabel.getStyleClass().add("bigger-paragraph-text");
+
+                if (goalPlanModel.getGoalPlan().getTimeline().equals(IGoalPlan.Timeline.DAILY)) {
+                    progressLabel.setText("You have been following this plan for a total of " + ChronoUnit.DAYS.between(goalPlanModel.getGoalPlan().getPlanStartDate(), LocalDate.now()) + " days.");
+                } else {
+                    progressLabel.setText("You have been following this plan for a total of " + ChronoUnit.WEEKS.between(goalPlanModel.getGoalPlan().getPlanStartDate(), LocalDate.now()) + " weeks.");
+                }
+
+                addInfoTitleModule.getChildren().addAll(startDate, endDate, progressLabel);
+
+                // If the plan is an increase plan, show some additional information
+                if (goalPlanModel.getGoalPlan() instanceof IncreaseGoalPlan) {
+                    Label increasePlanIntro = new Label("Since you are on an Increase plan, here are the details for the next increase cycle:");
+                    Label nextIncrementDate = new Label("The next day that your target number of goals to complete will increase is on " + ((IncreaseGoalPlan) goalPlanModel.getGoalPlan()).getNextIncrementDate().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")) + ".");
+                    Label nextIncrementValue = new Label("On this increase date, the your new target number of goals will be increased to " + ((IncreaseGoalPlan) goalPlanModel.getGoalPlan()).getNextIncrementValue()+ ".");
+
+                    increasePlanIntro.getStyleClass().add("bigger-paragraph-text");
+                    increasePlanIntro.setStyle("-fx-font-weight: bold;");
+                    nextIncrementValue.getStyleClass().add("bigger-paragraph-text");
+                    nextIncrementDate.getStyleClass().add("bigger-paragraph-text");
+
+                    addInfoTitleModule.getChildren().addAll(new Region(), increasePlanIntro, nextIncrementDate, nextIncrementValue);
+                }
+
+                root.getChildren().add(addInfoTitleModule);
             }
         }
     }
@@ -417,6 +479,10 @@ public class GoalPlanView extends StackPane implements Subscriber {
             VBox endDateSelectLayout = new VBox(10);
             Label endDateLabel= new Label("When would you like to reach your target number of goals to complete?");
 
+            Label endDateNote= new Label("NOTE: A DAILY Increase plan must run for a minimum of 1 week, and a WEEKLY Increase plan must run for a minimum of 2 weeks." +
+                    " Increase plans will roll-over to a new Maintain plan on their specified end date.");
+            endDateNote.setStyle("-fx-text-fill: royalblue; -fx-font-weight: bold;");
+
             endDatePicker = new DatePicker();
 
             // Set default value of date picker
@@ -441,7 +507,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 }
             });
 
-            endDateSelectLayout.getChildren().addAll(endDateLabel, endDatePicker);
+            endDateSelectLayout.getChildren().addAll(endDateLabel, endDateNote, endDatePicker);
 
 
             // Create container for submission and cancel buttons

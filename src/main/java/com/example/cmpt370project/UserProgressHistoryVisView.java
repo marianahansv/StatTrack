@@ -2,6 +2,7 @@ package com.example.cmpt370project;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -23,15 +24,21 @@ public class UserProgressHistoryVisView extends StackPane implements Subscriber 
     public UserProgressHistoryVisView(UserProgressHistoryController historicalChartController) {
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
-        root.setSpacing(10);
-        root.setPadding(new Insets(10));
-        Label enterlabel = new Label("Visualizing YOUR historical footprint!");
-        enterlabel.setStyle("-fx-font-weight: bold; -fx-font-size: 24px");
+        root.setSpacing(25);
+        root.setPadding(new Insets(20));
+        Label enterlabel = new Label("Let's Visualize Your Goal History: ");
+        enterlabel.setStyle("-fx-font-weight: bold; -fx-font-size: 28px");
 
-        root.getChildren().add(enterlabel);
+        Label goalVisSubtitle = new Label("Fill out the following fields to view your historical goal data for a specified time period of your choice.");
+        goalVisSubtitle.getStyleClass().add("bigger-paragraph-text");
+
+        // Space down the calendar a little more
+        Region spacer = new Region();
+
+        root.getChildren().addAll(new VBox(25, enterlabel, goalVisSubtitle), new Region());
         root.setAlignment(Pos.TOP_LEFT);
         historicalChartProgress = new UserHIstoryProgressVisuals(historicalChartController);
-        root.getChildren().add(historicalChartProgress);
+        root.getChildren().addAll(spacer, historicalChartProgress);
         this.getChildren().add(root);
     }
 

@@ -11,10 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class SuggestionsController{
     private GoalModel goalModel;
@@ -38,20 +35,13 @@ public class SuggestionsController{
 
     /**
      * Handles user choice between accepting suggested changes or not!*/
-    public String handleButtonPress(Goal newGoal) {
-        if (goalModel.getGoals().stream().filter(Goal::isCompleted).count() < 3) {
-            return "Here is what I found...\n" +
-                    "This looks like a great start for you! But...I don't have enough data to make suggestions yet (I need at least 3 goals in you history!)";
-        }
-        String timelineSuggestion = suggestionsModel.getTimelineSuggestion(newGoal);
-        String taskDifficultySuggestion = suggestionsModel.getDifficultySuggestion(newGoal);
-        String taskBreakdownSuggestion = suggestionsModel.getTaskBreakdownSuggestion(newGoal);
-        String isRealisticGoal = suggestionsModel.checkUnrealisticDeadline(newGoal);
-        return "Here is what I found...\n" +
-                "* "+ timelineSuggestion +
-                "\n* " + taskDifficultySuggestion +
-                "\n* " + taskBreakdownSuggestion +
-                "\n* " + isRealisticGoal;
+    public List<String> handleButtonPress(Goal newGoal){
+        ArrayList<String> suggestions = new ArrayList<>();
+        suggestions.add(suggestionsModel.getTimelineSuggestion(newGoal));
+        suggestions.add(suggestionsModel.getTaskBreakdownSuggestion(newGoal));
+        suggestions.add(suggestionsModel.getDifficultySuggestion(newGoal));
+        suggestions.add(suggestionsModel.checkUnrealisticDeadline(newGoal));
+        return suggestions;
     }
 
 
