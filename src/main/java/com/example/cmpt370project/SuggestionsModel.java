@@ -56,7 +56,19 @@ public class SuggestionsModel {
         double averageDuration = nonOutlierDurations.stream().mapToLong(Long::longValue).average().orElse(0);
         double stdDev = calculateStandardDeviation(nonOutlierDurations, averageDuration);
         long newGoalDuration = ChronoUnit.DAYS.between(newGoal.getStartDate(), newGoal.getEndDate());
-        double stdDevsAway = (newGoalDuration - averageDuration) / stdDev;
+
+        if (stdDev == 0) {
+            double ratio = newGoalDuration / averageDuration;
+
+            if (ratio > 1.5) {
+                int suggestedTasks = (int) Math.max(2, Math.round(ratio)*0.3);
+                return "This goal is significantly longer than your typical " + difficulty + " goals. Consider breaking it down into " + suggestedTasks + " smaller goals.";
+            } else if (ratio < 0.75 && completedGoalsOfDifficulty.size() > MIN_GOALS_FOR_STATS*2) {
+                return "This goal is significantly shorter than your typical " + difficulty + " goals. You might consider combining it with another goal if possible.";
+            }
+        }
+
+        double stdDevsAway = (newGoalDuration - averageDuration) / (stdDev);
 
         if (stdDevsAway > SIGNIFICANTLY_LONGER_STD_DEV && (newGoalDuration - averageDuration) > averageDuration*0.5) {
             long suggestedTasks = (long) Math.max(2, Math.round((newGoalDuration / averageDuration))*0.6);
@@ -117,7 +129,6 @@ public class SuggestionsModel {
         } else if (averagePercentage < EARLY_COMPLETION_THRESHOLD_PERCENTAGE) {
             return "Based on your past " + difficulty + " goals, you tend to finish around " + String.format("%.1f", Math.abs(averagePercentage)) + "% early. You might be able to set your deadline to " + suggestedDeadline.toString() + " (minus " + Math.abs(suggestedAdjustmentDays) + " days).";
         } else {
-            System.out.println(averagePercentage);
             return "Based on your past behaviour, your initial deadline it's perfect!";
 
         }
@@ -248,8 +259,8 @@ public class SuggestionsModel {
             if (duration <= 0) duration = 1;
             LocalDate startDate = LocalDate.now().minusDays(30 + i * 5L);
             LocalDate endDate = startDate.plusDays(duration);
-            Goal goal = new Goal("Past " + difficulty + " Goal " + i, "History", difficulty, startDate, endDate, completed);
-            if (completed) {
+            Goal goal = new Goal("Past " + difficulty + " Goal " + i, "History", difficulty, startDate, endDate, true);
+            if (true) {
                 goal.setCompletionDate(endDate.plusDays((int) (Math.random() * 3 - 1))); //this is to simulate some variation in completion
             }
             goals.add(goal);
