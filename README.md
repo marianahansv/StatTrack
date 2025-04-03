@@ -1,23 +1,25 @@
 StatTrack Application - Installation Instructions
 
 Introduction:
-This document provides instructions on how to run the StatTracker application.
+This document provides instructions on how to run the StatTrack application.
 
 Prerequisites:
 To run StatTrack, you need:
 
 1.  Java Runtime Environment (JRE) 17 or later:
-    * StatTracker requires a compatible JRE to execute.
+    * StatTrack requires a compatible JRE to execute.
     * Download and install a JRE from a trusted source:
         * Adoptium (Recommended): [https://adoptium.net/temurin/releases/](https://adoptium.net/temurin/releases/)
         * Oracle: [https://www.oracle.com/java/technologies/javase-downloads.html](https://www.oracle.com/java/technologies/javase-downloads.html)
 2.  JavaFX SDK 17 or later:
-    * StatTracker relies on JavaFX for its graphical user interface.
+    * StatTrack relies on JavaFX for its graphical user interface.
     * Download the JavaFX SDK from the official OpenJFX website:
         * OpenJFX: [https://openjfx.io/downloads/](https://openjfx.io/downloads/)
     * Extract the SDK to a location on your computer (e.g., C:\javafx-sdk-17.0.14).
 
 Running the Application using the Batch File (Recommended):
+
+Download the following files: [StatTrack Files](https://git.cs.usask.ca/cool-people/cmpt-370-project/-/tree/master/install?ref_type=heads)
 
 1.  Place the provided `runStatTrack.bat` file in the same directory as the StatTrack JAR file (StatTrack.jar).
 2.  Double-click the `runStatTrack.bat` file.
