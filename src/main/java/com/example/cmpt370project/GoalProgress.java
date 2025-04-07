@@ -16,7 +16,6 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 
@@ -38,7 +37,7 @@ public class GoalProgress extends VBox implements Subscriber {
     /**
      * ChoiceBox for selecting the type of chart to display.
      */
-    private ComboBox<String> chartTypeSelector;
+    ComboBox<String> chartTypeSelector;
 
     /**
      * PieChart for visualization
@@ -81,6 +80,7 @@ public class GoalProgress extends VBox implements Subscriber {
      */
     private void setupChartSelector() {
         chartTypeSelector = new ComboBox<>();
+        chartTypeSelector.setId("chartTypeSelector");
         chartTypeSelector.getItems().addAll("Pie Chart", "Bar Chart", "Line Chart"); // Types of visualization
         chartTypeSelector.setValue("Pie Chart"); // Defaulting to pie chart bc they are more epic
 
@@ -307,7 +307,7 @@ private void updateLineChart() {
      * Indicates if a goal is past due or due today
      *  @param goal goal to be checked when its duedate is by comparision of today
      */
-    private static String isDue(Goal goal) {
+    static String isDue(Goal goal) {
                 String title = null;
                 LocalDate today = LocalDate.now();
                 

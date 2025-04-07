@@ -1,10 +1,11 @@
 package com.example.cmpt370project;
 
+import java.util.Objects;
 import java.util.Optional;
+
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextInputDialog;
@@ -14,9 +15,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
@@ -306,6 +304,7 @@ public class DashboardView extends BorderPane {
         sidebar.setAlignment(Pos.CENTER);
         sidebar.setPrefWidth(180);
         homeButton = new Button("Home");
+        homeButton.setId("homeButton");
         goalsButton = new Button("My Goals");
         goalsButton.setId("goalsButton");
         goalPlanButton = new Button("Goal Plan");

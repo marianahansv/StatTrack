@@ -3,12 +3,34 @@ package com.example.cmpt370project;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * View to handle organization UI elements of the home page.
@@ -60,7 +82,7 @@ public class HomeView extends StackPane implements Subscriber {
 
     // ********* HOME PAGE ELEMENTS *********
     private final Button clearGoalsButton;
-    private final Button addGoalButton;
+    final Button addGoalButton;
     private final Label welcomeLabel;
     private VBox motivationModule;
     private Label userGreeting;
@@ -135,6 +157,7 @@ public class HomeView extends StackPane implements Subscriber {
 
         // Home page elements
         addGoalButton = new Button("Add Goal");
+        addGoalButton.setId("addGoalButton");
         addGoalButton.getStyleClass().add("cbutton");
 //        addGoalButton.getStyleClass().add("add-goal-button");
 
@@ -152,6 +175,7 @@ public class HomeView extends StackPane implements Subscriber {
         clearGoalsButton = new Button("Clear Goals");
         clearGoalsButton.getStyleClass().add("cbutton");
         clearGoalsButton.getStyleClass().add("critical-button");
+        clearGoalsButton.setId("clearGoalsButton");
 
 //        clearGoalsButton.getStyleClass().add("clear-goals-button");
 
@@ -187,10 +211,12 @@ public class HomeView extends StackPane implements Subscriber {
 
         submitGoalButton = new Button("Add Goal");
         submitGoalButton.getStyleClass().add("cbutton");
+        submitGoalButton.setId("saveGoalButton");
         giveMeSuggestionsButton = new Button("Give Me Suggestions");
-        giveMeSuggestionsButton.getStyleClass().add("cbutton");
+        giveMeSuggestionsButton.getStyleClass().add("caaaaaaaaaaaaaaaaaaaaabutton");
 
         titleInput = new TextField();
+        titleInput.setId("goalTitleField");
         cancelAddGoalButton = new Button("Cancel");
         cancelAddGoalButton.getStyleClass().add("cbutton");
 
@@ -246,7 +272,9 @@ public class HomeView extends StackPane implements Subscriber {
 
         // DatePickers for start and end date
         startDatePicker = new DatePicker(LocalDate.now());
+        startDatePicker.setId("startDatePicker");
         endDatePicker = new DatePicker(LocalDate.now().plusDays(7));
+        endDatePicker.setId("endDatePicker");
 
         // "Create New Section" feature
         createSectionButton = new Button("Create New Section");

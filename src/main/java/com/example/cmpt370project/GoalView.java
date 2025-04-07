@@ -6,7 +6,18 @@ import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -46,14 +57,14 @@ public class GoalView extends StackPane implements Subscriber {
 
     // ********* Add other ui elements as attributes here if needed (i.e. if they need to change in drawView()) *********
 
-    private ListView<Goal> goalListView;
+    ListView<Goal> goalListView;
     Label progressFeedback;
     private Label welcomeLabel;
-    private ComboBox<String> difficultyComboBox;
-    private ComboBox<String> completionStatusComboBox;
-    private Button completeGoalButton;
-    private Button editGoalButton;
-    private Button deleteGoalButton;
+    ComboBox<String> difficultyComboBox;
+    ComboBox<String> completionStatusComboBox;
+    Button completeGoalButton;
+    Button editGoalButton;
+    Button deleteGoalButton;
     
     
 
@@ -216,9 +227,11 @@ public class GoalView extends StackPane implements Subscriber {
         editGoalButton = new Button("Edit Goal");
         editGoalButton.getStyleClass().add("cbutton");
         editGoalButton.getStyleClass().add("edit-button");
+        editGoalButton.setId("editButton");
         deleteGoalButton = new Button("Delete Goal");
         deleteGoalButton.getStyleClass().add("cbutton");
         deleteGoalButton.getStyleClass().add("cancel-button");
+        deleteGoalButton.setId("deleteButton");
 
         Label goalActionsLabel = new Label("Selected Goal Quick Actions:");
         goalActionsLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
@@ -308,11 +321,13 @@ public class GoalView extends StackPane implements Subscriber {
 
         // Text field for editing the goal title (pre-populated with current title)
         TextField titleField = new TextField(goal.getTitle());
+        titleField.setId("goalNameField");
 
         // ComboBox for selecting the difficulty (pre-populated with current difficulty)
         ComboBox<String> editDifficultyComboBox = new ComboBox<>();
         editDifficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
         editDifficultyComboBox.setValue(goal.getDifficulty());
+        editDifficultyComboBox.setId("goalDifficulty");
 
         // DatePickers for editing start and end dates
         DatePicker editStartDatePicker = new DatePicker(goal.getStartDate());
@@ -333,10 +348,12 @@ public class GoalView extends StackPane implements Subscriber {
             }
             editSectionButtons.getChildren().add(sectionButton);
             sectionButton.getStyleClass().add("cbutton");
+            sectionButton.setId(section.substring(0));
         }
 
         // Buttons to submit or cancel the edit
         Button submitEditButton = new Button("Save Changes");
+        submitEditButton.setId("saveGoalButton");
         Button cancelEditButton = new Button("Cancel");
 
         // Event handler for saving changes
