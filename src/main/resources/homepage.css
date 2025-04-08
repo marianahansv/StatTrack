@@ -21,6 +21,34 @@
     -fx-spacing: 10px;
 }
 
+.b-module {
+    -fx-border-color: #4A90E2;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-color: #E3F2FD;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-spacing: 10px;
+}
+
+.date-module {
+    -fx-border-color: #4A90E2;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+    -fx-background-color: #E3F2FD;
+    -fx-background-radius: 15px;
+    -fx-padding: 20px;
+}
+
+.next-deadline-module {
+    -fx-border-color: #f7ca02;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+    -fx-background-color: #f5f3eb;
+    -fx-background-radius: 15px;
+    -fx-padding: 20px;
+}
+
 .user-greeting {
     -fx-font-size: 22px;
     -fx-font-weight: bold;

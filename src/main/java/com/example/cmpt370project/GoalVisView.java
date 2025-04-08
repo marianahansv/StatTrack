@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -34,7 +35,11 @@ public class GoalVisView extends StackPane implements Subscriber {
 
         Label welcomeLabel = new Label("Let's Visualize Your Goal Progress:");
         welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
-        root.getChildren().add(welcomeLabel);
+
+        Label goalVisSubtitle = new Label("Use the chart-type dropdown select to visualize and compare your progress on each goal timeline for all of your goals.");
+        goalVisSubtitle.getStyleClass().add("bigger-paragraph-text");
+
+        root.getChildren().add(new VBox(25, welcomeLabel, goalVisSubtitle, new Region()));
 
         VBox goalVisualizations = new VBox();
         goalVisualizations.setAlignment(Pos.CENTER);
