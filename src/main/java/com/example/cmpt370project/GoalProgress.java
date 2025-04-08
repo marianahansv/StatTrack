@@ -150,6 +150,7 @@ public class GoalProgress extends VBox implements Subscriber {
         
         PieChart pieChart = new PieChart();
         pieChart.setTitle((isDue(goal)));
+        pieChart.setId((isDue(goal)));
         // Calculate total days, days left, and days completed.
         long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getEndDate());
         long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), goal.getEndDate());

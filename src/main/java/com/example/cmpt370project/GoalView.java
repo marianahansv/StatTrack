@@ -331,7 +331,9 @@ public class GoalView extends StackPane implements Subscriber {
 
         // DatePickers for editing start and end dates
         DatePicker editStartDatePicker = new DatePicker(goal.getStartDate());
+        editStartDatePicker.setId("startDate");
         DatePicker editEndDatePicker = new DatePicker(goal.getEndDate());
+        editEndDatePicker.setId("endDate");
 
         // Create section selection buttons using ToggleGroup
         HBox editSectionButtons = new HBox(10);
