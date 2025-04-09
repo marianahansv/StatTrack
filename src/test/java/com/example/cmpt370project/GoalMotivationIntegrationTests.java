@@ -68,7 +68,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
 
         clickOn(root.goalsButton);
 
-        String expectedString = "You have met your target for the DAY and are currently on track with your goal plan. Props to you!";
+        String expectedString = "You have met your target for the DAY and are currently on track with you goal plan. Props to you!";
         String outputString = root.goalsPage.progressFeedback.getText();
 
         // Verify correct motivational message is shown
@@ -190,7 +190,7 @@ public class GoalMotivationIntegrationTests extends AppIntegrationTest {
 
         clickOn(root.goalsButton);
 
-        expectedString = "You have met your target for the DAY and are currently on track with your goal plan. Props to you!";
+        expectedString = "You have met your target for the DAY and are currently on track with you goal plan. Props to you!";
         outputString = root.goalsPage.progressFeedback.getText();
 
         // Verify correct motivational message is shown
