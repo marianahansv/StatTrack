@@ -99,7 +99,7 @@ public class MaintainGoalPlan implements IGoalPlan {
 
     @Override
     public LocalDate getPlanStartDate() {
-        return startDate;
+        return LocalDate.now();
     }
 
     @Override

@@ -17,10 +17,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
+
+import javafx.scene.control.Label;
 
 /**
  * Represents the base UI of the application that holds different views and sets up the MVC structure.
