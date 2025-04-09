@@ -31,53 +31,53 @@ import java.util.concurrent.atomic.AtomicReference;
     /**
      * CheckBox to select if the Pie Chart should be selected or not.
      */
-    CheckBox checkboxPieChart;
+    private CheckBox checkboxPieChart;
 
     /**
      * CheckBox to select if the Line Chart should be selected or not.
      */
-    CheckBox checkboxLineChart;
+    private CheckBox checkboxLineChart;
 
     /**
      * CheckBox to select if the Scatter Chart should be selected or not.
      */
-    CheckBox checkboxScatterGraph;
+    private CheckBox checkboxScatterGraph;
 
     /**
      * Radio Button to select if the user wants descriptive statistics to be
      * created alongside the graphs.
      */
-    RadioButton includeDescriptiveStatistics;
+    private RadioButton includeDescriptiveStatistics;
 
     /**
      * Radio Button to select if the user doesn't want descriptive statistics to be
      * created alongside the graphs.
      */
-    RadioButton notincludeDescriptiveStatistics;
+    private RadioButton notincludeDescriptiveStatistics;
 
     /**
      * Radio Button to select to allow the user to choose the red color as main
      * for the graphs.
      */
-    RadioButton redcolorPreference;
+    private RadioButton redcolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the purple color as main
      * for the graphs.
      */
-    RadioButton purplecolorPreference;
+    private RadioButton purplecolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the blue color as main
      * for the graphs.
      */
-    RadioButton bluecolorPreference;
+    private RadioButton bluecolorPreference;
 
     /**
      * Radio Button to select to allow the user to choose the orange color as main
      * for the graphs.
      */
-    RadioButton orangecolorPreference;
+    private RadioButton orangecolorPreference;
 
     /**
      * Piechart for the visualization purposes.

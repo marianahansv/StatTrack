@@ -110,7 +110,7 @@ public class DashboardView extends BorderPane implements Subscriber {
     /**
      * The visualization of the front end UI and the generation of the graphs for the application.
      */
-    UserHIstoryProgressVisuals historicalChartProgress;
+    private UserHIstoryProgressVisuals historicalChartProgress;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
