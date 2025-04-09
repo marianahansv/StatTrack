@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-public class FinalProgressView extends StackPane{
+public class FinalProgressView extends StackPane {
     private GoalModel goalModel;
     private LineChart<String, Number> lineChart;
     private Label averageGoalsLabel;

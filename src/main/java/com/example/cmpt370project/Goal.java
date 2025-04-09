@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
  * This class provides methods for creating, reading, and updating goals.
  */
 public class Goal {
+
     private String title;
     private String section = "General"; //default section
     private String difficulty = "Medium"; //default difficulty
@@ -15,6 +16,7 @@ public class Goal {
     private LocalDate endDate = LocalDate.now();
     private boolean completed = false; // defaults to false as why would you make a goal if it is completed already
     private LocalDate completionDate = endDate;
+
     // Constructors to initialize a new goal
     /**
      * Constructs a new Goal object with the specified attributes.
@@ -27,6 +29,7 @@ public class Goal {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
     /**
      * Constructs a new Goal object with the specified attributes.
      * @param title The title of the goal
@@ -90,21 +93,25 @@ public class Goal {
     public boolean isCompleted() {
         return completed;
     }
+
     public void setCompleted(boolean completed) {
         this.completed = completed;
         updateCompletionDate(LocalDate.now());
-
     }
     public LocalDate getCompletionDate(){
         return this.completionDate;
     }
+
     //for testing purposes
     public void setCompletionDate(LocalDate completionDate){
         this.completionDate = completionDate;
     }
+
     private void updateCompletionDate(LocalDate now){
         this.completionDate = now;
     }
+
+    // String representation #1: Simple
 //    /**
 //     * Returns a string representation of the Goal
 //     */
@@ -119,6 +126,7 @@ public class Goal {
 //                '}';
 //    }
 
+    // String representation #2: Default
     /**
      * Returns a string representation of the Goal
      */
@@ -132,7 +140,8 @@ public class Goal {
                 "Completed: " + isCompleted();
     }
 
-    // Would love to use this string representation, but means we need to fix the sections UI.
+    // String representation #3: Spaced-Out
+    // Need to update sections in the UI to use.
 //    /**
 //     * Returns a string representation of the Goal
 //     */

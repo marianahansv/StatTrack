@@ -21,14 +21,14 @@ public class GoalController {
     public void filterGoals(String difficulty) {
         goalModel.setFilteredDifficulty(difficulty); // updates the model
     }
+
     /**
      * Compeletes goal and updates the Suggestions Model
      */
     public void completeGoal(Goal goal) {
         goalModel.completeGoal(goal);
-        //suggestionsModel.onGoalCompletedUpdate(goal);
-        //System.out.println(55555);
     }
+
     /**
      * Deletes a goal from the model by its title. This removes the goal from:
      * @param title The title of the goal to be deleted
