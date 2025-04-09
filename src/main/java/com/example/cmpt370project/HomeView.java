@@ -225,7 +225,7 @@ public class HomeView extends StackPane implements Subscriber {
         submitGoalButton.getStyleClass().add("cbutton");
         submitGoalButton.setId("saveGoalButton");
         giveMeSuggestionsButton = new Button("Give Me Suggestions");
-        giveMeSuggestionsButton.getStyleClass().add("caaaaaaaaaaaaaaaaaaaaabutton");
+        giveMeSuggestionsButton.getStyleClass().add("cbutton");
 
         titleInput = new TextField();
         titleInput.setId("goalTitleField");
