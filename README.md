@@ -14,7 +14,7 @@ To run StatTrack, you need:
 2.  JavaFX SDK 17 or later:
     * StatTrack relies on JavaFX for its graphical user interface.
     * Download the JavaFX SDK from the official OpenJFX website:
-        * OpenJFX: [https://openjfx.io/downloads/](https://openjfx.io/)
+        * OpenJFX: [https://openjfx.io/downloads/](https://openjfx.io/downloads/)
     * Extract the SDK to a location on your computer (e.g., C:\javafx-sdk-17.0.14).
 
 Running the Application using the Batch File (Recommended):
