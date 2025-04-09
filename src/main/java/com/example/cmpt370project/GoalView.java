@@ -276,7 +276,6 @@ public class GoalView extends StackPane implements Subscriber {
             
             Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
 
-            selectedGoal.setEndDate(selectedGoal.getEndDate().plusDays(1));
             goalModel.updateGoal(selectedGoal.getTitle(), selectedGoal);
             goalModel.notifySubscribers();
             drawEditGoalView(selectedGoal);
