@@ -224,7 +224,6 @@ public class GoalView extends StackPane implements Subscriber {
         completeGoalButton = new Button("Complete Goal");
         completeGoalButton.getStyleClass().add("cbutton");
         completeGoalButton.getStyleClass().add("add-goal-button");
-        completeGoalButton.setId("completeGoalButton");
         editGoalButton = new Button("Edit Goal");
         editGoalButton.getStyleClass().add("cbutton");
         editGoalButton.getStyleClass().add("edit-button");
@@ -276,6 +275,8 @@ public class GoalView extends StackPane implements Subscriber {
         editGoalButton.setOnAction(e -> {
             
             Goal selectedGoal = goalListView.getSelectionModel().getSelectedItem();
+
+            selectedGoal.setEndDate(selectedGoal.getEndDate().plusDays(1));
             goalModel.updateGoal(selectedGoal.getTitle(), selectedGoal);
             goalModel.notifySubscribers();
             drawEditGoalView(selectedGoal);
@@ -357,7 +358,6 @@ public class GoalView extends StackPane implements Subscriber {
         Button submitEditButton = new Button("Save Changes");
         submitEditButton.setId("saveGoalButton");
         Button cancelEditButton = new Button("Cancel");
-        cancelEditButton.setId("cancelButton");
 
         // Event handler for saving changes
         submitEditButton.setOnAction(e -> {
