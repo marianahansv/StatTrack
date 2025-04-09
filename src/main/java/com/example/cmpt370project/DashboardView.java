@@ -30,13 +30,6 @@ import javafx.scene.control.Label;
  */
 public class DashboardView extends BorderPane implements Subscriber {
 
-    private GoalProgress goalChartView;
-    private GoalChartController chartController;
-
-    /**
-     * Controller for the suggestions methods
-     * **/
-    private SuggestionsController suggestionsController;
     // ************************* APPLICATION MODELS *************************
     /**
      * The model that holds the goal data of the application.
@@ -61,6 +54,11 @@ public class DashboardView extends BorderPane implements Subscriber {
      */
     UserHistoryDataModel userHistoryDataModel;
 
+    /**
+     * Controller for the suggestions methods
+     * **/
+    private SuggestionsController suggestionsController;
+
     // ************************* APPLICATION CONTROLLERS *************************
 
     /**
@@ -77,8 +75,8 @@ public class DashboardView extends BorderPane implements Subscriber {
      * The historicalChartController of the application (goes with the historical goal page).
      */
     private UserProgressHistoryController historicalChartController;
-    // Consider removing this later since it is not really doing anything now
-    //private GoalChartController chartController;
+
+    private GoalChartController chartController;
 
     // ************************* APPLICATION VIEWS *************************
 
@@ -102,9 +100,6 @@ public class DashboardView extends BorderPane implements Subscriber {
      */
     GoalVisView goalVisPage;
 
-    //private GoalProgress goalChartView;
-
-
     /**
      *  The user progress historical visualization page of the application
      */
@@ -114,6 +109,8 @@ public class DashboardView extends BorderPane implements Subscriber {
      * The visualization of the front end UI and the generation of the graphs for the application.
      */
     private UserHIstoryProgressVisuals historicalChartProgress;
+
+    private GoalProgress goalChartView;
 
     // ************************* UI ELEMENTS OF BASIC DASHBOARD VIEW *************************
 
@@ -150,6 +147,7 @@ public class DashboardView extends BorderPane implements Subscriber {
     private ScrollPane scrollPane;
 
     // ************************* UI Elements for Dashboard Sidebar Widgets  *************************
+
     private Label totalGoals;
     private Label dailyCompleted;
     private Label weeklyCompleted;
@@ -165,7 +163,6 @@ public class DashboardView extends BorderPane implements Subscriber {
         // ********* 1. Create all the MVC components *********
 
         // MODElS
-
         goalPlanModel = new GoalPlanModel();
         userHistoryDataModel = new UserHistoryDataModel();
         historicalChartModel = new UserProgressHIstoryVisModel(userHistoryDataModel);
@@ -185,8 +182,6 @@ public class DashboardView extends BorderPane implements Subscriber {
         this.goalPlanPage = new GoalPlanView();
         this.goalVisPage = new GoalVisView(goalModel);
         this.historicalChartView = new UserProgressHistoryVisView(historicalChartController);
-
-        //goalChartView = new GoalProgress(goalModel);
 
         // ********* 2. Add subscribers to models *********
 
@@ -233,13 +228,12 @@ public class DashboardView extends BorderPane implements Subscriber {
         goalsPage.setGoalPlanModel(goalPlanModel);
         goalsPage.setUserHistoryDataModel(userHistoryDataModel);
 
-
         homePage.setGoalModel(goalModel);
         homePage.setUserHistoryDataModel(userHistoryDataModel);
         homePage.setSuggestionsModel(suggestionsModel);
 
-
         goalVisPage.setGoalPlanModel(goalPlanModel);
+
         historicalChartController.setGoalPlanModel(historicalChartModel);
 
         // ************************* END MVC CONFIGURATION *************************
@@ -268,7 +262,6 @@ public class DashboardView extends BorderPane implements Subscriber {
 
         // If first time running the app, get the users name
         // Do this here in this class, because not specific to any view
-
         Platform.runLater(() -> {
             if (userHistoryDataModel.isFirstOpen()) {
                 // Create a TextInputDialog
@@ -298,6 +291,8 @@ public class DashboardView extends BorderPane implements Subscriber {
 
         // Set username to test on the HomeView page
         userHistoryDataModel.setUserName("HasAPlanFran");*/
+
+
         historicalChartButton.setOnAction(e -> scrollPane.setContent(historicalChartView));
     }
 
@@ -347,6 +342,7 @@ public class DashboardView extends BorderPane implements Subscriber {
         historicalChartButton.getStyleClass().add("cbutton");
 
         // Add current date display
+
         Label dateLabel = new Label();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy");
@@ -377,6 +373,7 @@ public class DashboardView extends BorderPane implements Subscriber {
         dateModule.getChildren().addAll(dateIntro, dateLabel);
 
         // Add goal summary data
+
         VBox goalQuickSummaryModule = new VBox();
         Label goalQuickSummaryTitle = new Label("\uD83C\uDFAF Goal Quick Summary:");
         HBox totalGoalsRow = new HBox();
@@ -411,6 +408,7 @@ public class DashboardView extends BorderPane implements Subscriber {
         goalQuickSummaryModule.getChildren().addAll(goalQuickSummaryTitle, dailyCompletedRow, weeklyCompletedRow, totalGoalsRow);
 
         // Add nearest deadline module
+
         VBox nearestDeadlineModule = new VBox();
         Label nearestDeadlineTitle = new Label("⏰ Your next goal deadline is:");
 
