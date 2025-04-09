@@ -18,9 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
-import javafx.collections.ObservableList;
 
 /**
  * The GoalModel holds all the Goals data in the application. It handles the CRUD operations, and
@@ -63,14 +60,13 @@ public class GoalModel {
         notifySubscribers();
     }
 
-    /*
+    /**
      * Sets the User History Data Model
-     * @param userHistoryDataModel the data model for a the system to track
+     * @param userHistoryDataModel the data model for the system to track
      */
     public void setUserHistoryDataModel(UserHistoryDataModel userHistoryDataModel) {
         this.userHistoryDataModel = userHistoryDataModel;
     }
-    
 
     /**
      * Create a new goal and add it to the dictionary.
@@ -101,6 +97,7 @@ public class GoalModel {
         save_goals_to_file();
         notifySubscribers();
     }
+
     /**
      * Empties the goal dictionary.
      */
@@ -146,6 +143,7 @@ public class GoalModel {
         }
         return false;
     }
+
     /**
      * @return list of all goals. (I'm thinking of future sorting/filtering operations for which we'll need a list)
      */
@@ -161,7 +159,8 @@ public class GoalModel {
     public int getGoalCount() {
         return goals.size();
     }
-      /**
+
+    /**
      * Complete a goal;
      * @param goal The goal to complete.
      */
@@ -173,6 +172,7 @@ public class GoalModel {
         userHistoryDataModel.notifySubscribers();
         notifySubscribers();
     }
+
     /**
      * Checks if file exists before reading or writing to it.
      * If it doesn't, it creates an empty file
@@ -193,6 +193,7 @@ public class GoalModel {
             System.err.println("Error: " + e.getMessage());
         }
     }
+
     /**
      * Save goals to file (in JSON format).
      */
@@ -204,6 +205,7 @@ public class GoalModel {
             System.err.println("Error saving goals to file: " + e.getMessage());
         }
     }
+
     /**
      * Load goals from file (in JSON format).
      */
@@ -324,7 +326,7 @@ public class GoalModel {
         }
     }
 
-    // Unit Testing :)
+    // Unit Testing :) - uncomment code below to test
     public static void main(String[] args) {
 
        /*  UserHistoryDataModel userHistoryDataModel;
@@ -364,8 +366,5 @@ public class GoalModel {
             System.out.println(goal.toString());
         }*/
     }
-
-
-
 }
 

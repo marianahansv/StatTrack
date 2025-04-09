@@ -19,7 +19,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 
-/*
+/**
  * View class for visualizing the progress of goals.
  * This view displays each goal's progress using separate charts.
  */
@@ -29,6 +29,7 @@ public class GoalProgress extends VBox implements Subscriber {
         Bar,
         Line
     }
+
  /**
      * The goal model that provides goal data.
      */
@@ -73,8 +74,6 @@ public class GoalProgress extends VBox implements Subscriber {
         updateChart();
     }
 
-    
-
     /**
      * Sets up the chart type selector allowing the user to choose the visualization type.
      */
@@ -89,7 +88,6 @@ public class GoalProgress extends VBox implements Subscriber {
         chartTypeSelector.setOnAction(e -> updateChart());
         getChildren().add(chartTypeSelector);
     }
-
 
     /**
      * Sets up the charts with the chosen visualization type.
@@ -108,7 +106,6 @@ public class GoalProgress extends VBox implements Subscriber {
         lineChart = new LineChart<>(xAxisLine, yAxisLine);
         lineChart.setTitle("Time Remaining");
     }
-
 
     /**
      * Updates the view by removing existing charts and adding new charts for each goal 
@@ -139,7 +136,6 @@ public class GoalProgress extends VBox implements Subscriber {
             getChildren().add(pieChart);
         }
     }
-
 
     /**
      * Creates a PieChart for the specified goal.
@@ -263,8 +259,6 @@ private void updateLineChart() {
     xAxis.setCategories(categories);
     yAxis.setLabel("Days Left");
     
-    
-    
     Map<String, Integer> startCount = new HashMap<>();
     Map<String, Integer> endCount = new HashMap<>();
     // Loop through each goal in the model
@@ -304,26 +298,28 @@ private void updateLineChart() {
         lineChart.getData().addAll(list);
     }
    
-    /*
+    /**
      * Indicates if a goal is past due or due today
      *  @param goal goal to be checked when its duedate is by comparision of today
      */
     static String isDue(Goal goal) {
-                String title = null;
-                LocalDate today = LocalDate.now();
-                
-                if (goal.getEndDate().isBefore(today)) {
-                    title = (goal.getTitle()+ " (Past Due!)");
-                } else if (goal.getEndDate().isEqual(today)) {
-                    title = (goal.getTitle()+ " (Due Today!)");
-                } else {
-                    title = (goal.getTitle());
-                }
-                return title;
-                }
-        
-        
-        public static void main(String[] args) {
+        String title = null;
+        LocalDate today = LocalDate.now();
+
+        if (goal.getEndDate().isBefore(today)) {
+            title = (goal.getTitle()+ " (Past Due!)");
+        } else if (goal.getEndDate().isEqual(today)) {
+            title = (goal.getTitle()+ " (Due Today!)");
+        } else {
+            title = (goal.getTitle());
+        }
+        return title;
+    }
+
+    /**
+     * Unit testing.
+     */
+    public static void main(String[] args) {
          UserHistoryDataModel history = new UserHistoryDataModel() {
             @Override
             public void completeGoal(LocalDate date) { }
@@ -331,53 +327,49 @@ private void updateLineChart() {
             public void saveDataToFile() { }
             @Override
             public void notifySubscribers() { }
-            
         };
     
         
         int passed = 0;
         int failed = 0;
+
         
-        
-        
-            // Test #1: Due today works
+        // Test #1: Due today works
         Goal g1 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(1), LocalDate.now());
         g1.setTitle(isDue(g1));
         
-    if ("Learn how to cook soup (Due Today!)".equals(g1.getTitle())) {
-        passed++;
-        System.out.println("Test 1 Passed");
-    } else {
-        failed++;
-        System.out.println("Test 1 Failed");
-    }
+        if ("Learn how to cook soup (Due Today!)".equals(g1.getTitle())) {
+            passed++;
+            System.out.println("Test 1 Passed");
+        } else {
+            failed++;
+            System.out.println("Test 1 Failed");
+        }
 
-    // Test #2: Past due worjs
+        // Test #2: Past due works
+        Goal g2 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(2), LocalDate.now().minusDays(1));
+        g2.setTitle(isDue(g2));
 
-    Goal g2 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(2), LocalDate.now().minusDays(1));
-    g2.setTitle(isDue(g2));
-        
-    if ("Learn how to cook soup (Past Due!)".equals(g2.getTitle())) {
-        passed++;
-        System.out.println("Test 2 Passed");
-    } else {
-        failed++;
-        System.out.println("Test 2 Failed");
-    }
+        if ("Learn how to cook soup (Past Due!)".equals(g2.getTitle())) {
+            passed++;
+            System.out.println("Test 2 Passed");
+        } else {
+            failed++;
+            System.out.println("Test 2 Failed");
+        }
 
-    // Test #3: Due Date within bounds works
+        // Test #3: Due Date within bounds works
+        Goal g3 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(2), LocalDate.now().minusDays(-2));
+        g3.setTitle(isDue(g3));
 
-    Goal g3 = new Goal("Learn how to cook soup", LocalDate.now().minusDays(2), LocalDate.now().minusDays(-2));
-    g3.setTitle(isDue(g3));
-        
-    if ("Learn how to cook soup".equals(g3.getTitle())) {
-        passed++;
-        System.out.println("Test 3 Passed");
-    } else {
-        failed++;
-        System.out.println("Test 3 Failed");
-    }
+        if ("Learn how to cook soup".equals(g3.getTitle())) {
+            passed++;
+            System.out.println("Test 3 Passed");
+        } else {
+            failed++;
+            System.out.println("Test 3 Failed");
+        }
 
-    System.out.println("Passed: "+passed+"\n"+"Failed: "+failed);
+        System.out.println("Passed: "+passed+"\n"+"Failed: "+failed);
     }
 }

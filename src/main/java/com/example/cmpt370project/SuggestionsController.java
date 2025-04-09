@@ -1,22 +1,13 @@
 package com.example.cmpt370project;
 
-import com.google.gson.Gson;
-import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.*;
 
-public class SuggestionsController{
+public class SuggestionsController {
     private GoalModel goalModel;
     private SuggestionsModel suggestionsModel;
     private HomeView homeView;
+
     /**
      * Initialize the Suggestion Controller
      */
@@ -26,7 +17,6 @@ public class SuggestionsController{
 
         updateSuggestionsModel();
         suggestionsModel.initializeSuggestionsModel(goalModel.getGoals());
-
     }
 
     private void updateSuggestionsModel(){
@@ -43,7 +33,6 @@ public class SuggestionsController{
         suggestions.add(suggestionsModel.checkUnrealisticDeadline(newGoal));
         return suggestions;
     }
-
 
     public void validateInput(Goal newGoal) throws InputMismatchException {
         if (newGoal.getTitle().isBlank()){

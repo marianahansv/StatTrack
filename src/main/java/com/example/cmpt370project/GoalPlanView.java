@@ -1,14 +1,11 @@
 package com.example.cmpt370project;
 
-import javafx.animation.PauseTransition;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Callback;
-import javafx.util.Duration;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -60,6 +57,7 @@ public class GoalPlanView extends StackPane implements Subscriber {
     DatePicker endDatePicker;
 
     Label errorLabel;
+
     /**
      * Create a new goal plan page.
      */
@@ -92,7 +90,6 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
         // This will get called later in the chain when model adds subscribers, because calling this here causes null issue
         // drawView();
-
 
         // ********* Wire up page change events non-controller based events *********
         goCreateEditGoalPlanButton.setOnAction(e-> { changePage(GoalPlanViewPage.CREATE_EDIT); });
@@ -268,9 +265,6 @@ public class GoalPlanView extends StackPane implements Subscriber {
                 goalSummaryHeaderModule.setAlignment(Pos.CENTER_LEFT);
                 Label currentPlanTitle = new Label();
                 currentPlanTitle.getStyleClass().add("bigger-paragraph-text");
-//                currentPlanTitle.setMinWidth(300);
-//                currentPlanTitle.setMaxWidth(500);
-//                currentPlanTitle.setWrapText(true);
 
                 // Get the completed goal values whether it is the week/day
                 String planTimelineString = "";
@@ -310,7 +304,6 @@ public class GoalPlanView extends StackPane implements Subscriber {
 
                 VBox goalProgressModule = new VBox(20);
                 goalProgressModule.setAlignment(Pos.CENTER_LEFT);
-//                goalProgressModule.setMaxWidth(670);
                 goalProgressModule.setStyle("-fx-background-color: lightgray; -fx-background-radius: 5;");
                 goalProgressModule.setPadding(new Insets(20));
                 goalProgressModule.getStyleClass().add("module");

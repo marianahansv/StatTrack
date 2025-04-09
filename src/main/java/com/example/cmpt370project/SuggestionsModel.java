@@ -21,14 +21,14 @@ public class SuggestionsModel {
     private static final double HIGH_INCOMPLETE_GOAL_RATIO = 0.5;
     private static final int HIGH_INCOMPLETE_GOAL_COUNT = 5;
 
-    public SuggestionsModel() {
-    }
+    public SuggestionsModel() {}
     public void initializeSuggestionsModel(List<Goal> goals) {
         this.goals = goals;
     }
     public void updateGoalList(List<Goal> goals) {
         this.goals = goals;
     }
+
     /**
      * Generates a task breakdown suggestion based on historical goal completion data.
      */

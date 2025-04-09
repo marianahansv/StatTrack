@@ -214,7 +214,7 @@ public class IncreaseGoalPlan implements IGoalPlan {
      */
     public static void main(String[] args) {
 
-        // Note: Future plan of dev is to update this test script to it won't 'expire' and become invalid as time moves on
+        // Note: Update this test script before running with up-to-date times/dates
 
         // Test 1: setUpIncreaseLogic() with weekly plan (called in constructor)
         IncreaseGoalPlan testGoalPlan = new IncreaseGoalPlan(3, 6, Timeline.WEEKLY, LocalDate.of(2025, 04, 3));

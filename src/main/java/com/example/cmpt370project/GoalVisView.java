@@ -10,7 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
- * View
+ * View for visualizing goals.
  */
 public class GoalVisView extends StackPane implements Subscriber {
 
@@ -67,7 +67,7 @@ public class GoalVisView extends StackPane implements Subscriber {
     }
 
     /**
-     * Model is updated
+     * Model is updated.
      */
     @Override
     public void modelUpdated() {

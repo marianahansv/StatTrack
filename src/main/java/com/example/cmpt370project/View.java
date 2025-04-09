@@ -12,12 +12,8 @@ import javafx.scene.layout.VBox;
 public class View extends StackPane implements Subscriber {
     private GoalModel gm;
     private Button addGoalButton;
-
     private Button removeGoalButton;
-
     private Label displayGoalsLabel;
-
-    // When importing classes, MAKE SURE IT IS FROM FX, NOT JAVA AWT LIBRARY!
 
     /**
      * Initially constructs the UI (prior to any model changes).
@@ -44,7 +40,6 @@ public class View extends StackPane implements Subscriber {
         this.gm = goalModel;
         update();
     }
-
 
     /**
      * What happens when the model is updated? This view updates itself.

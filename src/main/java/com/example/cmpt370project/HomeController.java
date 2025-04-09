@@ -17,9 +17,6 @@ public class HomeController {
     private GoalModel gm;
     private UserHistoryDataModel userHistoryDataModel;
 
-    // Could consider adding states for a state machine if that comes up later, depending on what our application requires...
-    // (i.e. if there are different interaction states for a single view...)
-
     public HomeController() {}
 
     public void setModel(GoalModel goalModel, UserHistoryDataModel userHistoryDataModel) {

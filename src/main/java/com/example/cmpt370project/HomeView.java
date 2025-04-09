@@ -150,7 +150,6 @@ public class HomeView extends StackPane implements Subscriber {
     private final Label goalDataOverviewLabel;
     private HBox goalDataOverviewModule;
 
-
     /**
      * The container that displays goals for the selected section.
      */
@@ -168,7 +167,6 @@ public class HomeView extends StackPane implements Subscriber {
         addGoalButton = new Button("Add Goal");
         addGoalButton.setId("addGoalButton");
         addGoalButton.getStyleClass().add("cbutton");
-//        addGoalButton.getStyleClass().add("add-goal-button");
 
         welcomeLabel = new Label("Welcome to StatTrack!");
         welcomeLabel.getStyleClass().add("welcome-label");
@@ -189,11 +187,9 @@ public class HomeView extends StackPane implements Subscriber {
         clearGoalsButton.getStyleClass().add("critical-button");
         clearGoalsButton.setId("clearGoalsButton");
 
-//        clearGoalsButton.getStyleClass().add("clear-goals-button");
 
         changeNameButton = new Button("Change Name");
         changeNameButton.getStyleClass().add("cbutton");
-//        changeNameButton.getStyleClass().add("change-name-button");
 
         // Motivational Message module
         motivationModule = new VBox(20);
@@ -275,7 +271,6 @@ public class HomeView extends StackPane implements Subscriber {
             ToggleButton sectionButton = new ToggleButton(section);
             sectionButton.setToggleGroup(sectionToggleGroup);
             sectionButton.getStyleClass().add("cbutton");
-//            sectionButton.getStyleClass().add("section-button");
             sectionButton.setOnAction(e -> {
                 currentSelectedSection = section; // update the currently selected section
                 updateGoalsDisplay(section);
@@ -292,7 +287,6 @@ public class HomeView extends StackPane implements Subscriber {
         // "Create New Section" feature
         createSectionButton = new Button("Create New Section");
         createSectionButton.getStyleClass().add("cbutton");
-//        createSectionButton.getStyleClass().add("create-section-button");
 
         createSectionButton.setOnAction(e -> {
             TextInputDialog dialog = new TextInputDialog();
@@ -331,7 +325,6 @@ public class HomeView extends StackPane implements Subscriber {
         deleteSectionButton = new Button("Delete Section");
         deleteSectionButton.getStyleClass().add("cbutton");
         deleteSectionButton.getStyleClass().add("critical-button");
-//        deleteSectionButton.getStyleClass().add("delete-section-button");
 
         deleteSectionButton.setOnAction(e -> {
             // ChoiceDialog to let the user select a section to delete
@@ -776,13 +769,10 @@ public class HomeView extends StackPane implements Subscriber {
 
         suggestionsBox = new VBox();
         suggestionsBox.setSpacing(4);
-        //suggestionsBox.setPadding(new Insets(10));
-//        suggestionsBox.setStyle("-fx-border-color: grey; -fx-border-width: 2px; -fx-background-color: #f9f9f9;");
         suggestionsBox.getStyleClass().add("module");
         suggestionsBox.getChildren().addAll(suggestionsContentLabel);
 
         // Spacer (to separate Form from suggestions)
-
         //Region spacer1 = new Region();
 
         root.getChildren().addAll(

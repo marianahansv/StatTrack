@@ -28,8 +28,6 @@ import javafx.scene.layout.VBox;
  */
 public class GoalView extends StackPane implements Subscriber {
 
-    // ********* The models that this view requires data from are to be added here! *********
-
     /**
      * The goal model that this view gets goal data from.
      */
@@ -65,8 +63,6 @@ public class GoalView extends StackPane implements Subscriber {
     Button completeGoalButton;
     Button editGoalButton;
     Button deleteGoalButton;
-    
-    
 
     /**
      * Create a new goal view page.
@@ -108,27 +104,26 @@ public class GoalView extends StackPane implements Subscriber {
         for (Goal goal : goalModel.getGoals()) {
             goalListView.getItems().add(goal);
         }
-    
-        // Yo Cell Factories are poggers
-    goalListView.setCellFactory(lv -> new ListCell<Goal>() {  
-    protected void updateItem(Goal goal, boolean empty) {
-        super.updateItem(goal, empty);
-        if (empty || goal == null) {
-            setText(null);
-            setStyle("");
-        } else {
-            setText(goal.toString());
-            if (goal.isCompleted()) {
-                // Change the text color to green if the goal is complete
-                setStyle("-fx-text-fill: green;");
-            } else if (!goal.isCompleted() && goal.getEndDate().isBefore(LocalDate.now())) {
-                // Change the text color to red if the goal is incomplete and past due
-                setStyle("-fx-text-fill: red;");
+
+        goalListView.setCellFactory(lv -> new ListCell<Goal>() {
+        protected void updateItem(Goal goal, boolean empty) {
+            super.updateItem(goal, empty);
+            if (empty || goal == null) {
+                setText(null);
+                setStyle("");
             } else {
-                // Otherwise, use the default text color
-                setStyle("-fx-text-fill: black;");
+                setText(goal.toString());
+                if (goal.isCompleted()) {
+                    // Change the text color to green if the goal is complete
+                    setStyle("-fx-text-fill: green;");
+                } else if (!goal.isCompleted() && goal.getEndDate().isBefore(LocalDate.now())) {
+                    // Change the text color to red if the goal is incomplete and past due
+                    setStyle("-fx-text-fill: red;");
+                } else {
+                    // Otherwise, use the default text color
+                    setStyle("-fx-text-fill: black;");
+                }
             }
-        }
         }
         });
 
@@ -305,7 +300,8 @@ public class GoalView extends StackPane implements Subscriber {
         root.getChildren().addAll(welcomeLabel, dashboardControls);
         goalModel.addSubscriber(this);
     }
-      /**
+
+    /**
      * Draws the edit view for a selected goal.
      * Provides form fields to modify the goal details and save or cancel changes.
      * @param goal the goal to be edited.
@@ -428,11 +424,9 @@ public class GoalView extends StackPane implements Subscriber {
         cancelEditButton.getStyleClass().add("cbutton");
         cancelEditButton.getStyleClass().add("cancel-button");
 
-
         // Display the edit form in the view
         this.getChildren().add(editRoot);
     }
-
 
     /**
      * Set the goal model of this view.
@@ -503,8 +497,6 @@ public class GoalView extends StackPane implements Subscriber {
         goalListView.getItems().addAll(filteredGoals);
     }
 
-
-
     /**
      * Set up interaction with a controller for this view.
      * @param controller the controller that will handle changing model data for user interactions on this page.
@@ -520,15 +512,4 @@ public class GoalView extends StackPane implements Subscriber {
         drawView();
     }
 
-    /**
-     * Set up interaction with a controller for this view.
-     * @param c the controller that will handle changing model data for user interactions on this page.
-     */
-    public void setupEvents(HomeController c) {
-
-        // See HomeView class for what to put here.
-        // i.e. when ready to change data in interface based on user interactions, make a new controller class
-        // and pass the button handler methods (and other interactive ui elements) of the buttons in this view to the controller
-
-    }
 }
