@@ -1,5 +1,7 @@
 StatTrack Application - Installation Instructions
 
+Learn more about our application: [StatTrack](https://docs.google.com/presentation/d/1_5335zRKoellHaaXzaR0L1oHeEtY_y1N24gYhsb4A8A/edit?usp=sharing)
+
 Introduction:
 This document provides instructions on how to run the StatTrack application.
 
